@@ -7,8 +7,9 @@
 	"scripts": {
 		"dev": "bun run --cwd packages/pwa dev",
 		"build": "bun run --cwd packages/pwa build",
-		"test": "bun run --cwd packages/pwa test",
-		"test:core": "cd packages/core && bun test",
+		"test:all": "bun run test:core && bun run test:pwa",
+		"test:core": "cd packages/core && bun test --coverage",
+		"test:pwa": "bun run --cwd packages/pwa test",
 		"link:cli": "cd packages/core && bun link",
 		"lint": "bun run lint:ts && bun run lint:md",
 		"lint:fix": "bun run lint:ts:fix && bun run lint:md:fix",

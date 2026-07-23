@@ -1,23 +1,4 @@
-# cli Specification
-
-## Purpose
-
-TBD - defines the `dhplan` command-line interface, including its entry
-point and subcommands.
-
-## Requirements
-
-### Requirement: Commander-based CLI entry point
-
-The `dhplan` CLI (`packages/core/cli/dhplan.ts`) SHALL be built on
-Commander.js. `schema` and `validate` SHALL be the only registered
-subcommands in this change.
-
-#### Scenario: Running the CLI with no arguments
-
-- **WHEN** `dhplan` is invoked with no subcommand
-- **THEN** the system SHALL print usage/help listing the available
-  subcommands (`schema`, `validate`) and exit non-zero
+## MODIFIED Requirements
 
 ### Requirement: `schema` command prints JSON Schema
 

@@ -13,6 +13,7 @@
 		"angular-expressions": "1.5.5",
 		"commander": "15.0.0",
 		"docxtemplater": "3.69.2",
+		"lodash": "4.17.23",
 		"pizzip": "3.2.0",
 		"zod": "4.4.3"
 	},

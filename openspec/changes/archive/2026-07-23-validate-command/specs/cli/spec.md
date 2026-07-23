@@ -1,11 +1,4 @@
-# cli Specification
-
-## Purpose
-
-TBD - defines the `dhplan` command-line interface, including its entry
-point and subcommands.
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: Commander-based CLI entry point
 
@@ -19,37 +12,14 @@ subcommands in this change.
 - **THEN** the system SHALL print usage/help listing the available
   subcommands (`schema`, `validate`) and exit non-zero
 
-### Requirement: `schema` command prints JSON Schema
-
-The `dhplan schema <type>` command SHALL accept exactly one positional
-argument, either `data` or `template`, and print the corresponding
-schema's JSON Schema document to stdout.
-
-#### Scenario: Requesting the data schema
-
-- **WHEN** a user runs `dhplan schema data`
-- **THEN** the system SHALL print the `data-schema` capability's JSON
-  Schema document to stdout
-
-#### Scenario: Requesting the template schema
-
-- **WHEN** a user runs `dhplan schema template`
-- **THEN** the system SHALL print the `template-schema` capability's JSON
-  Schema document to stdout
-
-#### Scenario: Requesting an invalid schema type via `schema`
-
-- **WHEN** a user runs `dhplan schema <anything other than data or template>`
-- **THEN** the system SHALL print an error identifying the valid schema
-  types (`data`, `template`) and exit non-zero without printing a JSON
-  Schema document
+## ADDED Requirements
 
 ### Requirement: `validate` command validates a file against a schema
 
-The `dhplan validate <type> <file>` command SHALL accept exactly two
-positional arguments: `type`, either `data` or `template`, and `file`, a
-path to the file to validate. It SHALL validate `file` against the schema
-named by `type` and report the result.
+The `dhplan validate <schema_type> <file>` command SHALL accept exactly two
+positional arguments: `schema_type`, either `data` or `template`, and
+`file`, a path to the file to validate. It SHALL validate `file` against
+the schema named by `schema_type` and report the result.
 
 #### Scenario: Validating a valid data file
 
@@ -79,7 +49,7 @@ named by `type` and report the result.
 - **THEN** the system SHALL print every discovered validation issue to
   stderr and exit non-zero, without printing a success message
 
-#### Scenario: Requesting an invalid schema type via `validate`
+#### Scenario: Requesting an invalid schema type
 
 - **WHEN** a user runs `dhplan validate <anything other than data or
   template> <file>`

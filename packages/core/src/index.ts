@@ -1,2 +1,3 @@
 export { renderCarePlan } from "./renderCarePlan";
-export { CarePlan } from "./schema";
+export { DataSchema } from "./schema/data";
+export { TemplateSchema } from "./schema/template";

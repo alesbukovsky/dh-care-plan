@@ -27,8 +27,9 @@ export default function App() {
 			anchor.download = `${baseName}-filled.docx`;
 			anchor.click();
 			URL.revokeObjectURL(url);
-		} catch (error: any) {
-			setErrors(error.message.split("\n"));
+		} catch (error) {
+			const message = error instanceof Error ? error.message : String(error);
+			setErrors(message.split("\n"));
 		}
 	}
 

@@ -4,13 +4,14 @@
 	"module": "src/index.ts",
 	"type": "module",
 	"bin": {
-		"dhplan": "./cli/convert.ts"
+		"dhplan": "./cli/dhplan.ts"
 	},
 	"exports": {
 		".": "./src/index.ts"
 	},
 	"dependencies": {
 		"angular-expressions": "1.5.5",
+		"commander": "15.0.0",
 		"docxtemplater": "3.69.2",
 		"pizzip": "3.2.0",
 		"zod": "4.4.3"

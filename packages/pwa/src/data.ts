@@ -1,0 +1,21 @@
+export const staticData = {
+	sections: [
+		{
+			label: "Section 1",
+			name: "First section",
+			goals: [
+				{ label: "Goal 1a", name: "First goal of first section" },
+				{ label: "Goal 1b", name: "Second goal of first section" },
+				{ label: "Goal 1c", name: "Third goal of first section" },
+			],
+		},
+		{
+			label: "Section 2",
+			name: "Second section",
+			goals: [
+				{ label: "Goal 2a", name: "First goal of second section" },
+				{ label: "Goal 2b", name: "Second goal of second section" },
+			],
+		},
+	],
+};

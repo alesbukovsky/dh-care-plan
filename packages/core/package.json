@@ -1,0 +1,21 @@
+{
+	"name": "dh-care-plan",
+	"version": "0.1.0",
+	"module": "src/index.ts",
+	"type": "module",
+	"bin": {
+		"dhplan": "./cli/convert.ts"
+	},
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"dependencies": {
+		"angular-expressions": "1.5.5",
+		"docxtemplater": "3.69.2",
+		"pizzip": "3.2.0",
+		"zod": "4.4.3"
+	},
+	"peerDependencies": {
+		"typescript": "^5"
+	}
+}

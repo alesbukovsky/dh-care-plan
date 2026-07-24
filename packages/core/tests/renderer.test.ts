@@ -99,7 +99,12 @@ describe("buildTemplateData", () => {
 	test("gives an unmet need without goals an empty goals array", () => {
 		const data = buildTemplateData({
 			needs: [
-				{ name: "brushing", isMet: false, relatedTo: "gum disease", evidencedBy: "x-ray" },
+				{
+					name: "brushing",
+					isMet: false,
+					relatedTo: "gum disease",
+					evidencedBy: "x-ray",
+				},
 			],
 		});
 
@@ -145,6 +150,9 @@ describe("buildTemplateData", () => {
 		const data2 = buildTemplateData({
 			needs: [{ name: "brushing", isMet: false, relatedTo: "gum disease" }],
 		});
-		expect(data2.statements[0]).toMatchObject({ relatedTo: "gum disease", evidencedBy: "" });
+		expect(data2.statements[0]).toMatchObject({
+			relatedTo: "gum disease",
+			evidencedBy: "",
+		});
 	});
 });

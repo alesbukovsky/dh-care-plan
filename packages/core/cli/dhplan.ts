@@ -1,8 +1,10 @@
 #!/usr/bin/env bun
 import { Argument, Command } from "commander";
 import {
+	buildTemplateData,
 	getPlanSchema,
 	getTemplateSchema,
+	Plan,
 	render,
 	validateData,
 	validateTemplate,
@@ -57,7 +59,7 @@ cli
 
 cli
 	.command("render")
-	.description("Render a plan and template into a filled-in .docx")
+	.description("Render a plan into a final .docx using given template")
 	.argument("<plan>", "path to the plan JSON file")
 	.argument("<template>", "path to the .docx template")
 	.argument("<output>", "path to write the rendered .docx")
@@ -84,6 +86,32 @@ cli
 
 		await Bun.write(outputPath, result.output);
 		console.log(`Wrote ${outputPath}`);
+	});
+
+cli
+	.command("inspect")
+	.description("Print template data generated from a plan")
+	.argument("<plan>", "path to the plan JSON file")
+	.action(async (planPath: string) => {
+		let planBuffer: ArrayBuffer;
+		try {
+			planBuffer = await Bun.file(planPath).arrayBuffer();
+		} catch (error: unknown) {
+			const message = error instanceof Error ? error.message : String(error);
+			console.error(`Failed to read ${planPath}: ${message}`);
+			process.exit(1);
+		}
+
+		const planCheck = validateData(planBuffer);
+		if (!planCheck.valid) {
+			for (const issue of planCheck.issues) {
+				console.error(issue.path ? `${issue.path}: ${issue.message}` : issue.message);
+			}
+			process.exit(1);
+		}
+
+		const plan = Plan.parse(JSON.parse(new TextDecoder().decode(planBuffer)));
+		console.log(JSON.stringify(buildTemplateData(plan), null, 2));
 	});
 
 if (process.argv.length < 3) {

@@ -19,7 +19,7 @@ const Statement = z.object({
 	relatedTo: z.string(),
 	evidencedBy: z.string(),
 	goals: z.array(Goal),
-}); 
+});
 
 export const Template = z.object({
 	assessments: z.array(Assessment),

@@ -9,12 +9,14 @@ the result. `schema` prints a schema, `validate` prints validation issues,
 ## Goals / Non-Goals
 
 **Goals:**
+
 - Let a user see the exact `Template` JSON a given plan produces, for
   visual sanity-checking during authoring/debugging.
 - Reuse the CLI's existing validate-then-act pattern (see `validate`,
   `render`).
 
 **Non-Goals:**
+
 - Validating or printing anything about a `.docx` template — `inspect`
   only takes a plan file.
 - Changing `buildTemplateData` behavior.

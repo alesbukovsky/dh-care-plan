@@ -13,11 +13,13 @@ seam where this translation happens, and today it just returns `{}`.
 ## Goals / Non-Goals
 
 **Goals:**
+
 - Implement `buildTemplateData(plan: Plan): Template` with the exact
   mapping described in the proposal.
 - Keep the function pure and synchronous — no I/O, no schema changes.
 
 **Non-Goals:**
+
 - Changing the `Plan` or `Template` zod schemas.
 - Handling malformed/invalid `Plan` input — `render()` already validates the
   plan against `Plan` before calling `buildTemplateData`, so the input can

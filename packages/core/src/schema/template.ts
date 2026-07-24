@@ -3,7 +3,28 @@ import { SCHEMA_BASE_URI } from "./common";
 
 const registry = z.registry<{ id?: string }>();
 
-export const Template = z.object({});
+const Assessment = z.object({
+	need: z.string(),
+	isMet: z.boolean(),
+});
+
+const Goal = z.object({
+	label: z.string(),
+	task: z.string(),
+	doneBy: z.iso.date().optional(),
+});
+
+const Statement = z.object({
+	need: z.string(),
+	relatedTo: z.string(),
+	evidencedBy: z.string(),
+	goals: z.array(Goal),
+}); 
+
+export const Template = z.object({
+	assessments: z.array(Assessment),
+	statements: z.array(Statement),
+});
 
 export type Template = z.infer<typeof Template>;
 

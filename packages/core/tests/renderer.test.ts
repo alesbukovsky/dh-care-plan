@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { render } from "../src/renderer";
+import { buildTemplateData, render } from "../src/renderer";
 import { buildDocx } from "./helpers/docx-fixture";
 
 function jsonBuffer(value: unknown): ArrayBuffer {
@@ -72,5 +72,79 @@ describe("render", () => {
 		if (!result.success) {
 			expect(result.issues[0]?.message).toContain("unclosed");
 		}
+	});
+});
+
+describe("buildTemplateData", () => {
+	test("maps every need to an assessment, preserving order", () => {
+		const data = buildTemplateData(validPlan);
+
+		expect(data.assessments).toEqual([
+			{ need: "flossing", isMet: true },
+			{ need: "brushing", isMet: false },
+		]);
+	});
+
+	test("lists only unmet needs as statements", () => {
+		const data = buildTemplateData(validPlan);
+
+		expect(data.statements).toHaveLength(1);
+		expect(data.statements[0]).toMatchObject({
+			need: "brushing",
+			relatedTo: "gum disease",
+			evidencedBy: "x-ray",
+		});
+	});
+
+	test("gives an unmet need without goals an empty goals array", () => {
+		const data = buildTemplateData({
+			needs: [
+				{ name: "brushing", isMet: false, relatedTo: "gum disease", evidencedBy: "x-ray" },
+			],
+		});
+
+		expect(data.statements[0]?.goals).toEqual([]);
+	});
+
+	test("labels goals with <statement number><goal letter>, based on position among statements", () => {
+		const data = buildTemplateData({
+			needs: [
+				{ name: "flossing", isMet: true },
+				{
+					name: "brushing",
+					isMet: false,
+					relatedTo: "gum disease",
+					evidencedBy: "x-ray",
+					goals: [{ task: "floss daily" }, { task: "brush twice a day" }],
+				},
+				{
+					name: "diet",
+					isMet: false,
+					relatedTo: "sugar intake",
+					evidencedBy: "diary",
+					goals: [{ task: "reduce sugar", doneBy: "2026-08-01" }],
+				},
+			],
+		});
+
+		expect(data.statements[0]?.goals).toEqual([
+			{ label: "1a", task: "floss daily", doneBy: undefined },
+			{ label: "1b", task: "brush twice a day", doneBy: undefined },
+		]);
+		expect(data.statements[1]?.goals).toEqual([
+			{ label: "2a", task: "reduce sugar", doneBy: "2026-08-01" },
+		]);
+	});
+
+	test("defaults a missing relatedTo or evidencedBy to an empty string", () => {
+		const data = buildTemplateData({
+			needs: [{ name: "brushing", isMet: false, evidencedBy: "x-ray" }],
+		});
+		expect(data.statements[0]).toMatchObject({ relatedTo: "", evidencedBy: "x-ray" });
+
+		const data2 = buildTemplateData({
+			needs: [{ name: "brushing", isMet: false, relatedTo: "gum disease" }],
+		});
+		expect(data2.statements[0]).toMatchObject({ relatedTo: "gum disease", evidencedBy: "" });
 	});
 });

@@ -7,8 +7,37 @@ export type RenderResult =
 	| { success: true; output: Uint8Array }
 	| { success: false; issues: ValidationIssue[] };
 
-export function buildTemplateData(_plan: Plan): Template {
-	return {};
+function goalLabel(statementNumber: number, goalIndex: number): string {
+	return `${statementNumber}${String.fromCharCode(97 + goalIndex)}`;
+}
+
+function orEmpty(value: string | undefined): string {
+	return value ?? "";
+}
+
+export function buildTemplateData(plan: Plan): Template {
+	const assessments = plan.needs.map((need) => ({
+		need: need.name,
+		isMet: need.isMet,
+	}));
+
+	const unmetNeeds = plan.needs.filter((need) => !need.isMet);
+
+	const statements = unmetNeeds.map((need, needIndex) => {
+		const statementNumber = needIndex + 1;
+		return {
+			need: need.name,
+			relatedTo: orEmpty(need.relatedTo),
+			evidencedBy: orEmpty(need.evidencedBy),
+			goals: (need.goals ?? []).map((goal, goalIndex) => ({
+				label: goalLabel(statementNumber, goalIndex),
+				task: goal.task,
+				doneBy: goal.doneBy,
+			})),
+		};
+	});
+
+	return { assessments, statements };
 }
 
 export function render(planInput: ArrayBuffer, templateInput: ArrayBuffer): RenderResult {

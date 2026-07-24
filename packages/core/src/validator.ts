@@ -1,7 +1,7 @@
 import InspectModule from "docxtemplater/js/inspect-module.js";
 import { z } from "zod";
-import { DataSchema } from "./schema/data";
-import { TemplateSchema } from "./schema/template";
+import { Plan } from "./schema/plan";
+import { Template } from "./schema/template";
 import { createTemplater, describeTemplaterError } from "./templater";
 
 export interface ValidationIssue {
@@ -27,7 +27,7 @@ export function validateData(input: ArrayBuffer): ValidationResult {
 		};
 	}
 
-	const result = DataSchema.safeParse(parsed);
+	const result = Plan.safeParse(parsed);
 	if (result.success) return { valid: true };
 
 	return {
@@ -50,7 +50,7 @@ function collectUndefinedTags(
 		if (!field) {
 			issues.push({
 				path: [...path, tag].join("."),
-				message: "not defined in TemplateSchema",
+				message: "not defined in Template",
 			});
 		}
 
@@ -90,12 +90,7 @@ export function validateTemplate(input: ArrayBuffer): ValidationResult {
 	}
 
 	const issues: ValidationIssue[] = [];
-	collectUndefinedTags(
-		inspector.getAllTags(),
-		TemplateSchema.shape,
-		[],
-		issues,
-	);
+	collectUndefinedTags(inspector.getAllTags(), Template.shape, [], issues);
 
 	if (issues.length === 0) return { valid: true };
 	return { valid: false, issues };

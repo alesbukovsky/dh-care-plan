@@ -1,6 +1,16 @@
 import { z } from "zod";
+import { SCHEMA_BASE_URI } from "./common";
 
-// Placeholder: flat shape TBD once the data→template conversion is designed.
-export const TemplateSchema = z.object({});
+const registry = z.registry<{ id?: string }>();
 
-export type TemplateSchema = z.infer<typeof TemplateSchema>;
+export const Template = z.object({});
+
+export type Template = z.infer<typeof Template>;
+
+export function getTemplateSchema(): object {
+	const json = z.toJSONSchema(Template, { metadata: registry });
+	return {
+		$id: `${SCHEMA_BASE_URI}/template.schema.json`,
+		...json,
+	};
+}

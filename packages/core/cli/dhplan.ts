@@ -1,14 +1,8 @@
 #!/usr/bin/env bun
 import { Argument, Command } from "commander";
-import { z } from "zod";
-import {
-	DataSchema,
-	TemplateSchema,
-	validateData,
-	validateTemplate,
-} from "../src";
+import { getPlanSchema, getTemplateSchema, validateData, validateTemplate } from "../src";
 
-const SCHEMA_TYPES = ["data", "template"] as const;
+const SCHEMA_TYPES = ["plan", "template"] as const;
 type SchemaType = (typeof SCHEMA_TYPES)[number];
 
 const cli = new Command();
@@ -18,21 +12,17 @@ cli.name("dhplan").description("Dental hygiene care plan builder CLI");
 cli
 	.command("schema")
 	.description("Print the JSON Schema for the data or template schema")
-	.addArgument(
-		new Argument("<type>", "which schema to print").choices(SCHEMA_TYPES),
-	)
+	.addArgument(new Argument("<type>", "which schema to print").choices(SCHEMA_TYPES))
 	.action((type: SchemaType) => {
-		const schema = type === "data" ? DataSchema : TemplateSchema;
-		console.log(JSON.stringify(z.toJSONSchema(schema), null, 2));
+		const schema = type === "plan" ? getPlanSchema() : getTemplateSchema();
+		console.log(JSON.stringify(schema, null, 2));
 	});
 
 cli
 	.command("validate")
 	.description("Validate a data or template file against its schema")
 	.addArgument(
-		new Argument("<type>", "which schema to validate against").choices(
-			SCHEMA_TYPES,
-		),
+		new Argument("<type>", "which schema to validate against").choices(SCHEMA_TYPES),
 	)
 	.argument("<file>", "path to the file to validate")
 	.action(async (type: SchemaType, file: string) => {
@@ -45,7 +35,7 @@ cli
 			process.exit(1);
 		}
 
-		const validate = type === "data" ? validateData : validateTemplate;
+		const validate = type === "plan" ? validateData : validateTemplate;
 		const result = validate(buffer);
 
 		if (result.valid) {
@@ -54,9 +44,7 @@ cli
 		}
 
 		for (const issue of result.issues) {
-			console.error(
-				issue.path ? `${issue.path}: ${issue.message}` : issue.message,
-			);
+			console.error(issue.path ? `${issue.path}: ${issue.message}` : issue.message);
 		}
 		process.exit(1);
 	});

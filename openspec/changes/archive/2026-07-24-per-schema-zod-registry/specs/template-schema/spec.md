@@ -1,27 +1,4 @@
-# template-schema Specification
-
-## Purpose
-
-TBD - defines the flat `TemplateSchema` representing the shape that
-docxtemplater tag resolution expects.
-
-## Requirements
-
-### Requirement: Flat template schema placeholder
-
-The system SHALL define a zod schema (`TemplateSchema`,
-`packages/core/src/schema/template.ts`) representing the flat shape that
-docxtemplater tag resolution expects. Until the data→template conversion
-process is designed, this schema SHALL exist as an explicit placeholder
-rather than a guessed flattening of the data schema.
-
-#### Scenario: Template author inspects available tags
-
-- **WHEN** a template author needs to know what tags are available to place
-  in a `.docx` template
-- **THEN** the system SHALL expose `TemplateSchema` as the single source of
-  truth for those tags (currently empty, to be populated once the
-  conversion process is designed)
+## MODIFIED Requirements
 
 ### Requirement: Template schema exportable as JSON Schema
 

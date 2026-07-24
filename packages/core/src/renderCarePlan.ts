@@ -1,9 +1,6 @@
 import { createTemplater, describeTemplaterError } from "./templater";
 
-export function renderCarePlan(
-	templateBuffer: ArrayBuffer,
-	data: unknown,
-): Uint8Array {
+export function renderCarePlan(templateBuffer: ArrayBuffer, data: unknown): Uint8Array {
 	const doc = createTemplater(templateBuffer);
 
 	try {

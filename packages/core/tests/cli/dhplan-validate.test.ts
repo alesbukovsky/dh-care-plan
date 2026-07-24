@@ -12,13 +12,21 @@ beforeAll(async () => {
 
 	await Bun.write(
 		join(dir, "valid-data.json"),
-		JSON.stringify({ any: "thing" }),
+		JSON.stringify({
+			needs: [
+				{ name: "flossing", isMet: true },
+				{
+					name: "brushing",
+					isMet: false,
+					relatedTo: "gum disease",
+					evidencedBy: "x-ray",
+					goals: [{ task: "floss daily" }],
+				},
+			],
+		}),
 	);
 	await Bun.write(join(dir, "malformed-data.json"), "{ not json");
-	await Bun.write(
-		join(dir, "not-an-object.json"),
-		JSON.stringify("just a string"),
-	);
+	await Bun.write(join(dir, "not-an-object.json"), JSON.stringify("just a string"));
 
 	await Bun.write(
 		join(dir, "no-tags.docx"),
@@ -34,11 +42,11 @@ afterAll(async () => {
 	await rm(dir, { recursive: true, force: true });
 });
 
-describe("dhplan validate data", () => {
-	test("a JSON object is valid, since DataSchema is currently an empty placeholder", async () => {
+describe("dhplan validate plan", () => {
+	test("a JSON object matching Plan's shape is valid", async () => {
 		const { stdout, exitCode } = await runCli([
 			"validate",
-			"data",
+			"plan",
 			join(dir, "valid-data.json"),
 		]);
 
@@ -49,7 +57,7 @@ describe("dhplan validate data", () => {
 	test("malformed JSON is invalid", async () => {
 		const { stdout, stderr, exitCode } = await runCli([
 			"validate",
-			"data",
+			"plan",
 			join(dir, "malformed-data.json"),
 		]);
 
@@ -61,7 +69,7 @@ describe("dhplan validate data", () => {
 	test("a non-object value is invalid", async () => {
 		const { exitCode } = await runCli([
 			"validate",
-			"data",
+			"plan",
 			join(dir, "not-an-object.json"),
 		]);
 
@@ -91,7 +99,7 @@ describe("dhplan validate template", () => {
 		expect(exitCode).not.toBe(0);
 		expect(stdout.trim()).toBe("");
 		expect(stderr).toContain("name");
-		expect(stderr).toContain("not defined in TemplateSchema");
+		expect(stderr).toContain("not defined in Template");
 	});
 });
 
@@ -105,7 +113,7 @@ describe("dhplan validate", () => {
 
 		expect(exitCode).not.toBe(0);
 		expect(stdout.trim()).toBe("");
-		expect(stderr).toContain("data");
+		expect(stderr).toContain("plan");
 		expect(stderr).toContain("template");
 	});
 });

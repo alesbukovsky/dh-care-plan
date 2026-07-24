@@ -4,7 +4,5 @@ import App from "./App";
 
 test("renders the heading", () => {
 	render(<App />);
-	expect(
-		screen.getByRole("heading", { name: "Care Plan" }),
-	).toBeInTheDocument();
+	expect(screen.getByRole("heading", { name: "Care Plan" })).toBeInTheDocument();
 });

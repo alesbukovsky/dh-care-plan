@@ -7,10 +7,21 @@ function jsonBuffer(value: unknown): ArrayBuffer {
 }
 
 describe("validateData", () => {
-	test("accepts an object, since DataSchema is currently an empty placeholder", () => {
-		expect(validateData(jsonBuffer({ anything: "goes" }))).toEqual({
-			valid: true,
-		});
+	test("accepts an object matching Plan's shape", () => {
+		const plan = {
+			needs: [
+				{ name: "flossing", isMet: true },
+				{
+					name: "brushing",
+					isMet: false,
+					relatedTo: "gum disease",
+					evidencedBy: "x-ray",
+					goals: [{ task: "floss daily" }],
+				},
+			],
+		};
+
+		expect(validateData(jsonBuffer(plan))).toEqual({ valid: true });
 	});
 
 	test("rejects a non-object value", () => {
@@ -23,8 +34,7 @@ describe("validateData", () => {
 	});
 
 	test("rejects malformed JSON", () => {
-		const malformed = new TextEncoder().encode("{ not json")
-			.buffer as ArrayBuffer;
+		const malformed = new TextEncoder().encode("{ not json").buffer as ArrayBuffer;
 
 		const result = validateData(malformed);
 		expect(result.valid).toBe(false);
@@ -41,30 +51,28 @@ describe("validateTemplate", () => {
 		expect(validateTemplate(docx)).toEqual({ valid: true });
 	});
 
-	test("rejects a tag not defined in TemplateSchema", () => {
+	test("rejects a tag not defined in Template", () => {
 		const docx = buildDocx("<w:p><w:r><w:t>Hello {name}</w:t></w:r></w:p>");
 
 		const result = validateTemplate(docx);
 		expect(result.valid).toBe(false);
 		if (!result.valid) {
 			expect(result.issues).toEqual([
-				{ path: "name", message: "not defined in TemplateSchema" },
+				{ path: "name", message: "not defined in Template" },
 			]);
 		}
 	});
 
 	test("rejects tags nested inside a loop", () => {
-		const docx = buildDocx(
-			"<w:p><w:r><w:t>{#items}{qty}{/items}</w:t></w:r></w:p>",
-		);
+		const docx = buildDocx("<w:p><w:r><w:t>{#items}{qty}{/items}</w:t></w:r></w:p>");
 
 		const result = validateTemplate(docx);
 		expect(result.valid).toBe(false);
 		if (!result.valid) {
 			expect(result.issues).toEqual(
 				expect.arrayContaining([
-					{ path: "items", message: "not defined in TemplateSchema" },
-					{ path: "items.qty", message: "not defined in TemplateSchema" },
+					{ path: "items", message: "not defined in Template" },
+					{ path: "items.qty", message: "not defined in Template" },
 				]),
 			);
 		}

@@ -1,22 +1,32 @@
 import { describe, expect, test } from "bun:test";
-import { z } from "zod";
-import { DataSchema } from "../../src/schema/data";
-import { TemplateSchema } from "../../src/schema/template";
+import { getPlanSchema, getTemplateSchema } from "../../src";
+import { SCHEMA_BASE_URI } from "../../src/schema/common";
 import { runCli } from "./run-cli";
 
 describe("dhplan schema", () => {
-	test("schema data prints the DataSchema JSON Schema", async () => {
-		const { stdout, exitCode } = await runCli(["schema", "data"]);
+	test("schema plan prints the Plan JSON Schema", async () => {
+		const { stdout, exitCode } = await runCli(["schema", "plan"]);
 
 		expect(exitCode).toBe(0);
-		expect(JSON.parse(stdout)).toEqual(z.toJSONSchema(DataSchema));
+		expect(JSON.parse(stdout)).toEqual(getPlanSchema());
 	});
 
-	test("schema template prints the TemplateSchema JSON Schema", async () => {
+	test("schema template prints the Template JSON Schema", async () => {
 		const { stdout, exitCode } = await runCli(["schema", "template"]);
 
 		expect(exitCode).toBe(0);
-		expect(JSON.parse(stdout)).toEqual(z.toJSONSchema(TemplateSchema));
+		expect(JSON.parse(stdout)).toEqual(getTemplateSchema());
+	});
+
+	test("plan schema has $defs entries for registered nested objects, referenced via $ref", () => {
+		const schema = getPlanSchema() as {
+			$id: string;
+			$defs?: Record<string, unknown>;
+		};
+
+		expect(schema.$id).toBe(`${SCHEMA_BASE_URI}/plan.schema.json`);
+		expect(schema.$defs?.MetNeed).toBeDefined();
+		expect(JSON.stringify(schema)).toContain("#/$defs/MetNeed");
 	});
 
 	test("schema with an invalid type errors without printing a schema", async () => {
@@ -24,7 +34,7 @@ describe("dhplan schema", () => {
 
 		expect(exitCode).not.toBe(0);
 		expect(stdout.trim()).toBe("");
-		expect(stderr).toContain("data");
+		expect(stderr).toContain("plan");
 		expect(stderr).toContain("template");
 	});
 

@@ -1,32 +1,6 @@
-# validate Specification
+## MODIFIED Requirements
 
-## Purpose
-
-TBD - defines the validator functions used to check data files and
-template files against their respective schemas.
-
-## Requirements
-
-### Requirement: Uniform validator interface
-
-`validateData` and `validateTemplate` SHALL share one call signature: both
-take the file's raw bytes (an `ArrayBuffer`) as input, and both return the
-same `ValidationResult` shape (`{ valid: true }` or `{ valid: false,
-issues: { path, message }[] }`). Content-level failures specific to one
-schema type (malformed JSON for data; an unreadable `.docx` for template)
-SHALL be reported as an issue within that same result shape, not thrown as
-an exception, so callers can treat both validators identically regardless
-of which schema type they're validating against.
-
-#### Scenario: Caller dispatches on schema type without changing call shape
-
-- **WHEN** a caller has a file's raw bytes and knows only whether to
-  validate them as `data` or `template`
-- **THEN** the system SHALL let the caller invoke `validateData` or
-  `validateTemplate` with that same `ArrayBuffer` and handle the result the
-  same way, without needing to pre-parse or branch on input type first
-
-### Requirement: Data file validation against Plan
+### Requirement: Data file validation against DataSchema
 
 The system SHALL provide a function (`validateData`,
 `packages/core/src/validator.ts`) that parses a given input as JSON and
@@ -45,8 +19,7 @@ first failure.
   (missing required fields, wrong types, or extra fields where the schema
   forbids them)
 - **THEN** the system SHALL report the input as invalid and return every
-  violated path and message from `Plan`'s validation, not only the
-  first
+  violated path and message from `Plan`'s validation, not only the first
 
 #### Scenario: Content is not valid JSON
 
@@ -54,13 +27,13 @@ first failure.
 - **THEN** the system SHALL report the input as invalid with an issue
   describing the JSON parse failure, without attempting schema validation
 
-### Requirement: Template tag validation against Template
+### Requirement: Template tag validation against TemplateSchema
 
 The system SHALL provide a function (`validateTemplate`,
-`packages/core/src/validator.ts`) that reads a `.docx` file,
-extracts every docxtemplater tag it references without rendering the
-document, and checks that each tag is defined by `Template` at the
-scope (top level, or nested inside a loop/section tag) where it is used.
+`packages/core/src/validator.ts`) that reads a `.docx` file, extracts
+every docxtemplater tag it references without rendering the document, and
+checks that each tag is defined by `Template` at the scope (top level, or
+nested inside a loop/section tag) where it is used.
 
 #### Scenario: Template only uses tags Template defines
 
@@ -72,10 +45,10 @@ scope (top level, or nested inside a loop/section tag) where it is used.
 #### Scenario: Template references an undefined tag
 
 - **WHEN** `validateTemplate` is given a `.docx` file that references at
-  least one docxtemplater tag not defined by `Template` at the scope
-  where it is used
-- **THEN** the system SHALL report the template as invalid and return every
-  undefined tag found (name and scope), not only the first
+  least one docxtemplater tag not defined by `Template` at the scope where
+  it is used
+- **THEN** the system SHALL report the template as invalid and return
+  every undefined tag found (name and scope), not only the first
 
 #### Scenario: Template omits tags Template defines
 

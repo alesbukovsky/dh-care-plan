@@ -1,14 +1,13 @@
-import type { Need } from "./schema/plan";
+import { DEFAULT_MAPPING, type Mapping, resolveMapping } from "./schema/mapping";
 import { Plan } from "./schema/plan";
 import type { Template } from "./schema/template";
 import { createTemplater, describeTemplaterError } from "./templater";
-import { type ValidationIssue, validateData, validateTemplate } from "./validator";
-
-const OUTCOME_STATUS_LABEL: Record<Need["outcome"]["status"], string> = {
-	met: "Met",
-	partial: "Partially met",
-	unmet: "Not met",
-};
+import {
+	type ValidationIssue,
+	validateData,
+	validateMapping,
+	validateTemplate,
+} from "./validator";
 
 export type RenderResult =
 	| { success: true; output: Uint8Array }
@@ -22,7 +21,10 @@ function orEmpty(value: string | undefined): string {
 	return value ?? "";
 }
 
-export function buildTemplateData(plan: Plan): Template {
+export function buildTemplateData(
+	plan: Plan,
+	mapping: Mapping = DEFAULT_MAPPING,
+): Template {
 	const assessments = plan.needs.map((need) => ({
 		need: need.name,
 		isMet: need.isMet,
@@ -43,7 +45,7 @@ export function buildTemplateData(plan: Plan): Template {
 			})),
 			interventions: need.interventions ?? [],
 			outcome: {
-				label: OUTCOME_STATUS_LABEL[need.outcome.status],
+				label: mapping.outcomeStatus[need.outcome.status],
 				note: need.outcome.note,
 			},
 		};
@@ -57,7 +59,11 @@ export function buildTemplateData(plan: Plan): Template {
 	};
 }
 
-export function render(planInput: ArrayBuffer, templateInput: ArrayBuffer): RenderResult {
+export function render(
+	planInput: ArrayBuffer,
+	templateInput: ArrayBuffer,
+	mappingInput?: ArrayBuffer,
+): RenderResult {
 	const planCheck = validateData(planInput);
 	if (!planCheck.valid) {
 		return { success: false, issues: planCheck.issues };
@@ -68,8 +74,17 @@ export function render(planInput: ArrayBuffer, templateInput: ArrayBuffer): Rend
 		return { success: false, issues: templateCheck.issues };
 	}
 
+	let mapping = DEFAULT_MAPPING;
+	if (mappingInput) {
+		const mappingCheck = validateMapping(mappingInput);
+		if (!mappingCheck.valid) {
+			return { success: false, issues: mappingCheck.issues };
+		}
+		mapping = resolveMapping(JSON.parse(new TextDecoder().decode(mappingInput)));
+	}
+
 	const plan = Plan.parse(JSON.parse(new TextDecoder().decode(planInput)));
-	const data = buildTemplateData(plan);
+	const data = buildTemplateData(plan, mapping);
 
 	const doc = createTemplater(templateInput);
 	try {

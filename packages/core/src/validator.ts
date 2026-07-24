@@ -1,5 +1,6 @@
 import InspectModule from "docxtemplater/js/inspect-module.js";
 import { z } from "zod";
+import { Mapping } from "./schema/mapping";
 import { Plan } from "./schema/plan";
 import { Template } from "./schema/template";
 import { createTemplater, describeTemplaterError } from "./templater";
@@ -28,6 +29,30 @@ export function validateData(input: ArrayBuffer): ValidationResult {
 	}
 
 	const result = Plan.safeParse(parsed);
+	if (result.success) return { valid: true };
+
+	return {
+		valid: false,
+		issues: result.error.issues.map((issue) => ({
+			path: issue.path.join("."),
+			message: issue.message,
+		})),
+	};
+}
+
+export function validateMapping(input: ArrayBuffer): ValidationResult {
+	let parsed: unknown;
+	try {
+		parsed = JSON.parse(new TextDecoder().decode(input));
+	} catch (error) {
+		const message = error instanceof Error ? error.message : String(error);
+		return {
+			valid: false,
+			issues: [{ path: "", message: `Invalid JSON: ${message}` }],
+		};
+	}
+
+	const result = Mapping.safeParse(parsed);
 	if (result.success) return { valid: true };
 
 	return {

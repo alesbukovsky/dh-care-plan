@@ -1,35 +1,4 @@
-# renderer Specification
-
-## Purpose
-
-TBD - defines `render()`, the pure (no file I/O) plan+template rendering
-function in `packages/core/src/renderer.ts`.
-
-## Requirements
-
-### Requirement: `render()` validates plan and template before rendering
-
-The system SHALL provide a function (`render`,
-`packages/core/src/renderer.ts`) that accepts a plan JSON buffer and a
-template `.docx` buffer (both `ArrayBuffer`, no file paths) and, before
-attempting to render anything, SHALL validate the plan against `Plan`
-(using the same validation `validateData` performs) and, if the plan is
-valid, SHALL validate the template against `Template` (using the same
-validation `validateTemplate` performs). `render()` SHALL do no file I/O.
-
-#### Scenario: Plan fails validation
-
-- **WHEN** `render()` is called with a plan buffer that fails `Plan`
-  validation
-- **THEN** the system SHALL return a failure result carrying every plan
-  validation issue, without inspecting the template buffer at all
-
-#### Scenario: Plan is valid but template fails validation
-
-- **WHEN** `render()` is called with a plan buffer that passes `Plan`
-  validation and a template buffer that fails `Template` validation
-- **THEN** the system SHALL return a failure result carrying every template
-  validation issue, without attempting to render
+## MODIFIED Requirements
 
 ### Requirement: `render()` converts Plan to template data by mapping needs to assessments and statements
 

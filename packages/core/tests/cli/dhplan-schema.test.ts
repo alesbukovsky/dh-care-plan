@@ -1,5 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import {
+	getMappingSample,
+	getMappingSchema,
 	getPlanSample,
 	getPlanSchema,
 	getTemplateSample,
@@ -34,6 +36,13 @@ describe("dhplan schema", () => {
 		expect(JSON.stringify(schema)).toContain("#/$defs/Need");
 	});
 
+	test("schema mapping prints the Mapping JSON Schema", async () => {
+		const { stdout, exitCode } = await runCli(["schema", "mapping"]);
+
+		expect(exitCode).toBe(0);
+		expect(JSON.parse(stdout)).toEqual(getMappingSchema());
+	});
+
 	test("schema with an invalid type errors without printing a schema", async () => {
 		const { stdout, stderr, exitCode } = await runCli(["schema", "nonsense"]);
 
@@ -41,6 +50,7 @@ describe("dhplan schema", () => {
 		expect(stdout.trim()).toBe("");
 		expect(stderr).toContain("plan");
 		expect(stderr).toContain("template");
+		expect(stderr).toContain("mapping");
 	});
 
 	test("no arguments prints help and exits non-zero", async () => {
@@ -62,5 +72,12 @@ describe("dhplan schema", () => {
 
 		expect(exitCode).toBe(0);
 		expect(JSON.parse(stdout)).toEqual(getTemplateSample());
+	});
+
+	test("schema mapping --sample prints the mapping sample instead of the JSON Schema", async () => {
+		const { stdout, exitCode } = await runCli(["schema", "mapping", "--sample"]);
+
+		expect(exitCode).toBe(0);
+		expect(JSON.parse(stdout)).toEqual(getMappingSample());
 	});
 });

@@ -28,6 +28,17 @@ beforeAll(async () => {
 		}),
 	);
 	await Bun.write(join(dir, "malformed-plan.json"), "{ not json");
+
+	await Bun.write(
+		join(dir, "valid-mapping.json"),
+		JSON.stringify({
+			outcomeStatus: { met: "Achieved", partial: "In progress", unmet: "Pending" },
+		}),
+	);
+	await Bun.write(
+		join(dir, "invalid-mapping.json"),
+		JSON.stringify({ outcomeStatus: { unmet: "Pending" } }),
+	);
 });
 
 afterAll(async () => {
@@ -74,6 +85,32 @@ describe("dhplan inspect", () => {
 		const { stdout, stderr, exitCode } = await runCli([
 			"inspect",
 			join(dir, "does-not-exist.json"),
+		]);
+
+		expect(exitCode).not.toBe(0);
+		expect(stdout.trim()).toBe("");
+		expect(stderr.length).toBeGreaterThan(0);
+	});
+
+	test("prints template data using a valid --mapping override file", async () => {
+		const { stdout, exitCode } = await runCli([
+			"inspect",
+			join(dir, "valid-plan.json"),
+			"--mapping",
+			join(dir, "valid-mapping.json"),
+		]);
+
+		expect(exitCode).toBe(0);
+		const data = JSON.parse(stdout);
+		expect(data.statements[0]?.outcome).toEqual({ label: "Pending" });
+	});
+
+	test("an invalid --mapping override file reports issues without printing template data", async () => {
+		const { stdout, stderr, exitCode } = await runCli([
+			"inspect",
+			join(dir, "valid-plan.json"),
+			"--mapping",
+			join(dir, "invalid-mapping.json"),
 		]);
 
 		expect(exitCode).not.toBe(0);

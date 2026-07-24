@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { validateData, validateTemplate } from "../src/validator";
+import { validateData, validateMapping, validateTemplate } from "../src/validator";
 import { buildDocx } from "./helpers/docx-fixture";
 
 function jsonBuffer(value: unknown): ArrayBuffer {
@@ -103,6 +103,52 @@ describe("validateTemplate", () => {
 						'The loop with tag "loop1" is unclosed\nThe loop with tag "loop2" is unclosed',
 				},
 			]);
+		}
+	});
+});
+
+describe("validateMapping", () => {
+	test("accepts a full mapping", () => {
+		const mapping = { outcomeStatus: { met: "A", partial: "B", unmet: "C" } };
+
+		expect(validateMapping(jsonBuffer(mapping))).toEqual({ valid: true });
+	});
+
+	test("rejects an empty object", () => {
+		const result = validateMapping(jsonBuffer({}));
+		expect(result.valid).toBe(false);
+		if (!result.valid) {
+			expect(result.issues.length).toBeGreaterThan(0);
+		}
+	});
+
+	test("rejects a partial outcomeStatus mapping", () => {
+		const partial = { outcomeStatus: { met: "Achieved" } };
+
+		const result = validateMapping(jsonBuffer(partial));
+		expect(result.valid).toBe(false);
+		if (!result.valid) {
+			expect(result.issues.length).toBeGreaterThan(0);
+		}
+	});
+
+	test("rejects a non-string label value", () => {
+		const mapping = { outcomeStatus: { met: 123, partial: "B", unmet: "C" } };
+
+		const result = validateMapping(jsonBuffer(mapping));
+		expect(result.valid).toBe(false);
+		if (!result.valid) {
+			expect(result.issues.length).toBeGreaterThan(0);
+		}
+	});
+
+	test("rejects malformed JSON", () => {
+		const malformed = new TextEncoder().encode("{ not json").buffer as ArrayBuffer;
+
+		const result = validateMapping(malformed);
+		expect(result.valid).toBe(false);
+		if (!result.valid) {
+			expect(result.issues).toEqual([expect.objectContaining({ path: "" })]);
 		}
 	});
 });

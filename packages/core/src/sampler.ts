@@ -1,4 +1,6 @@
 import { buildTemplateData } from "./renderer";
+import type { Mapping } from "./schema/mapping";
+import { DEFAULT_MAPPING } from "./schema/mapping";
 import type { Plan } from "./schema/plan";
 import type { Template } from "./schema/template";
 
@@ -30,4 +32,8 @@ export function getPlanSample(): Plan {
 
 export function getTemplateSample(): Template {
 	return buildTemplateData(getPlanSample());
+}
+
+export function getMappingSample(): Mapping {
+	return DEFAULT_MAPPING;
 }

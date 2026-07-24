@@ -80,6 +80,37 @@ describe("render", () => {
 			expect(result.issues[0]?.message).toContain("unclosed");
 		}
 	});
+
+	test("renders using the default mapping when no mapping is given", () => {
+		const docx = buildDocx("<w:p><w:r><w:t>Hello world</w:t></w:r></w:p>");
+
+		const result = render(jsonBuffer(validPlan), docx);
+
+		expect(result.success).toBe(true);
+	});
+
+	test("renders using a valid mapping override", () => {
+		const docx = buildDocx("<w:p><w:r><w:t>Hello world</w:t></w:r></w:p>");
+		const mapping = jsonBuffer({
+			outcomeStatus: { met: "Achieved", partial: "In progress", unmet: "Pending" },
+		});
+
+		const result = render(jsonBuffer(validPlan), docx, mapping);
+
+		expect(result.success).toBe(true);
+	});
+
+	test("returns mapping issues without rendering when the mapping override is invalid", () => {
+		const docx = buildDocx("<w:p><w:r><w:t>Hello world</w:t></w:r></w:p>");
+		const invalidMapping = jsonBuffer({ outcomeStatus: { met: "Achieved" } });
+
+		const result = render(jsonBuffer(validPlan), docx, invalidMapping);
+
+		expect(result.success).toBe(false);
+		if (!result.success) {
+			expect(result.issues.length).toBeGreaterThan(0);
+		}
+	});
 });
 
 describe("buildTemplateData", () => {
@@ -264,5 +295,33 @@ describe("buildTemplateData", () => {
 			],
 		});
 		expect(unmet.statements[0]?.outcome).toEqual({ label: "Not met", note: undefined });
+	});
+
+	test("uses a custom mapping's outcome labels instead of the defaults", () => {
+		const customMapping = {
+			outcomeStatus: { met: "Achieved", partial: "In progress", unmet: "Pending" },
+		};
+
+		const data = buildTemplateData(
+			{
+				patient: PATIENT,
+				appointments: APPOINTMENTS,
+				needs: [
+					{
+						name: "brushing",
+						isMet: false,
+						relatedTo: "gum disease",
+						evidencedBy: "x-ray",
+						outcome: { status: "partial" },
+					},
+				],
+			},
+			customMapping,
+		);
+
+		expect(data.statements[0]?.outcome).toEqual({
+			label: "In progress",
+			note: undefined,
+		});
 	});
 });

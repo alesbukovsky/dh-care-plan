@@ -21,6 +21,17 @@ beforeAll(async () => {
 	await Bun.write(join(dir, "malformed-plan.json"), "{ not json");
 
 	await Bun.write(
+		join(dir, "valid-mapping.json"),
+		JSON.stringify({
+			outcomeStatus: { met: "Achieved", partial: "In progress", unmet: "Pending" },
+		}),
+	);
+	await Bun.write(
+		join(dir, "invalid-mapping.json"),
+		JSON.stringify({ outcomeStatus: { met: "Achieved" } }),
+	);
+
+	await Bun.write(
 		join(dir, "no-tags.docx"),
 		buildDocx("<w:p><w:r><w:t>Hello world</w:t></w:r></w:p>"),
 	);
@@ -90,6 +101,41 @@ describe("dhplan render", () => {
 			join(dir, "does-not-exist.json"),
 			join(dir, "no-tags.docx"),
 			outputPath,
+		]);
+
+		expect(exitCode).not.toBe(0);
+		expect(stdout.trim()).toBe("");
+		expect(stderr.length).toBeGreaterThan(0);
+		expect(await Bun.file(outputPath).exists()).toBe(false);
+	});
+
+	test("renders with a valid --mapping override file", async () => {
+		const outputPath = join(dir, "out-with-mapping.docx");
+
+		const { stdout, exitCode } = await runCli([
+			"render",
+			join(dir, "valid-plan.json"),
+			join(dir, "no-tags.docx"),
+			outputPath,
+			"--mapping",
+			join(dir, "valid-mapping.json"),
+		]);
+
+		expect(exitCode).toBe(0);
+		expect(stdout).toContain(outputPath);
+		expect(await Bun.file(outputPath).exists()).toBe(true);
+	});
+
+	test("an invalid --mapping override file reports issues and does not write the output", async () => {
+		const outputPath = join(dir, "out-invalid-mapping.docx");
+
+		const { stdout, stderr, exitCode } = await runCli([
+			"render",
+			join(dir, "valid-plan.json"),
+			join(dir, "no-tags.docx"),
+			outputPath,
+			"--mapping",
+			join(dir, "invalid-mapping.json"),
 		]);
 
 		expect(exitCode).not.toBe(0);

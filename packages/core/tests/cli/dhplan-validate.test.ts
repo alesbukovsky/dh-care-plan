@@ -32,6 +32,17 @@ beforeAll(async () => {
 	await Bun.write(join(dir, "not-an-object.json"), JSON.stringify("just a string"));
 
 	await Bun.write(
+		join(dir, "valid-mapping.json"),
+		JSON.stringify({
+			outcomeStatus: { met: "Achieved", partial: "In progress", unmet: "Pending" },
+		}),
+	);
+	await Bun.write(
+		join(dir, "invalid-mapping.json"),
+		JSON.stringify({ outcomeStatus: { met: "Achieved" } }),
+	);
+
+	await Bun.write(
 		join(dir, "no-tags.docx"),
 		buildDocx("<w:p><w:r><w:t>Hello world</w:t></w:r></w:p>"),
 	);
@@ -106,6 +117,31 @@ describe("dhplan validate template", () => {
 	});
 });
 
+describe("dhplan validate mapping", () => {
+	test("a JSON object matching Mapping is valid", async () => {
+		const { stdout, exitCode } = await runCli([
+			"validate",
+			"mapping",
+			join(dir, "valid-mapping.json"),
+		]);
+
+		expect(exitCode).toBe(0);
+		expect(stdout).toContain("is valid");
+	});
+
+	test("a mapping file with a non-string label is invalid", async () => {
+		const { stdout, stderr, exitCode } = await runCli([
+			"validate",
+			"mapping",
+			join(dir, "invalid-mapping.json"),
+		]);
+
+		expect(exitCode).not.toBe(0);
+		expect(stdout.trim()).toBe("");
+		expect(stderr.length).toBeGreaterThan(0);
+	});
+});
+
 describe("dhplan validate", () => {
 	test("an invalid type errors before reading the file", async () => {
 		const { stdout, stderr, exitCode } = await runCli([
@@ -118,5 +154,6 @@ describe("dhplan validate", () => {
 		expect(stdout.trim()).toBe("");
 		expect(stderr).toContain("plan");
 		expect(stderr).toContain("template");
+		expect(stderr).toContain("mapping");
 	});
 });

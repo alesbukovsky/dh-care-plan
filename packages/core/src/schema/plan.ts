@@ -3,22 +3,40 @@ import { SCHEMA_BASE_URI } from "./common";
 
 const registry = z.registry<{ id?: string }>();
 
+const Patient = z.object({
+	initials: z.string(),
+	dob: z.iso.date(),
+	chartId: z.string(),
+});
+registry.add(Patient, { id: "Patient" });
+
 const Goal = z.object({
 	task: z.string(),
 	doneBy: z.iso.date().optional(),
 });
 registry.add(Goal, { id: "Goal" });
 
-const Need = z.object({
+const Outcome = z.object({
+	status: z.enum(["met", "partial", "unmet"]),
+	note: z.string().optional(),
+});
+
+export const Need = z.object({
 	name: z.string(),
 	isMet: z.boolean(),
 	relatedTo: z.string().optional(),
 	evidencedBy: z.string().optional(),
 	goals: z.array(Goal).optional(),
+	interventions: z.array(z.string()).optional(),
+	outcome: Outcome,
 });
 registry.add(Need, { id: "Need" });
 
+export type Need = z.infer<typeof Need>;
+
 export const Plan = z.object({
+	patient: Patient,
+	appointments: z.array(z.iso.date()),
 	needs: z.array(Need),
 });
 

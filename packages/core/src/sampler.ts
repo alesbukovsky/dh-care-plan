@@ -4,8 +4,14 @@ import type { Template } from "./schema/template";
 
 export function getPlanSample(): Plan {
 	return {
+		patient: { initials: "J.D.", dob: "1990-01-01", chartId: "12345" },
+		appointments: ["2026-07-01", "2026-08-01"],
 		needs: [
-			{ name: "flossing", isMet: true },
+			{
+				name: "flossing",
+				isMet: true,
+				outcome: { status: "met" },
+			},
 			{
 				name: "brushing",
 				isMet: false,
@@ -15,6 +21,8 @@ export function getPlanSample(): Plan {
 					{ task: "floss daily", doneBy: "2026-08-01" },
 					{ task: "brush twice a day" },
 				],
+				interventions: ["oral hygiene education"],
+				outcome: { status: "partial", note: "improving" },
 			},
 		],
 	};

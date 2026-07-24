@@ -13,7 +13,9 @@ beforeAll(async () => {
 	await Bun.write(
 		join(dir, "valid-plan.json"),
 		JSON.stringify({
-			needs: [{ name: "flossing", isMet: true }],
+			patient: { initials: "J.D.", dob: "1990-01-01", chartId: "12345" },
+			appointments: ["2026-07-01"],
+			needs: [{ name: "flossing", isMet: true, outcome: { status: "met" } }],
 		}),
 	);
 	await Bun.write(join(dir, "malformed-plan.json"), "{ not json");

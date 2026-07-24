@@ -1,7 +1,14 @@
+import type { Need } from "./schema/plan";
 import { Plan } from "./schema/plan";
 import type { Template } from "./schema/template";
 import { createTemplater, describeTemplaterError } from "./templater";
 import { type ValidationIssue, validateData, validateTemplate } from "./validator";
+
+const OUTCOME_STATUS_LABEL: Record<Need["outcome"]["status"], string> = {
+	met: "Met",
+	partial: "Partially met",
+	unmet: "Not met",
+};
 
 export type RenderResult =
 	| { success: true; output: Uint8Array }
@@ -34,10 +41,20 @@ export function buildTemplateData(plan: Plan): Template {
 				task: goal.task,
 				doneBy: goal.doneBy,
 			})),
+			interventions: need.interventions ?? [],
+			outcome: {
+				label: OUTCOME_STATUS_LABEL[need.outcome.status],
+				note: need.outcome.note,
+			},
 		};
 	});
 
-	return { assessments, statements };
+	return {
+		patient: plan.patient,
+		appointments: plan.appointments,
+		assessments,
+		statements,
+	};
 }
 
 export function render(planInput: ArrayBuffer, templateInput: ArrayBuffer): RenderResult {

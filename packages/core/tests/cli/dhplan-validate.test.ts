@@ -13,14 +13,17 @@ beforeAll(async () => {
 	await Bun.write(
 		join(dir, "valid-data.json"),
 		JSON.stringify({
+			patient: { initials: "J.D.", dob: "1990-01-01", chartId: "12345" },
+			appointments: ["2026-07-01"],
 			needs: [
-				{ name: "flossing", isMet: true },
+				{ name: "flossing", isMet: true, outcome: { status: "met" } },
 				{
 					name: "brushing",
 					isMet: false,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
 					goals: [{ task: "floss daily" }],
+					outcome: { status: "unmet" },
 				},
 			],
 		}),

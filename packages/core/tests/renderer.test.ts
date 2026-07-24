@@ -6,15 +6,22 @@ function jsonBuffer(value: unknown): ArrayBuffer {
 	return new TextEncoder().encode(JSON.stringify(value)).buffer as ArrayBuffer;
 }
 
+const PATIENT = { initials: "J.D.", dob: "1990-01-01", chartId: "12345" };
+const APPOINTMENTS = ["2026-07-01", "2026-08-01"];
+
 const validPlan = {
+	patient: PATIENT,
+	appointments: APPOINTMENTS,
 	needs: [
-		{ name: "flossing", isMet: true },
+		{ name: "flossing", isMet: true, outcome: { status: "met" as const } },
 		{
 			name: "brushing",
 			isMet: false,
 			relatedTo: "gum disease",
 			evidencedBy: "x-ray",
 			goals: [{ task: "floss daily" }],
+			interventions: ["oral hygiene education"],
+			outcome: { status: "partial" as const, note: "improving" },
 		},
 	],
 };
@@ -98,12 +105,15 @@ describe("buildTemplateData", () => {
 
 	test("gives an unmet need without goals an empty goals array", () => {
 		const data = buildTemplateData({
+			patient: PATIENT,
+			appointments: APPOINTMENTS,
 			needs: [
 				{
 					name: "brushing",
 					isMet: false,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
+					outcome: { status: "unmet" },
 				},
 			],
 		});
@@ -113,14 +123,17 @@ describe("buildTemplateData", () => {
 
 	test("labels goals with <statement number><goal letter>, based on position among statements", () => {
 		const data = buildTemplateData({
+			patient: PATIENT,
+			appointments: APPOINTMENTS,
 			needs: [
-				{ name: "flossing", isMet: true },
+				{ name: "flossing", isMet: true, outcome: { status: "met" } },
 				{
 					name: "brushing",
 					isMet: false,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
 					goals: [{ task: "floss daily" }, { task: "brush twice a day" }],
+					outcome: { status: "partial" },
 				},
 				{
 					name: "diet",
@@ -128,6 +141,7 @@ describe("buildTemplateData", () => {
 					relatedTo: "sugar intake",
 					evidencedBy: "diary",
 					goals: [{ task: "reduce sugar", doneBy: "2026-08-01" }],
+					outcome: { status: "unmet" },
 				},
 			],
 		});
@@ -143,16 +157,112 @@ describe("buildTemplateData", () => {
 
 	test("defaults a missing relatedTo or evidencedBy to an empty string", () => {
 		const data = buildTemplateData({
-			needs: [{ name: "brushing", isMet: false, evidencedBy: "x-ray" }],
+			patient: PATIENT,
+			appointments: APPOINTMENTS,
+			needs: [
+				{
+					name: "brushing",
+					isMet: false,
+					evidencedBy: "x-ray",
+					outcome: { status: "unmet" },
+				},
+			],
 		});
 		expect(data.statements[0]).toMatchObject({ relatedTo: "", evidencedBy: "x-ray" });
 
 		const data2 = buildTemplateData({
-			needs: [{ name: "brushing", isMet: false, relatedTo: "gum disease" }],
+			patient: PATIENT,
+			appointments: APPOINTMENTS,
+			needs: [
+				{
+					name: "brushing",
+					isMet: false,
+					relatedTo: "gum disease",
+					outcome: { status: "unmet" },
+				},
+			],
 		});
 		expect(data2.statements[0]).toMatchObject({
 			relatedTo: "gum disease",
 			evidencedBy: "",
 		});
+	});
+
+	test("copies patient and appointments unchanged", () => {
+		const data = buildTemplateData(validPlan);
+
+		expect(data.patient).toEqual(PATIENT);
+		expect(data.appointments).toEqual(APPOINTMENTS);
+	});
+
+	test("copies interventions onto a statement, defaulting to an empty array", () => {
+		const data = buildTemplateData(validPlan);
+
+		expect(data.statements[0]?.interventions).toEqual(["oral hygiene education"]);
+
+		const dataWithoutInterventions = buildTemplateData({
+			patient: PATIENT,
+			appointments: APPOINTMENTS,
+			needs: [
+				{
+					name: "brushing",
+					isMet: false,
+					relatedTo: "gum disease",
+					evidencedBy: "x-ray",
+					outcome: { status: "unmet" },
+				},
+			],
+		});
+		expect(dataWithoutInterventions.statements[0]?.interventions).toEqual([]);
+	});
+
+	test("maps outcome status to a display label, one case per status", () => {
+		const met = buildTemplateData({
+			patient: PATIENT,
+			appointments: APPOINTMENTS,
+			needs: [
+				{
+					name: "brushing",
+					isMet: false,
+					relatedTo: "gum disease",
+					evidencedBy: "x-ray",
+					outcome: { status: "met", note: "resolved" },
+				},
+			],
+		});
+		expect(met.statements[0]?.outcome).toEqual({ label: "Met", note: "resolved" });
+
+		const partial = buildTemplateData({
+			patient: PATIENT,
+			appointments: APPOINTMENTS,
+			needs: [
+				{
+					name: "brushing",
+					isMet: false,
+					relatedTo: "gum disease",
+					evidencedBy: "x-ray",
+					outcome: { status: "partial" },
+				},
+			],
+		});
+		expect(partial.statements[0]?.outcome).toEqual({
+			label: "Partially met",
+			note: undefined,
+		});
+
+		const unmet = buildTemplateData({
+			patient: PATIENT,
+			appointments: APPOINTMENTS,
+			needs: [
+				{
+					name: "brushing",
+					isMet: false,
+					relatedTo: "gum disease",
+					evidencedBy: "x-ray",
+					outcome: { status: "unmet" },
+				},
+			],
+		});
+		expect(unmet.statements[0]?.outcome).toEqual({ label: "Not met", note: undefined });
 	});
 });

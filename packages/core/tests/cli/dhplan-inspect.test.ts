@@ -12,14 +12,17 @@ beforeAll(async () => {
 	await Bun.write(
 		join(dir, "valid-plan.json"),
 		JSON.stringify({
+			patient: { initials: "J.D.", dob: "1990-01-01", chartId: "12345" },
+			appointments: ["2026-07-01"],
 			needs: [
-				{ name: "flossing", isMet: true },
+				{ name: "flossing", isMet: true, outcome: { status: "met" } },
 				{
 					name: "brushing",
 					isMet: false,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
 					goals: [{ task: "floss daily" }],
+					outcome: { status: "unmet" },
 				},
 			],
 		}),
@@ -37,6 +40,8 @@ describe("dhplan inspect", () => {
 
 		expect(exitCode).toBe(0);
 		expect(JSON.parse(stdout)).toEqual({
+			patient: { initials: "J.D.", dob: "1990-01-01", chartId: "12345" },
+			appointments: ["2026-07-01"],
 			assessments: [
 				{ need: "flossing", isMet: true },
 				{ need: "brushing", isMet: false },
@@ -47,6 +52,8 @@ describe("dhplan inspect", () => {
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
 					goals: [{ label: "1a", task: "floss daily" }],
+					interventions: [],
+					outcome: { label: "Not met" },
 				},
 			],
 		});

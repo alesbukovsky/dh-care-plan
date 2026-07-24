@@ -1,5 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import { getPlanSchema, getTemplateSchema } from "../../src";
+import {
+	getPlanSample,
+	getPlanSchema,
+	getTemplateSample,
+	getTemplateSchema,
+} from "../../src";
 import { SCHEMA_BASE_URI } from "../../src/schema/common";
 import { runCli } from "./run-cli";
 
@@ -43,5 +48,19 @@ describe("dhplan schema", () => {
 
 		expect(exitCode).not.toBe(0);
 		expect(stdout).toContain("Usage:");
+	});
+
+	test("schema plan --sample prints the plan sample instead of the JSON Schema", async () => {
+		const { stdout, exitCode } = await runCli(["schema", "plan", "--sample"]);
+
+		expect(exitCode).toBe(0);
+		expect(JSON.parse(stdout)).toEqual(getPlanSample());
+	});
+
+	test("schema template --sample prints the template sample instead of the JSON Schema", async () => {
+		const { stdout, exitCode } = await runCli(["schema", "template", "--sample"]);
+
+		expect(exitCode).toBe(0);
+		expect(JSON.parse(stdout)).toEqual(getTemplateSample());
 	});
 });

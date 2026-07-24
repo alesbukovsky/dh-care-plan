@@ -2,7 +2,9 @@
 import { Argument, Command } from "commander";
 import {
 	buildTemplateData,
+	getPlanSample,
 	getPlanSchema,
+	getTemplateSample,
 	getTemplateSchema,
 	Plan,
 	render,
@@ -21,7 +23,14 @@ cli
 	.command("schema")
 	.description("Print the JSON Schema for the data or template schema")
 	.addArgument(new Argument("<type>", "which schema to print").choices(SCHEMA_TYPES))
-	.action((type: SchemaType) => {
+	.option("--sample", "print an example JSON document instead of the schema")
+	.action((type: SchemaType, options: { sample?: boolean }) => {
+		if (options.sample) {
+			const sample = type === "plan" ? getPlanSample() : getTemplateSample();
+			console.log(JSON.stringify(sample, null, 2));
+			return;
+		}
+
 		const schema = type === "plan" ? getPlanSchema() : getTemplateSchema();
 		console.log(JSON.stringify(schema, null, 2));
 	});

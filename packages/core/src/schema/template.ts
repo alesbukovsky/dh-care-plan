@@ -7,12 +7,14 @@ const Assessment = z.object({
 	need: z.string(),
 	isMet: z.boolean(),
 });
+registry.add(Assessment, { id: "Assessment" });
 
 const Goal = z.object({
 	label: z.string(),
 	task: z.string(),
 	doneBy: z.iso.date().optional(),
 });
+registry.add(Goal, { id: "Goal" });
 
 const Statement = z.object({
 	need: z.string(),
@@ -20,6 +22,7 @@ const Statement = z.object({
 	evidencedBy: z.string(),
 	goals: z.array(Goal),
 });
+registry.add(Statement, { id: "Statement" });
 
 export const Template = z.object({
 	assessments: z.array(Assessment),

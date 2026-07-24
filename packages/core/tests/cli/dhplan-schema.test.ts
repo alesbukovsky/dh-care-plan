@@ -25,8 +25,8 @@ describe("dhplan schema", () => {
 		};
 
 		expect(schema.$id).toBe(`${SCHEMA_BASE_URI}/plan.schema.json`);
-		expect(schema.$defs?.MetNeed).toBeDefined();
-		expect(JSON.stringify(schema)).toContain("#/$defs/MetNeed");
+		expect(schema.$defs?.Need).toBeDefined();
+		expect(JSON.stringify(schema)).toContain("#/$defs/Need");
 	});
 
 	test("schema with an invalid type errors without printing a schema", async () => {

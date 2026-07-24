@@ -1,6 +1,12 @@
 #!/usr/bin/env bun
 import { Argument, Command } from "commander";
-import { getPlanSchema, getTemplateSchema, validateData, validateTemplate } from "../src";
+import {
+	getPlanSchema,
+	getTemplateSchema,
+	render,
+	validateData,
+	validateTemplate,
+} from "../src";
 
 const SCHEMA_TYPES = ["plan", "template"] as const;
 type SchemaType = (typeof SCHEMA_TYPES)[number];
@@ -49,30 +55,36 @@ cli
 		process.exit(1);
 	});
 
-// Placeholder: render logic kept for reference until the data→template
-// conversion is designed and this is re-wired as a real command.
-//
-// import { renderCarePlan } from "../src";
-//
-// program
-// 	.command("render")
-// 	.argument("<template>", "path to the .docx template")
-// 	.argument("<data>", "path to the data JSON file")
-// 	.argument("<output>", "path to write the rendered .docx")
-// 	.action(async (templatePath: string, dataPath: string, outputPath: string) => {
-// 		const templateBuffer = await Bun.file(templatePath).arrayBuffer();
-// 		const data = await Bun.file(dataPath).json();
-//
-// 		try {
-// 			const output = renderCarePlan(templateBuffer, data);
-// 			await Bun.write(outputPath, output);
-// 		} catch (error: any) {
-// 			console.error(error.message);
-// 			process.exit(1);
-// 		}
-//
-// 		console.log(`Wrote ${outputPath}`);
-// 	});
+cli
+	.command("render")
+	.description("Render a plan and template into a filled-in .docx")
+	.argument("<plan>", "path to the plan JSON file")
+	.argument("<template>", "path to the .docx template")
+	.argument("<output>", "path to write the rendered .docx")
+	.action(async (planPath: string, templatePath: string, outputPath: string) => {
+		let planBuffer: ArrayBuffer;
+		let templateBuffer: ArrayBuffer;
+		try {
+			planBuffer = await Bun.file(planPath).arrayBuffer();
+			templateBuffer = await Bun.file(templatePath).arrayBuffer();
+		} catch (error: unknown) {
+			const message = error instanceof Error ? error.message : String(error);
+			console.error(`Failed to read input file: ${message}`);
+			process.exit(1);
+		}
+
+		const result = render(planBuffer, templateBuffer);
+
+		if (!result.success) {
+			for (const issue of result.issues) {
+				console.error(issue.path ? `${issue.path}: ${issue.message}` : issue.message);
+			}
+			process.exit(1);
+		}
+
+		await Bun.write(outputPath, result.output);
+		console.log(`Wrote ${outputPath}`);
+	});
 
 if (process.argv.length < 3) {
 	cli.outputHelp();

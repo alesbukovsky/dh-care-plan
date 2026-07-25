@@ -7,10 +7,7 @@ export type TemplaterOptions = Omit<
 	"parser" | "paragraphLoop" | "linebreaks"
 >;
 
-export function createTemplater(
-	input: ArrayBuffer,
-	options?: TemplaterOptions,
-): Docxtemplater {
+export function createTemplater(input: ArrayBuffer, options?: TemplaterOptions): Docxtemplater {
 	const zip = new PizZip(input);
 	return new Docxtemplater(zip, {
 		errorLogging: false,

@@ -52,9 +52,7 @@ cli
 cli
 	.command("validate")
 	.description("Validate a data or template file against its schema")
-	.addArgument(
-		new Argument("<type>", "which schema to validate against").choices(SCHEMA_TYPES),
-	)
+	.addArgument(new Argument("<type>", "which schema to validate against").choices(SCHEMA_TYPES))
 	.argument("<file>", "path to the file to validate")
 	.action(async (type: SchemaType, file: string) => {
 		let buffer: ArrayBuffer;

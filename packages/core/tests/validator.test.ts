@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { DEFAULT_MAPPING } from "../src/schema/mapping";
 import { validateData, validateMapping, validateTemplate } from "../src/validator";
 import { buildDocx } from "./helpers/docx-fixture";
 
@@ -12,8 +13,9 @@ describe("validateData", () => {
 			patient: { initials: "J.D.", dob: "1990-01-01", chartId: "12345" },
 			appointments: ["2026-07-01"],
 			needs: [
-				{ name: "flossing", isMet: true, outcome: { status: "met" } },
+				{ type: "maintenance", name: "flossing", isMet: true, outcome: { status: "met" } },
 				{
+					type: "integrity",
 					name: "brushing",
 					isMet: false,
 					relatedTo: "gum disease",
@@ -60,9 +62,7 @@ describe("validateTemplate", () => {
 		const result = validateTemplate(docx);
 		expect(result.valid).toBe(false);
 		if (!result.valid) {
-			expect(result.issues).toEqual([
-				{ path: "name", message: "not defined in Template" },
-			]);
+			expect(result.issues).toEqual([{ path: "name", message: "not defined in Template" }]);
 		}
 	});
 
@@ -99,8 +99,7 @@ describe("validateTemplate", () => {
 			expect(result.issues).toEqual([
 				{
 					path: "",
-					message:
-						'The loop with tag "loop1" is unclosed\nThe loop with tag "loop2" is unclosed',
+					message: 'The loop with tag "loop1" is unclosed\nThe loop with tag "loop2" is unclosed',
 				},
 			]);
 		}
@@ -109,9 +108,7 @@ describe("validateTemplate", () => {
 
 describe("validateMapping", () => {
 	test("accepts a full mapping", () => {
-		const mapping = { outcomeStatus: { met: "A", partial: "B", unmet: "C" } };
-
-		expect(validateMapping(jsonBuffer(mapping))).toEqual({ valid: true });
+		expect(validateMapping(jsonBuffer(DEFAULT_MAPPING))).toEqual({ valid: true });
 	});
 
 	test("rejects an empty object", () => {
@@ -122,8 +119,8 @@ describe("validateMapping", () => {
 		}
 	});
 
-	test("rejects a partial outcomeStatus mapping", () => {
-		const partial = { outcomeStatus: { met: "Achieved" } };
+	test("rejects a partial outcome mapping", () => {
+		const partial = { ...DEFAULT_MAPPING, outcome: { met: "Achieved" } };
 
 		const result = validateMapping(jsonBuffer(partial));
 		expect(result.valid).toBe(false);
@@ -133,7 +130,10 @@ describe("validateMapping", () => {
 	});
 
 	test("rejects a non-string label value", () => {
-		const mapping = { outcomeStatus: { met: 123, partial: "B", unmet: "C" } };
+		const mapping = {
+			...DEFAULT_MAPPING,
+			outcome: { met: 123, partial: "B", unmet: "C" },
+		};
 
 		const result = validateMapping(jsonBuffer(mapping));
 		expect(result.valid).toBe(false);

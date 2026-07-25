@@ -48,10 +48,13 @@ defaulting to `DEFAULT_MAPPING` when omitted:
   same order, with `need.name` mapped to `assessment.need` and
   `need.isMet` mapped to `assessment.isMet`.
 - `statements` SHALL contain one entry per `Need` in `plan.needs` whose
-  `isMet` is `false`, in the same relative order, with `need.name` mapped
-  to `statement.need`, `need.relatedTo` mapped to `statement.relatedTo`,
-  and `need.evidencedBy` mapped to `statement.evidencedBy`. `Need`s where
-  `isMet` is `true` SHALL be excluded from `statements`.
+  `isMet` is `false`, in the same relative order, with `statement.need`
+  derived from the given `Mapping`'s `need` section via
+  `mapping.need[need.type]` (the canonical display label for that need
+  category, not the `Need`'s free-text `name`), `need.relatedTo` mapped
+  to `statement.relatedTo`, and `need.evidencedBy` mapped to
+  `statement.evidencedBy`. `Need`s where `isMet` is `true` SHALL be
+  excluded from `statements`.
 - Each statement's `goals` SHALL contain one entry per `Goal` in the
   source `Need`'s `goals`, in the same order, with `task` and `doneBy`
   mapped 1:1, plus a generated `label` of the form `<n><letter>` where
@@ -64,9 +67,9 @@ defaulting to `DEFAULT_MAPPING` when omitted:
   has no `interventions`.
 - Each statement's `outcome` SHALL be derived from the source `Need`'s
   `outcome`: `outcome.note` SHALL be copied 1:1, and `outcome.status`
-  SHALL be mapped to `outcome.label` via the given `Mapping`'s
-  `outcomeStatus` (i.e. `mapping.outcomeStatus[need.outcome.status]`),
-  not a hard-coded lookup.
+  SHALL be mapped to `outcome.label` via the given `Mapping`'s `outcome`
+  section (i.e. `mapping.outcome[need.outcome.status]`), not a
+  hard-coded lookup.
 - If an unmet `Need` is missing `relatedTo` or `evidencedBy`, `render()`
   SHALL default the corresponding `Statement` field to an empty string
   rather than throwing, so an incomplete `Plan` can still be rendered.
@@ -79,8 +82,9 @@ defaulting to `DEFAULT_MAPPING` when omitted:
   `appointments` match the plan's unchanged, whose `assessments` array
   lists every need (met and unmet) in original order with `need` and
   `isMet` copied from each `Need`, and whose `statements` array lists
-  only the unmet needs in original relative order with `need`,
-  `relatedTo`, and `evidencedBy` copied from each `Need`
+  only the unmet needs in original relative order with `need` derived
+  from the mapping's `need` section (per `need.type`), and `relatedTo`
+  and `evidencedBy` copied from each `Need`
 
 #### Scenario: Generating goal labels for statements
 
@@ -133,10 +137,16 @@ defaulting to `DEFAULT_MAPPING` when omitted:
 #### Scenario: Mapping outcome status to a display label using a custom mapping
 
 - **WHEN** `buildTemplateData` is called with an explicit `Mapping` whose
-  `outcomeStatus` differ from the defaults, and maps an unmet
-  `Need`
+  `outcome` section differs from the defaults, and maps an unmet `Need`
 - **THEN** the resulting `Statement`'s `outcome.label` SHALL come from the
   given `Mapping`, not `DEFAULT_MAPPING`
+
+#### Scenario: Deriving a statement's need label from the mapping, not the plan's free-text name
+
+- **WHEN** `buildTemplateData` maps an unmet `Need` whose `name` differs
+  from the mapping's canonical label for that `Need`'s `type`
+- **THEN** the resulting `Statement`'s `need` SHALL equal
+  `mapping.need[need.type]`, not the `Need`'s `name`
 
 ### Requirement: `render()` renders the template with the generated template data
 

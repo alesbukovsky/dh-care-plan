@@ -6,12 +6,5 @@
 		"MD041": false
 	},
 	"globs": ["**/*.md"],
-	"ignores": [
-		"node_modules",
-		"dev-dist",
-		"dist",
-		"coverage",
-		"packages/*/node_modules",
-		".claude"
-	]
+	"ignores": ["node_modules", "dev-dist", "dist", "coverage", "packages/*/node_modules", ".claude"]
 }

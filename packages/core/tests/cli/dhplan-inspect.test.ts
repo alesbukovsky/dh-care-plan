@@ -2,6 +2,7 @@ import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { DEFAULT_MAPPING } from "../../src/schema/mapping";
 import { runCli } from "./run-cli";
 
 let dir: string;
@@ -15,8 +16,9 @@ beforeAll(async () => {
 			patient: { initials: "J.D.", dob: "1990-01-01", chartId: "12345" },
 			appointments: ["2026-07-01"],
 			needs: [
-				{ name: "flossing", isMet: true, outcome: { status: "met" } },
+				{ type: "maintenance", name: "flossing", isMet: true, outcome: { status: "met" } },
 				{
+					type: "integrity",
 					name: "brushing",
 					isMet: false,
 					relatedTo: "gum disease",
@@ -32,12 +34,13 @@ beforeAll(async () => {
 	await Bun.write(
 		join(dir, "valid-mapping.json"),
 		JSON.stringify({
-			outcomeStatus: { met: "Achieved", partial: "In progress", unmet: "Pending" },
+			...DEFAULT_MAPPING,
+			outcome: { met: "Achieved", partial: "In progress", unmet: "Pending" },
 		}),
 	);
 	await Bun.write(
 		join(dir, "invalid-mapping.json"),
-		JSON.stringify({ outcomeStatus: { unmet: "Pending" } }),
+		JSON.stringify({ outcome: { unmet: "Pending" } }),
 	);
 });
 
@@ -59,7 +62,7 @@ describe("dhplan inspect", () => {
 			],
 			statements: [
 				{
-					need: "brushing",
+					need: DEFAULT_MAPPING.need.integrity,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
 					goals: [{ label: "1a", task: "floss daily" }],

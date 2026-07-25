@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { buildTemplateData, render } from "../src/renderer";
+import { DEFAULT_MAPPING } from "../src/schema/mapping";
 import { buildDocx } from "./helpers/docx-fixture";
 
 function jsonBuffer(value: unknown): ArrayBuffer {
@@ -13,8 +14,14 @@ const validPlan = {
 	patient: PATIENT,
 	appointments: APPOINTMENTS,
 	needs: [
-		{ name: "flossing", isMet: true, outcome: { status: "met" as const } },
 		{
+			type: "maintenance" as const,
+			name: "flossing",
+			isMet: true,
+			outcome: { status: "met" as const },
+		},
+		{
+			type: "integrity" as const,
 			name: "brushing",
 			isMet: false,
 			relatedTo: "gum disease",
@@ -92,7 +99,8 @@ describe("render", () => {
 	test("renders using a valid mapping override", () => {
 		const docx = buildDocx("<w:p><w:r><w:t>Hello world</w:t></w:r></w:p>");
 		const mapping = jsonBuffer({
-			outcomeStatus: { met: "Achieved", partial: "In progress", unmet: "Pending" },
+			...DEFAULT_MAPPING,
+			outcome: { met: "Achieved", partial: "In progress", unmet: "Pending" },
 		});
 
 		const result = render(jsonBuffer(validPlan), docx, mapping);
@@ -102,7 +110,7 @@ describe("render", () => {
 
 	test("returns mapping issues without rendering when the mapping override is invalid", () => {
 		const docx = buildDocx("<w:p><w:r><w:t>Hello world</w:t></w:r></w:p>");
-		const invalidMapping = jsonBuffer({ outcomeStatus: { met: "Achieved" } });
+		const invalidMapping = jsonBuffer({ outcome: { met: "Achieved" } });
 
 		const result = render(jsonBuffer(validPlan), docx, invalidMapping);
 
@@ -128,10 +136,29 @@ describe("buildTemplateData", () => {
 
 		expect(data.statements).toHaveLength(1);
 		expect(data.statements[0]).toMatchObject({
-			need: "brushing",
+			need: DEFAULT_MAPPING.need.integrity,
 			relatedTo: "gum disease",
 			evidencedBy: "x-ray",
 		});
+	});
+
+	test("maps a statement's need from the mapping's need labels, not the plan's free-text name", () => {
+		const data = buildTemplateData({
+			patient: PATIENT,
+			appointments: APPOINTMENTS,
+			needs: [
+				{
+					type: "comfort",
+					name: "some free-text name unrelated to the mapping label",
+					isMet: false,
+					relatedTo: "gum disease",
+					evidencedBy: "x-ray",
+					outcome: { status: "unmet" },
+				},
+			],
+		});
+
+		expect(data.statements[0]?.need).toBe(DEFAULT_MAPPING.need.comfort);
 	});
 
 	test("gives an unmet need without goals an empty goals array", () => {
@@ -140,6 +167,7 @@ describe("buildTemplateData", () => {
 			appointments: APPOINTMENTS,
 			needs: [
 				{
+					type: "integrity",
 					name: "brushing",
 					isMet: false,
 					relatedTo: "gum disease",
@@ -157,8 +185,9 @@ describe("buildTemplateData", () => {
 			patient: PATIENT,
 			appointments: APPOINTMENTS,
 			needs: [
-				{ name: "flossing", isMet: true, outcome: { status: "met" } },
+				{ type: "maintenance", name: "flossing", isMet: true, outcome: { status: "met" } },
 				{
+					type: "integrity",
 					name: "brushing",
 					isMet: false,
 					relatedTo: "gum disease",
@@ -167,6 +196,7 @@ describe("buildTemplateData", () => {
 					outcome: { status: "partial" },
 				},
 				{
+					type: "health",
 					name: "diet",
 					isMet: false,
 					relatedTo: "sugar intake",
@@ -192,6 +222,7 @@ describe("buildTemplateData", () => {
 			appointments: APPOINTMENTS,
 			needs: [
 				{
+					type: "integrity",
 					name: "brushing",
 					isMet: false,
 					evidencedBy: "x-ray",
@@ -206,6 +237,7 @@ describe("buildTemplateData", () => {
 			appointments: APPOINTMENTS,
 			needs: [
 				{
+					type: "integrity",
 					name: "brushing",
 					isMet: false,
 					relatedTo: "gum disease",
@@ -236,6 +268,7 @@ describe("buildTemplateData", () => {
 			appointments: APPOINTMENTS,
 			needs: [
 				{
+					type: "integrity",
 					name: "brushing",
 					isMet: false,
 					relatedTo: "gum disease",
@@ -253,6 +286,7 @@ describe("buildTemplateData", () => {
 			appointments: APPOINTMENTS,
 			needs: [
 				{
+					type: "integrity",
 					name: "brushing",
 					isMet: false,
 					relatedTo: "gum disease",
@@ -268,6 +302,7 @@ describe("buildTemplateData", () => {
 			appointments: APPOINTMENTS,
 			needs: [
 				{
+					type: "integrity",
 					name: "brushing",
 					isMet: false,
 					relatedTo: "gum disease",
@@ -286,6 +321,7 @@ describe("buildTemplateData", () => {
 			appointments: APPOINTMENTS,
 			needs: [
 				{
+					type: "integrity",
 					name: "brushing",
 					isMet: false,
 					relatedTo: "gum disease",
@@ -299,7 +335,8 @@ describe("buildTemplateData", () => {
 
 	test("uses a custom mapping's outcome labels instead of the defaults", () => {
 		const customMapping = {
-			outcomeStatus: { met: "Achieved", partial: "In progress", unmet: "Pending" },
+			...DEFAULT_MAPPING,
+			outcome: { met: "Achieved", partial: "In progress", unmet: "Pending" },
 		};
 
 		const data = buildTemplateData(
@@ -308,6 +345,7 @@ describe("buildTemplateData", () => {
 				appointments: APPOINTMENTS,
 				needs: [
 					{
+						type: "integrity",
 						name: "brushing",
 						isMet: false,
 						relatedTo: "gum disease",

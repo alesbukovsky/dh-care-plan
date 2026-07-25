@@ -13,11 +13,20 @@ and schema/sample helpers.
 The system SHALL provide a `Mapping` config
 (`packages/core/src/schema/mapping.ts`) representing every
 user-overridable text mapping used when converting a `Plan` into
-`Template` data. `Mapping` SHALL include an `outcomeStatus` section
-mapping each `Need.outcome.status` value (`"met"`, `"partial"`,
-`"unmet"`) to a display string, with every key required. The system
-SHALL provide a `DEFAULT_MAPPING` constant with `outcomeStatus` set
-to `"Met"`, `"Partially met"`, and `"Not met"` respectively.
+`Template` data, with every key in every section required. `Mapping`
+SHALL include:
+
+- a `need` section mapping each `Need.type` value (`"image"`, `"peace"`,
+  `"integrity"`, `"health"`, `"comfort"`, `"dentition"`, `"understanding"`,
+  `"responsibility"`, `"maintenance"`) to a canonical display label for
+  that need category
+- an `outcome` section mapping each `Need.outcome.status` value
+  (`"met"`, `"partial"`, `"unmet"`) to a display string
+
+The system SHALL provide a `DEFAULT_MAPPING` constant with a canonical
+label for each `need` key (e.g. `"integrity"` -> `"Skin and mucous
+membrane integrity of head and neck"`) and `outcome` set to `"Met"`,
+`"Partially met"`, and `"Not met"` respectively.
 
 #### Scenario: Default mapping values
 
@@ -57,8 +66,8 @@ already return.
 #### Scenario: Invalid or incomplete mapping file
 
 - **WHEN** `validateMapping` is called with a buffer containing JSON that
-  violates `Mapping` (e.g. a non-string label value, or a section/key
-  missing), or content that is not valid JSON
+  violates `Mapping` (e.g. a non-string label value, or a `need`/`outcome`
+  key missing), or content that is not valid JSON
 - **THEN** the system SHALL return `{ valid: false, issues }` describing
   every violation
 

@@ -22,6 +22,17 @@ const Outcome = z.object({
 });
 
 export const Need = z.object({
+	type: z.enum([
+		"image",
+		"peace",
+		"integrity",
+		"health",
+		"comfort",
+		"dentition",
+		"understanding",
+		"responsibility",
+		"maintenance",
+	]),
 	name: z.string(),
 	isMet: z.boolean(),
 	relatedTo: z.string().optional(),

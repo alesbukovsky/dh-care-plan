@@ -21,10 +21,7 @@ function orEmpty(value: string | undefined): string {
 	return value ?? "";
 }
 
-export function buildTemplateData(
-	plan: Plan,
-	mapping: Mapping = DEFAULT_MAPPING,
-): Template {
+export function buildTemplateData(plan: Plan, mapping: Mapping = DEFAULT_MAPPING): Template {
 	const assessments = plan.needs.map((need) => ({
 		need: need.name,
 		isMet: need.isMet,
@@ -35,7 +32,7 @@ export function buildTemplateData(
 	const statements = unmetNeeds.map((need, needIndex) => {
 		const statementNumber = needIndex + 1;
 		return {
-			need: need.name,
+			need: mapping.need[need.type],
 			relatedTo: orEmpty(need.relatedTo),
 			evidencedBy: orEmpty(need.evidencedBy),
 			goals: (need.goals ?? []).map((goal, goalIndex) => ({
@@ -45,7 +42,7 @@ export function buildTemplateData(
 			})),
 			interventions: need.interventions ?? [],
 			outcome: {
-				label: mapping.outcomeStatus[need.outcome.status],
+				label: mapping.outcome[need.outcome.status],
 				note: need.outcome.note,
 			},
 		};

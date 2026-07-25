@@ -10,9 +10,7 @@ export interface ValidationIssue {
 	message: string;
 }
 
-export type ValidationResult =
-	| { valid: true }
-	| { valid: false; issues: ValidationIssue[] };
+export type ValidationResult = { valid: true } | { valid: false; issues: ValidationIssue[] };
 
 export type Validator = (input: ArrayBuffer) => ValidationResult;
 
@@ -80,9 +78,7 @@ function collectUndefinedTags(
 		}
 
 		const hasNestedTags =
-			children !== null &&
-			typeof children === "object" &&
-			Object.keys(children).length > 0;
+			children !== null && typeof children === "object" && Object.keys(children).length > 0;
 		if (hasNestedTags) {
 			const nestedShape =
 				field instanceof z.ZodArray && field.element instanceof z.ZodObject

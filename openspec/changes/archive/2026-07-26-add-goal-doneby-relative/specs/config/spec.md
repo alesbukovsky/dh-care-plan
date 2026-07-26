@@ -1,12 +1,4 @@
-# config Specification
-
-## Purpose
-
-TBD - defines `Config`, the user-overridable formatting and text mapping
-configuration used when converting a `Plan` into `Template` data, its
-defaults, validation, and schema/sample helpers.
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: `Config` holds user-overridable formatting and text choices with built-in defaults
 
@@ -47,21 +39,6 @@ mucous membrane integrity of head and neck"`) and `outcome` set to
   SHALL return a `Config` equal to `DEFAULT_CONFIG`, including its
   `format.date` pattern, `format.goal.doneBy` pattern, and
   `mapping.need`/`mapping.outcome` sections
-
-### Requirement: A supplied config replaces the defaults entirely
-
-The system SHALL provide a `resolveConfig(config?: Config): Config`
-function that returns the given `Config` unchanged when one is provided,
-or `DEFAULT_CONFIG` when omitted. There SHALL be no partial-override or
-per-key merge behavior: a user-supplied config must fully specify every
-key in every section (`format.date`, and every `mapping.need`/
-`mapping.outcome` key).
-
-#### Scenario: A given config is returned unchanged
-
-- **WHEN** `resolveConfig(config)` is called with a complete `Config`
-- **THEN** the system SHALL return that `Config` unchanged, without
-  merging it against `DEFAULT_CONFIG`
 
 ### Requirement: Config files are validated against `Config`
 

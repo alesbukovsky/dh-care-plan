@@ -1,5 +1,6 @@
+export { convertData } from "./converter";
 export type { RenderResult } from "./renderer";
-export { buildTemplateData, render } from "./renderer";
+export { render } from "./renderer";
 export { getConfigSample, getPlanSample, getTemplateSample } from "./sampler";
 export {
 	Config,

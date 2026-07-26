@@ -158,6 +158,17 @@ describe("validateConfig", () => {
 		}
 	});
 
+	test("rejects a config missing format.goal.doneBy", () => {
+		const { goal, ...formatWithoutGoal } = DEFAULT_CONFIG.format;
+		const config = { ...DEFAULT_CONFIG, format: formatWithoutGoal };
+
+		const result = validateConfig(jsonBuffer(config));
+		expect(result.valid).toBe(false);
+		if (!result.valid) {
+			expect(result.issues.length).toBeGreaterThan(0);
+		}
+	});
+
 	test("rejects malformed JSON", () => {
 		const malformed = new TextEncoder().encode("{ not json").buffer as ArrayBuffer;
 

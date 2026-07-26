@@ -1,4 +1,4 @@
-import { buildTemplateData } from "./renderer";
+import { convertData } from "./converter";
 import type { Config } from "./schema/config";
 import { DEFAULT_CONFIG } from "./schema/config";
 import type { Plan } from "./schema/plan";
@@ -21,7 +21,10 @@ export function getPlanSample(): Plan {
 				isMet: false,
 				relatedTo: "gum disease",
 				evidencedBy: "x-ray",
-				goals: [{ task: "floss daily", doneBy: "2026-08-01" }, { task: "brush twice a day" }],
+				goals: [
+					{ task: "floss daily", doneBy: { date: "2026-08-01", relative: "by next visit" } },
+					{ task: "brush twice a day" },
+				],
 				interventions: ["oral hygiene education"],
 				outcome: { status: "partial", note: "improving" },
 			},
@@ -30,7 +33,7 @@ export function getPlanSample(): Plan {
 }
 
 export function getTemplateSample(): Template {
-	return buildTemplateData(getPlanSample());
+	return convertData(getPlanSample());
 }
 
 export function getConfigSample(): Config {

@@ -21,8 +21,13 @@ const Outcome = z.object({
 	unmet: z.string(),
 });
 
+const Goal = z.object({
+	doneBy: z.string(),
+});
+
 const Format = z.object({
 	date: z.string(),
+	goal: Goal,
 });
 
 const Mapping = z.object({
@@ -48,6 +53,9 @@ export function getConfigSchema(): object {
 export const DEFAULT_CONFIG: Config = {
 	format: {
 		date: "MM/DD/YYYY",
+		goal: {
+			doneBy: "{date}, {relative}",
+		},
 	},
 	mapping: {
 		need: {

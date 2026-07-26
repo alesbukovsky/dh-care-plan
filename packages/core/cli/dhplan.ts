@@ -2,7 +2,7 @@
 import { Argument, Command } from "commander";
 import type { Config } from "../src";
 import {
-	buildTemplateData,
+	convertData,
 	getConfigSample,
 	getConfigSchema,
 	getPlanSample,
@@ -165,7 +165,7 @@ cli
 		}
 
 		const plan = Plan.parse(JSON.parse(new TextDecoder().decode(planBuffer)));
-		console.log(JSON.stringify(buildTemplateData(plan, config), null, 2));
+		console.log(JSON.stringify(convertData(plan, config), null, 2));
 	});
 
 if (process.argv.length < 3) {

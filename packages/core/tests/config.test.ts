@@ -11,6 +11,10 @@ describe("resolveConfig", () => {
 	test("returns the given config unchanged when one is provided", () => {
 		expect(resolveConfig(DEFAULT_CONFIG)).toEqual(DEFAULT_CONFIG);
 	});
+
+	test("DEFAULT_CONFIG includes a format.goal.doneBy pattern", () => {
+		expect(DEFAULT_CONFIG.format.goal.doneBy).toBe("{date}, {relative}");
+	});
 });
 
 describe("Config's mapping shape aligns with Plan enums", () => {

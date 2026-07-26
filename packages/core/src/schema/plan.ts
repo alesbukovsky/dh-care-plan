@@ -12,7 +12,12 @@ registry.add(Patient, { id: "Patient" });
 
 const Goal = z.object({
 	task: z.string(),
-	doneBy: z.iso.date().optional(),
+	doneBy: z
+		.object({
+			date: z.iso.date().optional(),
+			relative: z.string().optional(),
+		})
+		.optional(),
 });
 registry.add(Goal, { id: "Goal" });
 

@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { DEFAULT_MAPPING } from "../../src/schema/mapping";
+import { DEFAULT_CONFIG } from "../../src/schema/config";
 import { runCli } from "./run-cli";
 
 let dir: string;
@@ -32,15 +32,18 @@ beforeAll(async () => {
 	await Bun.write(join(dir, "malformed-plan.json"), "{ not json");
 
 	await Bun.write(
-		join(dir, "valid-mapping.json"),
+		join(dir, "valid-config.json"),
 		JSON.stringify({
-			...DEFAULT_MAPPING,
-			outcome: { met: "Achieved", partial: "In progress", unmet: "Pending" },
+			...DEFAULT_CONFIG,
+			mapping: {
+				...DEFAULT_CONFIG.mapping,
+				outcome: { met: "Achieved", partial: "In progress", unmet: "Pending" },
+			},
 		}),
 	);
 	await Bun.write(
-		join(dir, "invalid-mapping.json"),
-		JSON.stringify({ outcome: { unmet: "Pending" } }),
+		join(dir, "invalid-config.json"),
+		JSON.stringify({ mapping: { outcome: { unmet: "Pending" } } }),
 	);
 });
 
@@ -54,15 +57,15 @@ describe("dhplan inspect", () => {
 
 		expect(exitCode).toBe(0);
 		expect(JSON.parse(stdout)).toEqual({
-			patient: { initials: "J.D.", dob: "1990-01-01", chartId: "12345" },
-			appointments: ["2026-07-01"],
+			patient: { initials: "J.D.", dob: "01/01/1990", chartId: "12345" },
+			appointments: ["07/01/2026"],
 			assessments: [
 				{ need: "flossing", isMet: true },
 				{ need: "brushing", isMet: false },
 			],
 			statements: [
 				{
-					need: DEFAULT_MAPPING.need.integrity,
+					need: DEFAULT_CONFIG.mapping.need.integrity,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
 					goals: [{ label: "1a", task: "floss daily" }],
@@ -95,12 +98,12 @@ describe("dhplan inspect", () => {
 		expect(stderr.length).toBeGreaterThan(0);
 	});
 
-	test("prints template data using a valid --mapping override file", async () => {
+	test("prints template data using a valid --config override file", async () => {
 		const { stdout, exitCode } = await runCli([
 			"inspect",
 			join(dir, "valid-plan.json"),
-			"--mapping",
-			join(dir, "valid-mapping.json"),
+			"--config",
+			join(dir, "valid-config.json"),
 		]);
 
 		expect(exitCode).toBe(0);
@@ -108,12 +111,12 @@ describe("dhplan inspect", () => {
 		expect(data.statements[0]?.outcome).toEqual({ label: "Pending" });
 	});
 
-	test("an invalid --mapping override file reports issues without printing template data", async () => {
+	test("an invalid --config override file reports issues without printing template data", async () => {
 		const { stdout, stderr, exitCode } = await runCli([
 			"inspect",
 			join(dir, "valid-plan.json"),
-			"--mapping",
-			join(dir, "invalid-mapping.json"),
+			"--config",
+			join(dir, "invalid-config.json"),
 		]);
 
 		expect(exitCode).not.toBe(0);

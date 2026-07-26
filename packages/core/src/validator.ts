@@ -1,6 +1,6 @@
 import InspectModule from "docxtemplater/js/inspect-module.js";
 import { z } from "zod";
-import { Mapping } from "./schema/mapping";
+import { Config } from "./schema/config";
 import { Plan } from "./schema/plan";
 import { Template } from "./schema/template";
 import { createTemplater, describeTemplaterError } from "./templater";
@@ -38,7 +38,7 @@ export function validateData(input: ArrayBuffer): ValidationResult {
 	};
 }
 
-export function validateMapping(input: ArrayBuffer): ValidationResult {
+export function validateConfig(input: ArrayBuffer): ValidationResult {
 	let parsed: unknown;
 	try {
 		parsed = JSON.parse(new TextDecoder().decode(input));
@@ -50,7 +50,7 @@ export function validateMapping(input: ArrayBuffer): ValidationResult {
 		};
 	}
 
-	const result = Mapping.safeParse(parsed);
+	const result = Config.safeParse(parsed);
 	if (result.success) return { valid: true };
 
 	return {

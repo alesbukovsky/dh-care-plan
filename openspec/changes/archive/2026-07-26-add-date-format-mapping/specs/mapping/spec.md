@@ -1,14 +1,18 @@
-# mapping Specification
-
-## Purpose
-
-TBD - defines `Mapping`, the user-overridable text configuration used
-when converting a `Plan` into `Template` data, its defaults, validation,
-and schema/sample helpers.
-
-## Requirements
+## REMOVED Requirements
 
 ### Requirement: `Mapping` holds user-overridable text choices with built-in defaults
+
+**Reason**: The `mapping` capability is renamed to `config` and
+restructured with `format`/`mapping` top-level sections — see the
+`config` capability's `Config holds user-overridable formatting and text
+choices with built-in defaults` requirement.
+
+**Migration**: Replace `Mapping` (`packages/core/src/schema/mapping.ts`)
+with `Config` (`packages/core/src/schema/config.ts`). Move existing
+`need`/`outcome` sections unchanged under a new `mapping` key
+(`config.mapping.need`, `config.mapping.outcome`), and add a required
+`format.date` pattern. `DEFAULT_MAPPING` becomes `DEFAULT_CONFIG` with
+the same values, restructured under `format`/`mapping`.
 
 The system SHALL provide a `Mapping` config
 (`packages/core/src/schema/mapping.ts`) representing every
@@ -36,6 +40,11 @@ membrane integrity of head and neck"`) and `outcome` set to `"Met"`,
 
 ### Requirement: A supplied mapping replaces the defaults entirely
 
+**Reason**: Renamed to `config`'s `resolveConfig` — see the `config`
+capability.
+
+**Migration**: Replace calls to `resolveMapping` with `resolveConfig`.
+
 The system SHALL provide a `resolveMapping(mapping?: Mapping): Mapping`
 function that returns the given `Mapping` unchanged when one is provided,
 or `DEFAULT_MAPPING` when omitted. There SHALL be no partial-override or
@@ -49,6 +58,11 @@ key in every section.
   merging it against `DEFAULT_MAPPING`
 
 ### Requirement: Mapping files are validated against `Mapping`
+
+**Reason**: Renamed to `config`'s `validateConfig` — see the `config`
+capability.
+
+**Migration**: Replace calls to `validateMapping` with `validateConfig`.
 
 The system SHALL provide a `validateMapping` function
 (`packages/core/src/validator.ts`) that parses a buffer as JSON and
@@ -72,6 +86,12 @@ already return.
   every violation
 
 ### Requirement: `getMappingSchema()` and `getMappingSample()` describe the mapping file format
+
+**Reason**: Renamed to `config`'s `getConfigSchema()`/`getConfigSample()`
+— see the `config` capability.
+
+**Migration**: Replace calls to `getMappingSchema`/`getMappingSample`
+with `getConfigSchema`/`getConfigSample`.
 
 The system SHALL provide `getMappingSchema(): object`, returning the JSON
 Schema document for `Mapping`, and `getMappingSample(): Mapping`,

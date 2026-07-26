@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { buildTemplateData, render } from "../src/renderer";
-import { DEFAULT_MAPPING } from "../src/schema/mapping";
+import { DEFAULT_CONFIG } from "../src/schema/config";
 import { buildDocx } from "./helpers/docx-fixture";
 
 function jsonBuffer(value: unknown): ArrayBuffer {
@@ -88,7 +88,7 @@ describe("render", () => {
 		}
 	});
 
-	test("renders using the default mapping when no mapping is given", () => {
+	test("renders using the default config when no config is given", () => {
 		const docx = buildDocx("<w:p><w:r><w:t>Hello world</w:t></w:r></w:p>");
 
 		const result = render(jsonBuffer(validPlan), docx);
@@ -96,23 +96,26 @@ describe("render", () => {
 		expect(result.success).toBe(true);
 	});
 
-	test("renders using a valid mapping override", () => {
+	test("renders using a valid config override", () => {
 		const docx = buildDocx("<w:p><w:r><w:t>Hello world</w:t></w:r></w:p>");
-		const mapping = jsonBuffer({
-			...DEFAULT_MAPPING,
-			outcome: { met: "Achieved", partial: "In progress", unmet: "Pending" },
+		const config = jsonBuffer({
+			...DEFAULT_CONFIG,
+			mapping: {
+				...DEFAULT_CONFIG.mapping,
+				outcome: { met: "Achieved", partial: "In progress", unmet: "Pending" },
+			},
 		});
 
-		const result = render(jsonBuffer(validPlan), docx, mapping);
+		const result = render(jsonBuffer(validPlan), docx, config);
 
 		expect(result.success).toBe(true);
 	});
 
-	test("returns mapping issues without rendering when the mapping override is invalid", () => {
+	test("returns config issues without rendering when the config override is invalid", () => {
 		const docx = buildDocx("<w:p><w:r><w:t>Hello world</w:t></w:r></w:p>");
-		const invalidMapping = jsonBuffer({ outcome: { met: "Achieved" } });
+		const invalidConfig = jsonBuffer({ mapping: { outcome: { met: "Achieved" } } });
 
-		const result = render(jsonBuffer(validPlan), docx, invalidMapping);
+		const result = render(jsonBuffer(validPlan), docx, invalidConfig);
 
 		expect(result.success).toBe(false);
 		if (!result.success) {
@@ -136,13 +139,13 @@ describe("buildTemplateData", () => {
 
 		expect(data.statements).toHaveLength(1);
 		expect(data.statements[0]).toMatchObject({
-			need: DEFAULT_MAPPING.need.integrity,
+			need: DEFAULT_CONFIG.mapping.need.integrity,
 			relatedTo: "gum disease",
 			evidencedBy: "x-ray",
 		});
 	});
 
-	test("maps a statement's need from the mapping's need labels, not the plan's free-text name", () => {
+	test("maps a statement's need from the config's mapping.need labels, not the plan's free-text name", () => {
 		const data = buildTemplateData({
 			patient: PATIENT,
 			appointments: APPOINTMENTS,
@@ -158,7 +161,7 @@ describe("buildTemplateData", () => {
 			],
 		});
 
-		expect(data.statements[0]?.need).toBe(DEFAULT_MAPPING.need.comfort);
+		expect(data.statements[0]?.need).toBe(DEFAULT_CONFIG.mapping.need.comfort);
 	});
 
 	test("gives an unmet need without goals an empty goals array", () => {
@@ -212,7 +215,7 @@ describe("buildTemplateData", () => {
 			{ label: "1b", task: "brush twice a day", doneBy: undefined },
 		]);
 		expect(data.statements[1]?.goals).toEqual([
-			{ label: "2a", task: "reduce sugar", doneBy: "2026-08-01" },
+			{ label: "2a", task: "reduce sugar", doneBy: "08/01/2026" },
 		]);
 	});
 
@@ -251,11 +254,41 @@ describe("buildTemplateData", () => {
 		});
 	});
 
-	test("copies patient and appointments unchanged", () => {
+	test("formats patient.dob and appointments using config.format.date, otherwise copying patient fields unchanged", () => {
 		const data = buildTemplateData(validPlan);
 
-		expect(data.patient).toEqual(PATIENT);
-		expect(data.appointments).toEqual(APPOINTMENTS);
+		expect(data.patient).toEqual({ ...PATIENT, dob: "01/01/1990" });
+		expect(data.appointments).toEqual(["07/01/2026", "08/01/2026"]);
+	});
+
+	test("formats dates using a custom config.format.date pattern", () => {
+		const data = buildTemplateData(validPlan, {
+			...DEFAULT_CONFIG,
+			format: { date: "DD.MM.YYYY" },
+		});
+
+		expect(data.patient.dob).toBe("01.01.1990");
+		expect(data.appointments).toEqual(["01.07.2026", "01.08.2026"]);
+	});
+
+	test("leaves a goal's doneBy undefined rather than formatting when absent", () => {
+		const data = buildTemplateData({
+			patient: PATIENT,
+			appointments: APPOINTMENTS,
+			needs: [
+				{
+					type: "integrity",
+					name: "brushing",
+					isMet: false,
+					relatedTo: "gum disease",
+					evidencedBy: "x-ray",
+					goals: [{ task: "brush twice a day" }],
+					outcome: { status: "unmet" },
+				},
+			],
+		});
+
+		expect(data.statements[0]?.goals[0]?.doneBy).toBeUndefined();
 	});
 
 	test("copies interventions onto a statement, defaulting to an empty array", () => {
@@ -333,10 +366,13 @@ describe("buildTemplateData", () => {
 		expect(unmet.statements[0]?.outcome).toEqual({ label: "Not met", note: undefined });
 	});
 
-	test("uses a custom mapping's outcome labels instead of the defaults", () => {
-		const customMapping = {
-			...DEFAULT_MAPPING,
-			outcome: { met: "Achieved", partial: "In progress", unmet: "Pending" },
+	test("uses a custom config's mapping.outcome labels instead of the defaults", () => {
+		const customConfig = {
+			...DEFAULT_CONFIG,
+			mapping: {
+				...DEFAULT_CONFIG.mapping,
+				outcome: { met: "Achieved", partial: "In progress", unmet: "Pending" },
+			},
 		};
 
 		const data = buildTemplateData(
@@ -354,7 +390,7 @@ describe("buildTemplateData", () => {
 					},
 				],
 			},
-			customMapping,
+			customConfig,
 		);
 
 		expect(data.statements[0]?.outcome).toEqual({

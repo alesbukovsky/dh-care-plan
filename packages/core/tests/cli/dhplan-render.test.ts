@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { DEFAULT_MAPPING } from "../../src/schema/mapping";
+import { DEFAULT_CONFIG } from "../../src/schema/config";
 import { buildDocx } from "../helpers/docx-fixture";
 import { runCli } from "./run-cli";
 
@@ -22,15 +22,18 @@ beforeAll(async () => {
 	await Bun.write(join(dir, "malformed-plan.json"), "{ not json");
 
 	await Bun.write(
-		join(dir, "valid-mapping.json"),
+		join(dir, "valid-config.json"),
 		JSON.stringify({
-			...DEFAULT_MAPPING,
-			outcome: { met: "Achieved", partial: "In progress", unmet: "Pending" },
+			...DEFAULT_CONFIG,
+			mapping: {
+				...DEFAULT_CONFIG.mapping,
+				outcome: { met: "Achieved", partial: "In progress", unmet: "Pending" },
+			},
 		}),
 	);
 	await Bun.write(
-		join(dir, "invalid-mapping.json"),
-		JSON.stringify({ outcome: { met: "Achieved" } }),
+		join(dir, "invalid-config.json"),
+		JSON.stringify({ mapping: { outcome: { met: "Achieved" } } }),
 	);
 
 	await Bun.write(
@@ -111,16 +114,16 @@ describe("dhplan render", () => {
 		expect(await Bun.file(outputPath).exists()).toBe(false);
 	});
 
-	test("renders with a valid --mapping override file", async () => {
-		const outputPath = join(dir, "out-with-mapping.docx");
+	test("renders with a valid --config override file", async () => {
+		const outputPath = join(dir, "out-with-config.docx");
 
 		const { stdout, exitCode } = await runCli([
 			"render",
 			join(dir, "valid-plan.json"),
 			join(dir, "no-tags.docx"),
 			outputPath,
-			"--mapping",
-			join(dir, "valid-mapping.json"),
+			"--config",
+			join(dir, "valid-config.json"),
 		]);
 
 		expect(exitCode).toBe(0);
@@ -128,16 +131,16 @@ describe("dhplan render", () => {
 		expect(await Bun.file(outputPath).exists()).toBe(true);
 	});
 
-	test("an invalid --mapping override file reports issues and does not write the output", async () => {
-		const outputPath = join(dir, "out-invalid-mapping.docx");
+	test("an invalid --config override file reports issues and does not write the output", async () => {
+		const outputPath = join(dir, "out-invalid-config.docx");
 
 		const { stdout, stderr, exitCode } = await runCli([
 			"render",
 			join(dir, "valid-plan.json"),
 			join(dir, "no-tags.docx"),
 			outputPath,
-			"--mapping",
-			join(dir, "invalid-mapping.json"),
+			"--config",
+			join(dir, "invalid-config.json"),
 		]);
 
 		expect(exitCode).not.toBe(0);

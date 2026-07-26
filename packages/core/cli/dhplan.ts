@@ -1,23 +1,23 @@
 #!/usr/bin/env bun
 import { Argument, Command } from "commander";
-import type { Mapping } from "../src";
+import type { Config } from "../src";
 import {
 	buildTemplateData,
-	getMappingSample,
-	getMappingSchema,
+	getConfigSample,
+	getConfigSchema,
 	getPlanSample,
 	getPlanSchema,
 	getTemplateSample,
 	getTemplateSchema,
 	Plan,
 	render,
-	resolveMapping,
+	resolveConfig,
+	validateConfig,
 	validateData,
-	validateMapping,
 	validateTemplate,
 } from "../src";
 
-const SCHEMA_TYPES = ["plan", "template", "mapping"] as const;
+const SCHEMA_TYPES = ["plan", "template", "config"] as const;
 type SchemaType = (typeof SCHEMA_TYPES)[number];
 
 const cli = new Command();
@@ -33,12 +33,12 @@ cli
 		const samples = {
 			plan: getPlanSample,
 			template: getTemplateSample,
-			mapping: getMappingSample,
+			config: getConfigSample,
 		};
 		const schemas = {
 			plan: getPlanSchema,
 			template: getTemplateSchema,
-			mapping: getMappingSchema,
+			config: getConfigSchema,
 		};
 
 		if (options.sample) {
@@ -67,7 +67,7 @@ cli
 		const validators = {
 			plan: validateData,
 			template: validateTemplate,
-			mapping: validateMapping,
+			config: validateConfig,
 		};
 		const result = validators[type](buffer);
 
@@ -88,22 +88,22 @@ cli
 	.argument("<plan>", "path to the plan JSON file")
 	.argument("<template>", "path to the .docx template")
 	.argument("<output>", "path to write the rendered .docx")
-	.option("--mapping <file>", "path to a mapping override JSON file")
+	.option("--config <file>", "path to a config override JSON file")
 	.action(
 		async (
 			planPath: string,
 			templatePath: string,
 			outputPath: string,
-			options: { mapping?: string },
+			options: { config?: string },
 		) => {
 			let planBuffer: ArrayBuffer;
 			let templateBuffer: ArrayBuffer;
-			let mappingBuffer: ArrayBuffer | undefined;
+			let configBuffer: ArrayBuffer | undefined;
 			try {
 				planBuffer = await Bun.file(planPath).arrayBuffer();
 				templateBuffer = await Bun.file(templatePath).arrayBuffer();
-				if (options.mapping) {
-					mappingBuffer = await Bun.file(options.mapping).arrayBuffer();
+				if (options.config) {
+					configBuffer = await Bun.file(options.config).arrayBuffer();
 				}
 			} catch (error: unknown) {
 				const message = error instanceof Error ? error.message : String(error);
@@ -111,7 +111,7 @@ cli
 				process.exit(1);
 			}
 
-			const result = render(planBuffer, templateBuffer, mappingBuffer);
+			const result = render(planBuffer, templateBuffer, configBuffer);
 
 			if (!result.success) {
 				for (const issue of result.issues) {
@@ -129,14 +129,14 @@ cli
 	.command("inspect")
 	.description("Print template data generated from a plan")
 	.argument("<plan>", "path to the plan JSON file")
-	.option("--mapping <file>", "path to a mapping override JSON file")
-	.action(async (planPath: string, options: { mapping?: string }) => {
+	.option("--config <file>", "path to a config override JSON file")
+	.action(async (planPath: string, options: { config?: string }) => {
 		let planBuffer: ArrayBuffer;
-		let mappingBuffer: ArrayBuffer | undefined;
+		let configBuffer: ArrayBuffer | undefined;
 		try {
 			planBuffer = await Bun.file(planPath).arrayBuffer();
-			if (options.mapping) {
-				mappingBuffer = await Bun.file(options.mapping).arrayBuffer();
+			if (options.config) {
+				configBuffer = await Bun.file(options.config).arrayBuffer();
 			}
 		} catch (error: unknown) {
 			const message = error instanceof Error ? error.message : String(error);
@@ -152,20 +152,20 @@ cli
 			process.exit(1);
 		}
 
-		let mapping: Mapping | undefined;
-		if (mappingBuffer) {
-			const mappingCheck = validateMapping(mappingBuffer);
-			if (!mappingCheck.valid) {
-				for (const issue of mappingCheck.issues) {
+		let config: Config | undefined;
+		if (configBuffer) {
+			const configCheck = validateConfig(configBuffer);
+			if (!configCheck.valid) {
+				for (const issue of configCheck.issues) {
 					console.error(issue.path ? `${issue.path}: ${issue.message}` : issue.message);
 				}
 				process.exit(1);
 			}
-			mapping = resolveMapping(JSON.parse(new TextDecoder().decode(mappingBuffer)));
+			config = resolveConfig(JSON.parse(new TextDecoder().decode(configBuffer)));
 		}
 
 		const plan = Plan.parse(JSON.parse(new TextDecoder().decode(planBuffer)));
-		console.log(JSON.stringify(buildTemplateData(plan, mapping), null, 2));
+		console.log(JSON.stringify(buildTemplateData(plan, config), null, 2));
 	});
 
 if (process.argv.length < 3) {

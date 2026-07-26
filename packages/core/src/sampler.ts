@@ -1,6 +1,6 @@
 import { buildTemplateData } from "./renderer";
-import type { Mapping } from "./schema/mapping";
-import { DEFAULT_MAPPING } from "./schema/mapping";
+import type { Config } from "./schema/config";
+import { DEFAULT_CONFIG } from "./schema/config";
 import type { Plan } from "./schema/plan";
 import type { Template } from "./schema/template";
 
@@ -33,6 +33,6 @@ export function getTemplateSample(): Template {
 	return buildTemplateData(getPlanSample());
 }
 
-export function getMappingSample(): Mapping {
-	return DEFAULT_MAPPING;
+export function getConfigSample(): Config {
+	return DEFAULT_CONFIG;
 }

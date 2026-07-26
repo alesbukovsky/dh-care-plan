@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { DEFAULT_MAPPING } from "../../src/schema/mapping";
+import { DEFAULT_CONFIG } from "../../src/schema/config";
 import { buildDocx } from "../helpers/docx-fixture";
 import { runCli } from "./run-cli";
 
@@ -34,15 +34,18 @@ beforeAll(async () => {
 	await Bun.write(join(dir, "not-an-object.json"), JSON.stringify("just a string"));
 
 	await Bun.write(
-		join(dir, "valid-mapping.json"),
+		join(dir, "valid-config.json"),
 		JSON.stringify({
-			...DEFAULT_MAPPING,
-			outcome: { met: "Achieved", partial: "In progress", unmet: "Pending" },
+			...DEFAULT_CONFIG,
+			mapping: {
+				...DEFAULT_CONFIG.mapping,
+				outcome: { met: "Achieved", partial: "In progress", unmet: "Pending" },
+			},
 		}),
 	);
 	await Bun.write(
-		join(dir, "invalid-mapping.json"),
-		JSON.stringify({ outcome: { met: "Achieved" } }),
+		join(dir, "invalid-config.json"),
+		JSON.stringify({ mapping: { outcome: { met: "Achieved" } } }),
 	);
 
 	await Bun.write(
@@ -108,23 +111,23 @@ describe("dhplan validate template", () => {
 	});
 });
 
-describe("dhplan validate mapping", () => {
-	test("a JSON object matching Mapping is valid", async () => {
+describe("dhplan validate config", () => {
+	test("a JSON object matching Config is valid", async () => {
 		const { stdout, exitCode } = await runCli([
 			"validate",
-			"mapping",
-			join(dir, "valid-mapping.json"),
+			"config",
+			join(dir, "valid-config.json"),
 		]);
 
 		expect(exitCode).toBe(0);
 		expect(stdout).toContain("is valid");
 	});
 
-	test("a mapping file with a non-string label is invalid", async () => {
+	test("a config file with a non-string label is invalid", async () => {
 		const { stdout, stderr, exitCode } = await runCli([
 			"validate",
-			"mapping",
-			join(dir, "invalid-mapping.json"),
+			"config",
+			join(dir, "invalid-config.json"),
 		]);
 
 		expect(exitCode).not.toBe(0);
@@ -145,6 +148,6 @@ describe("dhplan validate", () => {
 		expect(stdout.trim()).toBe("");
 		expect(stderr).toContain("plan");
 		expect(stderr).toContain("template");
-		expect(stderr).toContain("mapping");
+		expect(stderr).toContain("config");
 	});
 });

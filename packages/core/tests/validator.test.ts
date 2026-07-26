@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { DEFAULT_MAPPING } from "../src/schema/mapping";
-import { validateData, validateMapping, validateTemplate } from "../src/validator";
+import { DEFAULT_CONFIG } from "../src/schema/config";
+import { validateConfig, validateData, validateTemplate } from "../src/validator";
 import { buildDocx } from "./helpers/docx-fixture";
 
 function jsonBuffer(value: unknown): ArrayBuffer {
@@ -106,23 +106,26 @@ describe("validateTemplate", () => {
 	});
 });
 
-describe("validateMapping", () => {
-	test("accepts a full mapping", () => {
-		expect(validateMapping(jsonBuffer(DEFAULT_MAPPING))).toEqual({ valid: true });
+describe("validateConfig", () => {
+	test("accepts a full config", () => {
+		expect(validateConfig(jsonBuffer(DEFAULT_CONFIG))).toEqual({ valid: true });
 	});
 
 	test("rejects an empty object", () => {
-		const result = validateMapping(jsonBuffer({}));
+		const result = validateConfig(jsonBuffer({}));
 		expect(result.valid).toBe(false);
 		if (!result.valid) {
 			expect(result.issues.length).toBeGreaterThan(0);
 		}
 	});
 
-	test("rejects a partial outcome mapping", () => {
-		const partial = { ...DEFAULT_MAPPING, outcome: { met: "Achieved" } };
+	test("rejects a partial mapping.outcome section", () => {
+		const partial = {
+			...DEFAULT_CONFIG,
+			mapping: { ...DEFAULT_CONFIG.mapping, outcome: { met: "Achieved" } },
+		};
 
-		const result = validateMapping(jsonBuffer(partial));
+		const result = validateConfig(jsonBuffer(partial));
 		expect(result.valid).toBe(false);
 		if (!result.valid) {
 			expect(result.issues.length).toBeGreaterThan(0);
@@ -130,12 +133,25 @@ describe("validateMapping", () => {
 	});
 
 	test("rejects a non-string label value", () => {
-		const mapping = {
-			...DEFAULT_MAPPING,
-			outcome: { met: 123, partial: "B", unmet: "C" },
+		const config = {
+			...DEFAULT_CONFIG,
+			mapping: {
+				...DEFAULT_CONFIG.mapping,
+				outcome: { met: 123, partial: "B", unmet: "C" },
+			},
 		};
 
-		const result = validateMapping(jsonBuffer(mapping));
+		const result = validateConfig(jsonBuffer(config));
+		expect(result.valid).toBe(false);
+		if (!result.valid) {
+			expect(result.issues.length).toBeGreaterThan(0);
+		}
+	});
+
+	test("rejects a config missing the format section", () => {
+		const { format, ...withoutFormat } = DEFAULT_CONFIG;
+
+		const result = validateConfig(jsonBuffer(withoutFormat));
 		expect(result.valid).toBe(false);
 		if (!result.valid) {
 			expect(result.issues.length).toBeGreaterThan(0);
@@ -145,7 +161,7 @@ describe("validateMapping", () => {
 	test("rejects malformed JSON", () => {
 		const malformed = new TextEncoder().encode("{ not json").buffer as ArrayBuffer;
 
-		const result = validateMapping(malformed);
+		const result = validateConfig(malformed);
 		expect(result.valid).toBe(false);
 		if (!result.valid) {
 			expect(result.issues).toEqual([expect.objectContaining({ path: "" })]);

@@ -5,7 +5,7 @@ const registry = z.registry<{ id?: string }>();
 
 const Patient = z.object({
 	initials: z.string(),
-	dob: z.iso.date(),
+	dob: z.string(),
 	chartId: z.string(),
 });
 registry.add(Patient, { id: "Patient" });
@@ -19,7 +19,7 @@ registry.add(Assessment, { id: "Assessment" });
 const Goal = z.object({
 	label: z.string(),
 	task: z.string(),
-	doneBy: z.iso.date().optional(),
+	doneBy: z.string().optional(),
 });
 registry.add(Goal, { id: "Goal" });
 
@@ -40,7 +40,7 @@ registry.add(Statement, { id: "Statement" });
 
 export const Template = z.object({
 	patient: Patient,
-	appointments: z.array(z.iso.date()),
+	appointments: z.array(z.string()),
 	assessments: z.array(Assessment),
 	statements: z.array(Statement),
 });

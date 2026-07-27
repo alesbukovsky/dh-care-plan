@@ -7,6 +7,9 @@ export type TemplaterOptions = Omit<
 	"parser" | "paragraphLoop" | "linebreaks"
 >;
 
+expressionParser.filters.lower = (input: unknown) =>
+	typeof input === "string" ? input.toLowerCase() : input;
+
 export function createTemplater(input: ArrayBuffer, options?: TemplaterOptions): Docxtemplater {
 	const zip = new PizZip(input);
 	return new Docxtemplater(zip, {

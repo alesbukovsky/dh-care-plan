@@ -35,7 +35,7 @@ beforeAll(async () => {
 			...DEFAULT_CONFIG,
 			mapping: {
 				...DEFAULT_CONFIG.mapping,
-				outcome: { met: "Achieved", partial: "In progress", unmet: "Pending" },
+				outcome: { met: "Achieved", partial: "In progress", unmet: "Pending", undefined: "TBD" },
 			},
 		}),
 	);
@@ -60,17 +60,18 @@ describe("dhplan inspect", () => {
 			assessments: [
 				{
 					need: DEFAULT_CONFIG.mapping.need.maintenance,
-					isUnmet: DEFAULT_CONFIG.format.bool.false,
+					isMet: true,
 				},
 				{
 					need: DEFAULT_CONFIG.mapping.need.integrity,
-					isUnmet: DEFAULT_CONFIG.format.bool.true,
+					isMet: false,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
 				},
 			],
 			statements: [
 				{
+					label: "1",
 					need: DEFAULT_CONFIG.mapping.need.integrity,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",

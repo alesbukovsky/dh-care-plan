@@ -26,10 +26,6 @@ function goalLabel(number: number, index: number): string {
 	return `${number}${String.fromCharCode(97 + index)}`;
 }
 
-function boolStr(value: boolean, config: Config): string {
-	return value ? config.format.bool.true : config.format.bool.false;
-}
-
 function goalDoneBy(
 	doneBy: { date?: string; relative?: string } | undefined,
 	config: Config,
@@ -50,27 +46,28 @@ function goalDoneBy(
 export function convertData(plan: Plan, config: Config = DEFAULT_CONFIG): Template {
 	const assessments = plan.needs.map((need) => ({
 		need: config.mapping.need[need.type],
-		isUnmet: boolStr(!need.isMet, config),
+		isMet: need.isMet,
 		relatedTo: need.relatedTo,
 		evidencedBy: need.evidencedBy,
 	}));
 
 	const unmetNeeds = plan.needs.filter((need) => !need.isMet);
 
-	const statements = unmetNeeds.map((need, needIndex) => {
-		const statementNumber = needIndex + 1;
+	const statements = unmetNeeds.map((need, needInx) => {
+		const statementNo = needInx + 1;
 		return {
+			label: String(statementNo),
 			need: config.mapping.need[need.type],
 			relatedTo: orEmpty(need.relatedTo),
 			evidencedBy: orEmpty(need.evidencedBy),
-			goals: (need.goals ?? []).map((goal, goalIndex) => ({
-				label: goalLabel(statementNumber, goalIndex),
+			goals: (need.goals ?? []).map((goal, goalInx) => ({
+				label: goalLabel(statementNo, goalInx),
 				task: goal.task,
 				doneBy: goalDoneBy(goal.doneBy, config),
 				interventions: goal.interventions ?? [],
 				outcome: {
-					label: config.mapping.outcome[goal.outcome.status],
-					note: goal.outcome.note,
+					label: config.mapping.outcome[goal.outcome?.status ?? "undefined"],
+					note: goal.outcome?.note,
 				},
 			})),
 		};

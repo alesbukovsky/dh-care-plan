@@ -12,7 +12,7 @@ registry.add(Patient, { id: "Patient" });
 
 const Assessment = z.object({
 	need: z.string(),
-	isUnmet: z.string(),
+	isMet: z.boolean(),
 	relatedTo: z.string().optional(),
 	evidencedBy: z.string().optional(),
 });
@@ -28,11 +28,12 @@ const Goal = z.object({
 	task: z.string(),
 	doneBy: z.string().optional(),
 	interventions: z.array(z.string()).optional(),
-	outcome: Outcome,
+	outcome: Outcome.optional(),
 });
 registry.add(Goal, { id: "Goal" });
 
 const Statement = z.object({
+	label: z.string(),
 	need: z.string(),
 	relatedTo: z.string(),
 	evidencedBy: z.string(),

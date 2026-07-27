@@ -71,16 +71,28 @@ function resolveTagShape(
 
 	for (const segment of tag.split(".")) {
 		field = currentShape[segment];
-		if (field instanceof z.ZodObject) {
-			currentShape = field.shape;
-		} else if (field instanceof z.ZodArray && field.element instanceof z.ZodObject) {
-			currentShape = field.element.shape;
-		} else {
+		let unwrapped: z.ZodType | undefined = field;
+		while (unwrapped instanceof z.ZodOptional || unwrapped instanceof z.ZodNullable) {
+			unwrapped = unwrapped.unwrap();
+		}
+		if (unwrapped instanceof z.ZodObject) {
+			currentShape = unwrapped.shape;
+		} else if (unwrapped instanceof z.ZodArray && unwrapped.element instanceof z.ZodObject) {
+			currentShape = unwrapped.element.shape;
+		} else if (unwrapped instanceof z.ZodArray) {
+			// Loop over an array of primitives: each item becomes the scope,
+			// only self-reference (".") is valid inside.
 			currentShape = {};
 		}
+		// Otherwise the field is a scalar used as an if-section ({#field}...{/field}):
+		// docxtemplater doesn't rescope, so leave currentShape as the enclosing shape.
 	}
 
 	return { field, nestedShape: currentShape };
+}
+
+function stripFilters(tag: string): string {
+	return (tag.split("|")[0] ?? tag).trim();
 }
 
 function collectUndefinedTags(
@@ -90,10 +102,13 @@ function collectUndefinedTags(
 	issues: ValidationIssue[],
 ): void {
 	for (const [tag, children] of Object.entries(tagTree)) {
-		const { field, nestedShape } = resolveTagShape(shape, tag);
+		const baseTag = stripFilters(tag);
+		if (baseTag === ".") continue;
+
+		const { field, nestedShape } = resolveTagShape(shape, baseTag);
 		if (!field) {
 			issues.push({
-				path: [...path, tag].join("."),
+				path: [...path, baseTag].join("."),
 				message: "not defined in Template",
 			});
 		}
@@ -104,7 +119,7 @@ function collectUndefinedTags(
 			collectUndefinedTags(
 				children as Record<string, unknown>,
 				nestedShape,
-				[...path, tag],
+				[...path, baseTag],
 				issues,
 			);
 		}

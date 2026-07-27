@@ -114,6 +114,7 @@ cli
 			const result = render(planBuffer, templateBuffer, configBuffer);
 
 			if (!result.success) {
+				console.error(`Failed to render output file`);
 				for (const issue of result.issues) {
 					console.error(issue.path ? `${issue.path}: ${issue.message}` : issue.message);
 				}

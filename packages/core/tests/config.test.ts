@@ -13,7 +13,7 @@ describe("resolveConfig", () => {
 	});
 
 	test("DEFAULT_CONFIG includes a format.goal.doneBy pattern", () => {
-		expect(DEFAULT_CONFIG.format.goal.doneBy).toBe("{date}, {relative}");
+		expect(DEFAULT_CONFIG.format.goal.doneBy).toBe("{date} / {relative}");
 	});
 });
 
@@ -25,10 +25,10 @@ describe("Config's mapping shape aligns with Plan enums", () => {
 		expect(mappingNeedKeys.sort()).toEqual([...needTypeValues].sort());
 	});
 
-	test("Config's mapping.outcome keys match Outcome.status's enum values", () => {
-		const outcomeStatusValues = Goal.shape.outcome.shape.status.options;
+	test("Config's mapping.outcome keys match Outcome.status's enum values plus undefined", () => {
+		const outcomeStatusValues = Goal.shape.outcome.unwrap().shape.status.options;
 		const mappingOutcomeKeys = Object.keys(Config.shape.mapping.shape.outcome.shape);
 
-		expect(mappingOutcomeKeys.sort()).toEqual([...outcomeStatusValues].sort());
+		expect(mappingOutcomeKeys.sort()).toEqual([...outcomeStatusValues, "undefined"].sort());
 	});
 });

@@ -24,7 +24,7 @@ export const Goal = z.object({
 		})
 		.optional(),
 	interventions: z.array(z.string()).optional(),
-	outcome: Outcome,
+	outcome: Outcome.optional(),
 });
 registry.add(Goal, { id: "Goal" });
 

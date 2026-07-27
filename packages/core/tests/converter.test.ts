@@ -54,13 +54,13 @@ describe("convertData", () => {
 		expect(data.assessments).toEqual([
 			{
 				need: DEFAULT_CONFIG.mapping.need.maintenance,
-				isUnmet: DEFAULT_CONFIG.format.bool.false,
+				isMet: true,
 				relatedTo: undefined,
 				evidencedBy: undefined,
 			},
 			{
 				need: DEFAULT_CONFIG.mapping.need.integrity,
-				isUnmet: DEFAULT_CONFIG.format.bool.true,
+				isMet: false,
 				relatedTo: "gum disease",
 				evidencedBy: "x-ray",
 			},
@@ -94,21 +94,6 @@ describe("convertData", () => {
 
 		expect(data.assessments[0]?.need).toBe(DEFAULT_CONFIG.mapping.need.comfort);
 		expect(data.statements[0]?.need).toBe(DEFAULT_CONFIG.mapping.need.comfort);
-	});
-
-	test("maps assessment.isUnmet using a custom config.format.bool, not the default", () => {
-		const customConfig = {
-			...DEFAULT_CONFIG,
-			format: {
-				...DEFAULT_CONFIG.format,
-				bool: { true: "Outstanding", false: "Resolved" },
-			},
-		};
-
-		const data = convertData(validPlan, customConfig);
-
-		expect(data.assessments[0]?.isUnmet).toBe("Resolved");
-		expect(data.assessments[1]?.isUnmet).toBe("Outstanding");
 	});
 
 	test("leaves an assessment's relatedTo/evidencedBy undefined when the need has neither", () => {
@@ -298,7 +283,7 @@ describe("convertData", () => {
 
 	test("combines date and relative using config.format.goal.doneBy when both are given", () => {
 		const data = goalWithDoneBy({ date: "2026-08-01", relative: "by next visit" });
-		expect(data.statements[0]?.goals[0]?.doneBy).toBe("08/01/2026, by next visit");
+		expect(data.statements[0]?.goals[0]?.doneBy).toBe("08/01/2026 / by next visit");
 	});
 
 	test("uses a custom config.format.goal.doneBy pattern when both are given", () => {
@@ -402,12 +387,29 @@ describe("convertData", () => {
 		expect(unmet.statements[0]?.goals[0]?.outcome).toEqual({ label: "Not met", note: undefined });
 	});
 
+	test("labels a goal's outcome as undefined when no outcome is given", () => {
+		const data = convertData({
+			patient: PATIENT,
+			appointments: APPOINTMENTS,
+			needs: [
+				{
+					type: "integrity",
+					isMet: false,
+					relatedTo: "gum disease",
+					evidencedBy: "x-ray",
+					goals: [{ task: "floss daily" }],
+				},
+			],
+		});
+		expect(data.statements[0]?.goals[0]?.outcome).toEqual({ label: "TBD", note: undefined });
+	});
+
 	test("uses a custom config's mapping.outcome labels instead of the defaults", () => {
 		const customConfig = {
 			...DEFAULT_CONFIG,
 			mapping: {
 				...DEFAULT_CONFIG.mapping,
-				outcome: { met: "Achieved", partial: "In progress", unmet: "Pending" },
+				outcome: { met: "Achieved", partial: "In progress", unmet: "Pending", undefined: "TBD" },
 			},
 		};
 

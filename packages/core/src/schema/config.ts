@@ -19,19 +19,14 @@ const Outcome = z.object({
 	met: z.string(),
 	partial: z.string(),
 	unmet: z.string(),
+	undefined: z.string(),
 });
 
 const Goal = z.object({
 	doneBy: z.string(),
 });
 
-const Bool = z.object({
-	true: z.string(),
-	false: z.string(),
-});
-
 const Format = z.object({
-	bool: Bool,
 	date: z.string(),
 	goal: Goal,
 	appointment: z.string(),
@@ -59,13 +54,9 @@ export function getConfigSchema(): object {
 
 export const DEFAULT_CONFIG: Config = {
 	format: {
-		bool: {
-			true: "Yes",
-			false: "No",
-		},
 		date: "MM/DD/YYYY",
 		goal: {
-			doneBy: "{date}, {relative}",
+			doneBy: "{date} / {relative}",
 		},
 		appointment: ", ",
 	},
@@ -85,6 +76,7 @@ export const DEFAULT_CONFIG: Config = {
 			met: "Met",
 			partial: "Partially met",
 			unmet: "Not met",
+			undefined: "TBD",
 		},
 	},
 };

@@ -103,7 +103,7 @@ describe("render", () => {
 			...DEFAULT_CONFIG,
 			mapping: {
 				...DEFAULT_CONFIG.mapping,
-				outcome: { met: "Achieved", partial: "In progress", unmet: "Pending" },
+				outcome: { met: "Achieved", partial: "In progress", unmet: "Pending", undefined: "TBD" },
 			},
 		});
 

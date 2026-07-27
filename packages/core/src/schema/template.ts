@@ -10,6 +10,62 @@ const Patient = z.object({
 });
 registry.add(Patient, { id: "Patient" });
 
+const Subjective = z.object({
+	complaint: z.string().optional(),
+	personal: z.string().optional(),
+	medical: z.string().optional(),
+	dental: z.string().optional(),
+	social: z.string().optional(),
+	significance: z.string().optional(),
+	other: z.string().optional(),
+});
+registry.add(Subjective, { id: "Subjective" });
+
+const Medical = z.object({
+	bmi: z.string().optional(),
+	medications: z.string().optional(),
+	allergies: z.string().optional(),
+	diseases: z.string().optional(),
+	asa: z.string().optional(),
+	referrals: z.string().optional(),
+});
+registry.add(Medical, { id: "Medical" });
+
+const Exams = z.object({
+	findings: z.array(z.string()).optional(),
+	referrals: z.string().optional(),
+});
+registry.add(Exams, { id: "Exams" });
+
+const Restorative = z.object({
+	caries: z.string().optional(),
+	restorations: z.string().optional(),
+	risk: z.string().optional(),
+	occlusion: z.string().optional(),
+	referrals: z.string().optional(),
+});
+registry.add(Restorative, { id: "Restorative" });
+
+const Periodontal = z.object({
+	gingiva: z.string().optional(),
+	aap: z.string().optional(),
+	debridement: z.string().optional(),
+	gi: z.string().optional(),
+	pi: z.string().optional(),
+	referrals: z.string().optional(),
+});
+registry.add(Periodontal, { id: "Periodontal" });
+
+const Objective = z.object({
+	medical: Medical.optional(),
+	exams: Exams.optional(),
+	restorative: Restorative.optional(),
+	periodontal: Periodontal.optional(),
+	radiographic: z.string().optional(),
+	diagnostic: z.string().optional(),
+});
+registry.add(Objective, { id: "Objective" });
+
 const Assessment = z.object({
 	need: z.string(),
 	isMet: z.boolean(),
@@ -44,6 +100,8 @@ registry.add(Statement, { id: "Statement" });
 export const Template = z.object({
 	patient: Patient,
 	appointments: z.string(),
+	subjective: Subjective,
+	objective: Objective,
 	assessments: z.array(Assessment),
 	statements: z.array(Statement),
 });

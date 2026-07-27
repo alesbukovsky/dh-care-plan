@@ -8,18 +8,7 @@ function orEmpty(value: string | undefined): string {
 
 export function dateStr(iso: string, pattern: string): string {
 	const [year = "", month = "", day = ""] = iso.split("-");
-	return pattern.replace(/YYYY|MM|DD/g, (token) => {
-		switch (token) {
-			case "YYYY":
-				return year;
-			case "MM":
-				return month;
-			case "DD":
-				return day;
-			default:
-				return token;
-		}
-	});
+	return pattern.replaceAll("YYYY", year).replaceAll("MM", month).replaceAll("DD", day);
 }
 
 function goalLabel(number: number, index: number): string {
@@ -81,6 +70,8 @@ export function convertData(plan: Plan, config: Config = DEFAULT_CONFIG): Templa
 		appointments: plan.appointments
 			.map((date) => dateStr(date, config.format.date))
 			.join(config.format.appointment),
+		subjective: plan.subjective,
+		objective: plan.objective,
 		assessments,
 		statements,
 	};

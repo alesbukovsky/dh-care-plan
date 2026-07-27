@@ -8,6 +8,11 @@ const APPOINTMENTS = ["2026-07-01", "2026-08-01"];
 const validPlan = {
 	patient: PATIENT,
 	appointments: APPOINTMENTS,
+	subjective: { complaint: "sensitive teeth" },
+	objective: {
+		medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
+		exams: { findings: ["no visible caries"], referrals: "none" },
+	},
 	needs: [
 		{
 			type: "maintenance" as const,
@@ -82,6 +87,11 @@ describe("convertData", () => {
 		const data = convertData({
 			patient: PATIENT,
 			appointments: APPOINTMENTS,
+			subjective: { complaint: "sensitive teeth" },
+			objective: {
+				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
+				exams: { findings: ["no visible caries"], referrals: "none" },
+			},
 			needs: [
 				{
 					type: "comfort",
@@ -100,6 +110,11 @@ describe("convertData", () => {
 		const data = convertData({
 			patient: PATIENT,
 			appointments: APPOINTMENTS,
+			subjective: { complaint: "sensitive teeth" },
+			objective: {
+				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
+				exams: { findings: ["no visible caries"], referrals: "none" },
+			},
 			needs: [{ type: "maintenance", isMet: true }],
 		});
 
@@ -111,6 +126,11 @@ describe("convertData", () => {
 		const data = convertData({
 			patient: PATIENT,
 			appointments: APPOINTMENTS,
+			subjective: { complaint: "sensitive teeth" },
+			objective: {
+				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
+				exams: { findings: ["no visible caries"], referrals: "none" },
+			},
 			needs: [
 				{
 					type: "integrity",
@@ -128,6 +148,11 @@ describe("convertData", () => {
 		const data = convertData({
 			patient: PATIENT,
 			appointments: APPOINTMENTS,
+			subjective: { complaint: "sensitive teeth" },
+			objective: {
+				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
+				exams: { findings: ["no visible caries"], referrals: "none" },
+			},
 			needs: [
 				{ type: "maintenance", isMet: true },
 				{
@@ -187,6 +212,11 @@ describe("convertData", () => {
 		const data = convertData({
 			patient: PATIENT,
 			appointments: APPOINTMENTS,
+			subjective: { complaint: "sensitive teeth" },
+			objective: {
+				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
+				exams: { findings: ["no visible caries"], referrals: "none" },
+			},
 			needs: [
 				{
 					type: "integrity",
@@ -200,6 +230,11 @@ describe("convertData", () => {
 		const data2 = convertData({
 			patient: PATIENT,
 			appointments: APPOINTMENTS,
+			subjective: { complaint: "sensitive teeth" },
+			objective: {
+				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
+				exams: { findings: ["no visible caries"], referrals: "none" },
+			},
 			needs: [
 				{
 					type: "integrity",
@@ -250,6 +285,11 @@ describe("convertData", () => {
 		return convertData({
 			patient: PATIENT,
 			appointments: APPOINTMENTS,
+			subjective: { complaint: "sensitive teeth" },
+			objective: {
+				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
+				exams: { findings: ["no visible caries"], referrals: "none" },
+			},
 			needs: [
 				{
 					type: "integrity",
@@ -291,6 +331,11 @@ describe("convertData", () => {
 			{
 				patient: PATIENT,
 				appointments: APPOINTMENTS,
+				subjective: { complaint: "sensitive teeth" },
+				objective: {
+					medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
+					exams: { findings: ["no visible caries"], referrals: "none" },
+				},
 				needs: [
 					{
 						type: "integrity",
@@ -324,6 +369,11 @@ describe("convertData", () => {
 		const dataWithoutInterventions = convertData({
 			patient: PATIENT,
 			appointments: APPOINTMENTS,
+			subjective: { complaint: "sensitive teeth" },
+			objective: {
+				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
+				exams: { findings: ["no visible caries"], referrals: "none" },
+			},
 			needs: [
 				{
 					type: "integrity",
@@ -341,6 +391,11 @@ describe("convertData", () => {
 		const met = convertData({
 			patient: PATIENT,
 			appointments: APPOINTMENTS,
+			subjective: { complaint: "sensitive teeth" },
+			objective: {
+				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
+				exams: { findings: ["no visible caries"], referrals: "none" },
+			},
 			needs: [
 				{
 					type: "integrity",
@@ -356,6 +411,11 @@ describe("convertData", () => {
 		const partial = convertData({
 			patient: PATIENT,
 			appointments: APPOINTMENTS,
+			subjective: { complaint: "sensitive teeth" },
+			objective: {
+				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
+				exams: { findings: ["no visible caries"], referrals: "none" },
+			},
 			needs: [
 				{
 					type: "integrity",
@@ -374,6 +434,11 @@ describe("convertData", () => {
 		const unmet = convertData({
 			patient: PATIENT,
 			appointments: APPOINTMENTS,
+			subjective: { complaint: "sensitive teeth" },
+			objective: {
+				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
+				exams: { findings: ["no visible caries"], referrals: "none" },
+			},
 			needs: [
 				{
 					type: "integrity",
@@ -391,6 +456,11 @@ describe("convertData", () => {
 		const data = convertData({
 			patient: PATIENT,
 			appointments: APPOINTMENTS,
+			subjective: { complaint: "sensitive teeth" },
+			objective: {
+				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
+				exams: { findings: ["no visible caries"], referrals: "none" },
+			},
 			needs: [
 				{
 					type: "integrity",
@@ -417,6 +487,11 @@ describe("convertData", () => {
 			{
 				patient: PATIENT,
 				appointments: APPOINTMENTS,
+				subjective: { complaint: "sensitive teeth" },
+				objective: {
+					medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
+					exams: { findings: ["no visible caries"], referrals: "none" },
+				},
 				needs: [
 					{
 						type: "integrity",
@@ -440,6 +515,11 @@ describe("convertData", () => {
 		const data = convertData({
 			patient: PATIENT,
 			appointments: APPOINTMENTS,
+			subjective: { complaint: "sensitive teeth" },
+			objective: {
+				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
+				exams: { findings: ["no visible caries"], referrals: "none" },
+			},
 			needs: [
 				{
 					type: "integrity",

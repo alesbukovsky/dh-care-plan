@@ -12,6 +12,11 @@ describe("validateData", () => {
 		const plan = {
 			patient: { initials: "J.D.", dob: "1990-01-01", chartId: "12345" },
 			appointments: ["2026-07-01"],
+			subjective: { complaint: "sensitive teeth" },
+			objective: {
+				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
+				exams: { findings: ["no visible caries"], referrals: "none" },
+			},
 			needs: [
 				{ type: "maintenance", isMet: true },
 				{
@@ -77,6 +82,38 @@ describe("validateTemplate", () => {
 				]),
 			);
 		}
+	});
+
+	test("accepts a loop over an array of objects, resolving nested field tags", () => {
+		const docx = buildDocx(
+			"<w:p><w:r><w:t>{#statements}{#goals}{task}{/goals}{/statements}</w:t></w:r></w:p>",
+		);
+
+		expect(validateTemplate(docx)).toEqual({ valid: true });
+	});
+
+	test("accepts an if-section over an optional scalar field, referencing the same field inside", () => {
+		const docx = buildDocx(
+			"<w:p><w:r><w:t>{#statements}{#goals}{#doneBy} by {doneBy}{/doneBy}{/goals}{/statements}</w:t></w:r></w:p>",
+		);
+
+		expect(validateTemplate(docx)).toEqual({ valid: true });
+	});
+
+	test("accepts an if-section over a dotted, optional nested object field", () => {
+		const docx = buildDocx(
+			"<w:p><w:r><w:t>{#statements}{#goals}{#outcome.note}. {outcome.note}{/outcome.note}{/goals}{/statements}</w:t></w:r></w:p>",
+		);
+
+		expect(validateTemplate(docx)).toEqual({ valid: true });
+	});
+
+	test("accepts a loop over an array of primitives, referencing only the current item", () => {
+		const docx = buildDocx(
+			"<w:p><w:r><w:t>{#statements}{#goals}{#interventions}{.}{/interventions}{/goals}{/statements}</w:t></w:r></w:p>",
+		);
+
+		expect(validateTemplate(docx)).toEqual({ valid: true });
 	});
 
 	test("reports a read failure for a non-.docx file", () => {

@@ -73,7 +73,7 @@ function resolveTagShape(
 		field = currentShape[segment];
 		let unwrapped: z.ZodType | undefined = field;
 		while (unwrapped instanceof z.ZodOptional || unwrapped instanceof z.ZodNullable) {
-			unwrapped = unwrapped.unwrap();
+			unwrapped = unwrapped.unwrap() as z.ZodType;
 		}
 		if (unwrapped instanceof z.ZodObject) {
 			currentShape = unwrapped.shape;

@@ -13,6 +13,11 @@ const APPOINTMENTS = ["2026-07-01", "2026-08-01"];
 const validPlan = {
 	patient: PATIENT,
 	appointments: APPOINTMENTS,
+	subjective: { complaint: "sensitive teeth" },
+	objective: {
+		medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
+		exams: { findings: ["no visible caries"], referrals: "none" },
+	},
 	needs: [
 		{
 			type: "maintenance" as const,

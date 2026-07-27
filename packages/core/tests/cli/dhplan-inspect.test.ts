@@ -15,6 +15,11 @@ beforeAll(async () => {
 		JSON.stringify({
 			patient: { initials: "J.D.", dob: "1990-01-01", chartId: "12345" },
 			appointments: ["2026-07-01"],
+			subjective: { complaint: "sensitive teeth" },
+			objective: {
+				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
+				exams: { findings: ["no visible caries"], referrals: "none" },
+			},
 			needs: [
 				{ type: "maintenance", isMet: true },
 				{
@@ -57,6 +62,11 @@ describe("dhplan inspect", () => {
 		expect(JSON.parse(stdout)).toEqual({
 			patient: { initials: "J.D.", dob: "01/01/1990", chartId: "12345" },
 			appointments: "07/01/2026",
+			subjective: { complaint: "sensitive teeth" },
+			objective: {
+				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
+				exams: { findings: ["no visible caries"], referrals: "none" },
+			},
 			assessments: [
 				{
 					need: DEFAULT_CONFIG.mapping.need.maintenance,

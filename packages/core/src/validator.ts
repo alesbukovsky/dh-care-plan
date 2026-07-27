@@ -62,6 +62,27 @@ export function validateConfig(input: ArrayBuffer): ValidationResult {
 	};
 }
 
+function resolveTagShape(
+	shape: Record<string, z.ZodType>,
+	tag: string,
+): { field: z.ZodType | undefined; nestedShape: Record<string, z.ZodType> } {
+	let currentShape = shape;
+	let field: z.ZodType | undefined;
+
+	for (const segment of tag.split(".")) {
+		field = currentShape[segment];
+		if (field instanceof z.ZodObject) {
+			currentShape = field.shape;
+		} else if (field instanceof z.ZodArray && field.element instanceof z.ZodObject) {
+			currentShape = field.element.shape;
+		} else {
+			currentShape = {};
+		}
+	}
+
+	return { field, nestedShape: currentShape };
+}
+
 function collectUndefinedTags(
 	tagTree: Record<string, unknown>,
 	shape: Record<string, z.ZodType>,
@@ -69,7 +90,7 @@ function collectUndefinedTags(
 	issues: ValidationIssue[],
 ): void {
 	for (const [tag, children] of Object.entries(tagTree)) {
-		const field = shape[tag];
+		const { field, nestedShape } = resolveTagShape(shape, tag);
 		if (!field) {
 			issues.push({
 				path: [...path, tag].join("."),
@@ -80,10 +101,6 @@ function collectUndefinedTags(
 		const hasNestedTags =
 			children !== null && typeof children === "object" && Object.keys(children).length > 0;
 		if (hasNestedTags) {
-			const nestedShape =
-				field instanceof z.ZodArray && field.element instanceof z.ZodObject
-					? field.element.shape
-					: {};
 			collectUndefinedTags(
 				children as Record<string, unknown>,
 				nestedShape,

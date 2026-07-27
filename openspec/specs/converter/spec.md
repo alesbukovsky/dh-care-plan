@@ -23,9 +23,9 @@ its second parameter, defaulting to `DEFAULT_CONFIG` when omitted:
   that need category) and `need.isMet` mapped to `assessment.isMet`.
 - `statements` SHALL contain one entry per `Need` in `plan.needs` whose `isMet` is `false`, in the same relative order,
   with `statement.need` derived from the given `Config`'s `mapping.need` section via `config.mapping.need[need.type]`
-  (the same canonical display label used for `assessment.need`), `need.relatedTo` mapped to
-  `statement.relatedTo`, and `need.evidencedBy` mapped to `statement.evidencedBy`. `Need`s where `isMet` is `true` SHALL
-  be excluded from `statements`.
+  (the same canonical display label used for `assessment.need`), `need.relatedTo` mapped to `statement.relatedTo`, and
+  `need.evidencedBy` mapped to `statement.evidencedBy`. `Need`s where `isMet` is `true` SHALL be excluded from
+  `statements`.
 - Each statement's `goals` SHALL contain one entry per `Goal` in the source `Need`'s `goals`, in the same order, with
   `task` mapped 1:1 and `doneBy` derived from the source `Goal`'s `doneBy.date` and `doneBy.relative` as follows:
   - if neither is present (or the `Goal` has no `doneBy` at all), the resulting `doneBy` SHALL be `undefined`

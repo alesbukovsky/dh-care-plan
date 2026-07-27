@@ -74,8 +74,8 @@ a `Goal` may specify neither, either, or both fields, or omit `doneBy` entirely.
 The system SHALL define each `Goal` (`packages/core/src/schema/plan.ts`) with an `interventions` field
 (`z.array(z.string()).optional()`) and a required `outcome` field
 (`{ status: "met" | "partial" | "unmet", note?: string }`, the same `Outcome` shape used previously on `Need`). `Need`
-SHALL NOT define `interventions` or `outcome` fields of its own — only `type`, `isMet`, `relatedTo`,
-`evidencedBy`, and `goals` remain on `Need`.
+SHALL NOT define `interventions` or `outcome` fields of its own — only `type`, `isMet`, `relatedTo`, `evidencedBy`, and
+`goals` remain on `Need`.
 
 #### Scenario: Parsing a Need with per-goal interventions and outcome
 

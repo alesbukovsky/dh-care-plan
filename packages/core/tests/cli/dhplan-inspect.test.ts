@@ -16,10 +16,9 @@ beforeAll(async () => {
 			patient: { initials: "J.D.", dob: "1990-01-01", chartId: "12345" },
 			appointments: ["2026-07-01"],
 			needs: [
-				{ type: "maintenance", name: "flossing", isMet: true },
+				{ type: "maintenance", isMet: true },
 				{
 					type: "integrity",
-					name: "brushing",
 					isMet: false,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
@@ -59,8 +58,8 @@ describe("dhplan inspect", () => {
 			patient: { initials: "J.D.", dob: "01/01/1990", chartId: "12345" },
 			appointments: "07/01/2026",
 			assessments: [
-				{ need: "flossing", isMet: true },
-				{ need: "brushing", isMet: false },
+				{ need: DEFAULT_CONFIG.mapping.need.maintenance, isMet: true },
+				{ need: DEFAULT_CONFIG.mapping.need.integrity, isMet: false },
 			],
 			statements: [
 				{

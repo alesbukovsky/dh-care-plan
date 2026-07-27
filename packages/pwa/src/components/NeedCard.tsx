@@ -47,7 +47,6 @@ export default function NeedCard({ definition, index, need, onChange }: NeedCard
 	function setStatus(status: "met" | "unmet") {
 		onChange({
 			type: definition.type,
-			name: definition.name,
 			isMet: status === "met",
 			relatedTo: need?.relatedTo,
 			evidencedBy: need?.evidencedBy,

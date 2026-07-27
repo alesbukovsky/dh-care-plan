@@ -45,7 +45,7 @@ function goalDoneBy(
 
 export function convertData(plan: Plan, config: Config = DEFAULT_CONFIG): Template {
 	const assessments = plan.needs.map((need) => ({
-		need: need.name,
+		need: config.mapping.need[need.type],
 		isMet: need.isMet,
 	}));
 

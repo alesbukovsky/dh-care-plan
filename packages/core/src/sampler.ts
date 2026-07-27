@@ -11,12 +11,10 @@ export function getPlanSample(): Plan {
 		needs: [
 			{
 				type: "maintenance",
-				name: "flossing",
 				isMet: true,
 			},
 			{
 				type: "integrity",
-				name: "brushing",
 				isMet: false,
 				relatedTo: "gum disease",
 				evidencedBy: "x-ray",

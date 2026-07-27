@@ -11,12 +11,10 @@ const validPlan = {
 	needs: [
 		{
 			type: "maintenance" as const,
-			name: "flossing",
 			isMet: true,
 		},
 		{
 			type: "integrity" as const,
-			name: "brushing",
 			isMet: false,
 			relatedTo: "gum disease",
 			evidencedBy: "x-ray",
@@ -54,8 +52,8 @@ describe("convertData", () => {
 		const data = convertData(validPlan);
 
 		expect(data.assessments).toEqual([
-			{ need: "flossing", isMet: true },
-			{ need: "brushing", isMet: false },
+			{ need: DEFAULT_CONFIG.mapping.need.maintenance, isMet: true },
+			{ need: DEFAULT_CONFIG.mapping.need.integrity, isMet: false },
 		]);
 	});
 
@@ -70,14 +68,13 @@ describe("convertData", () => {
 		});
 	});
 
-	test("maps a statement's need from the config's mapping.need labels, not the plan's free-text name", () => {
+	test("derives both assessment.need and statement.need from config.mapping.need for the same need", () => {
 		const data = convertData({
 			patient: PATIENT,
 			appointments: APPOINTMENTS,
 			needs: [
 				{
 					type: "comfort",
-					name: "some free-text name unrelated to the mapping label",
 					isMet: false,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
@@ -85,6 +82,7 @@ describe("convertData", () => {
 			],
 		});
 
+		expect(data.assessments[0]?.need).toBe(DEFAULT_CONFIG.mapping.need.comfort);
 		expect(data.statements[0]?.need).toBe(DEFAULT_CONFIG.mapping.need.comfort);
 	});
 
@@ -95,7 +93,6 @@ describe("convertData", () => {
 			needs: [
 				{
 					type: "integrity",
-					name: "brushing",
 					isMet: false,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
@@ -111,10 +108,9 @@ describe("convertData", () => {
 			patient: PATIENT,
 			appointments: APPOINTMENTS,
 			needs: [
-				{ type: "maintenance", name: "flossing", isMet: true },
+				{ type: "maintenance", isMet: true },
 				{
 					type: "integrity",
-					name: "brushing",
 					isMet: false,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
@@ -125,7 +121,6 @@ describe("convertData", () => {
 				},
 				{
 					type: "health",
-					name: "diet",
 					isMet: false,
 					relatedTo: "sugar intake",
 					evidencedBy: "diary",
@@ -174,7 +169,6 @@ describe("convertData", () => {
 			needs: [
 				{
 					type: "integrity",
-					name: "brushing",
 					isMet: false,
 					evidencedBy: "x-ray",
 				},
@@ -188,7 +182,6 @@ describe("convertData", () => {
 			needs: [
 				{
 					type: "integrity",
-					name: "brushing",
 					isMet: false,
 					relatedTo: "gum disease",
 				},
@@ -239,7 +232,6 @@ describe("convertData", () => {
 			needs: [
 				{
 					type: "integrity",
-					name: "brushing",
 					isMet: false,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
@@ -281,7 +273,6 @@ describe("convertData", () => {
 				needs: [
 					{
 						type: "integrity",
-						name: "brushing",
 						isMet: false,
 						relatedTo: "gum disease",
 						evidencedBy: "x-ray",
@@ -315,7 +306,6 @@ describe("convertData", () => {
 			needs: [
 				{
 					type: "integrity",
-					name: "brushing",
 					isMet: false,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
@@ -333,7 +323,6 @@ describe("convertData", () => {
 			needs: [
 				{
 					type: "integrity",
-					name: "brushing",
 					isMet: false,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
@@ -349,7 +338,6 @@ describe("convertData", () => {
 			needs: [
 				{
 					type: "integrity",
-					name: "brushing",
 					isMet: false,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
@@ -368,7 +356,6 @@ describe("convertData", () => {
 			needs: [
 				{
 					type: "integrity",
-					name: "brushing",
 					isMet: false,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
@@ -395,7 +382,6 @@ describe("convertData", () => {
 				needs: [
 					{
 						type: "integrity",
-						name: "brushing",
 						isMet: false,
 						relatedTo: "gum disease",
 						evidencedBy: "x-ray",
@@ -419,7 +405,6 @@ describe("convertData", () => {
 			needs: [
 				{
 					type: "integrity",
-					name: "brushing",
 					isMet: false,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",

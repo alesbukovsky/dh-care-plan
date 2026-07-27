@@ -16,12 +16,10 @@ const validPlan = {
 	needs: [
 		{
 			type: "maintenance" as const,
-			name: "flossing",
 			isMet: true,
 		},
 		{
 			type: "integrity" as const,
-			name: "brushing",
 			isMet: false,
 			relatedTo: "gum disease",
 			evidencedBy: "x-ray",

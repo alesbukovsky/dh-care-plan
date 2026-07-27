@@ -6,6 +6,11 @@ import NeedCard from "./NeedCard";
 
 const definition = { type: "health", name: "Health", def: "test need" } as const;
 
+function required<T>(value: T | undefined | null): T {
+	if (value === undefined || value === null) throw new Error("expected value to be defined");
+	return value;
+}
+
 function Harness() {
 	const [need, setNeed] = useState<Need | undefined>({
 		type: "health",
@@ -21,26 +26,30 @@ function Harness() {
 test("each goal's outcome, interventions, and note are edited independently", () => {
 	render(<Harness />);
 
-	fireEvent.click(screen.getByRole("heading", { name: definition.name }).closest("button")!);
+	fireEvent.click(
+		required(screen.getByRole("heading", { name: definition.name }).closest("button")),
+	);
 
 	const goalTasks = screen.getAllByPlaceholderText("e.g. Client will floss daily");
 	expect(goalTasks).toHaveLength(2);
-	fireEvent.change(goalTasks[0]!, { target: { value: "Floss daily" } });
-	fireEvent.change(goalTasks[1]!, { target: { value: "Brush twice daily" } });
+	fireEvent.change(required(goalTasks[0]), { target: { value: "Floss daily" } });
+	fireEvent.change(required(goalTasks[1]), { target: { value: "Brush twice daily" } });
 
 	const goalMetButtons = screen.getAllByRole("button", { name: "Goal is met" });
-	fireEvent.click(goalMetButtons[0]!);
+	fireEvent.click(required(goalMetButtons[0]));
 
 	const addInterventionButtons = screen.getAllByRole("button", { name: "Add intervention" });
-	fireEvent.click(addInterventionButtons[0]!);
+	fireEvent.click(required(addInterventionButtons[0]));
 	const interventionInputs = screen.getAllByPlaceholderText(
 		"e.g. Provide oral hygiene instruction",
 	);
-	fireEvent.change(interventionInputs[0]!, { target: { value: "Oral hygiene instruction" } });
+	fireEvent.change(required(interventionInputs[0]), {
+		target: { value: "Oral hygiene instruction" },
+	});
 
 	const notes = screen.getAllByPlaceholderText("How and when will this goal be reassessed?");
-	fireEvent.change(notes[0]!, { target: { value: "Reassess at next visit" } });
-	fireEvent.change(notes[1]!, { target: { value: "Reassess in six months" } });
+	fireEvent.change(required(notes[0]), { target: { value: "Reassess at next visit" } });
+	fireEvent.change(required(notes[1]), { target: { value: "Reassess in six months" } });
 
 	expect(screen.getAllByRole("button", { name: "Goal is met" })[0]).toHaveClass("bg-[#2F6F62]");
 	expect(screen.getAllByRole("button", { name: "Goal is unmet" })[1]).toHaveClass("bg-[#B85C2E]");

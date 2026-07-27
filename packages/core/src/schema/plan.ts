@@ -40,7 +40,6 @@ export const Need = z.object({
 		"responsibility",
 		"maintenance",
 	]),
-	name: z.string(),
 	isMet: z.boolean(),
 	relatedTo: z.string().optional(),
 	evidencedBy: z.string().optional(),

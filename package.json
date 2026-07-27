@@ -13,8 +13,8 @@
 		"link:cli": "cd packages/core && bun link",
 		"lint": "bun run lint:ts && bun run lint:md",
 		"lint:fix": "bun run lint:ts:fix && bun run lint:md:fix",
-		"lint:ts": "biome lint .",
-		"lint:ts:fix": "biome check --write .",
+		"lint:ts": "biome lint --error-on-warnings .",
+		"lint:ts:fix": "biome check --write --error-on-warnings .",
 		"lint:md": "markdownlint-cli2",
 		"lint:md:fix": "prettier --write '**/*.md' && markdownlint-cli2 --fix"
 	},

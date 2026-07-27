@@ -204,7 +204,7 @@ describe("convertData", () => {
 		const data = convertData(validPlan);
 
 		expect(data.patient).toEqual({ ...PATIENT, dob: "01/01/1990" });
-		expect(data.appointments).toEqual(["07/01/2026", "08/01/2026"]);
+		expect(data.appointments).toBe("07/01/2026, 08/01/2026");
 	});
 
 	test("formats dates using a custom config.format.date pattern", () => {
@@ -214,7 +214,22 @@ describe("convertData", () => {
 		});
 
 		expect(data.patient.dob).toBe("01.01.1990");
-		expect(data.appointments).toEqual(["01.07.2026", "01.08.2026"]);
+		expect(data.appointments).toBe("01.07.2026, 01.08.2026");
+	});
+
+	test("joins appointment dates using a custom config.format.appointment separator", () => {
+		const data = convertData(validPlan, {
+			...DEFAULT_CONFIG,
+			format: { ...DEFAULT_CONFIG.format, appointment: " / " },
+		});
+
+		expect(data.appointments).toBe("07/01/2026 / 08/01/2026");
+	});
+
+	test("joins an empty appointments list into an empty string", () => {
+		const data = convertData({ ...validPlan, appointments: [] });
+
+		expect(data.appointments).toBe("");
 	});
 
 	function goalWithDoneBy(doneBy: { date?: string; relative?: string } | undefined) {

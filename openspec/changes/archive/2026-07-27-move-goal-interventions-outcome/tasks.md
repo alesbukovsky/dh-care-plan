@@ -38,10 +38,10 @@
 
 - [x] 6.1 Run `bun test:all` and fix any failures
 - [x] 6.2 Run `bun lint:fix`
-- [x] 6.3 Exercise the PWA plan editor (add a need with two goals, set different outcomes/interventions/notes per
-      goal, confirm each goal's state is independent) — verified two ways: (1) live in a real browser via the
-      `agent-browser` CLI against the running Vite dev server (added two goals, set goal 1 met with an intervention
-      and note, goal 2 unmet with a different task and note, screenshot confirmed no cross-goal bleed), and (2) an
-      automated interaction test (`packages/pwa/src/components/NeedCard.test.tsx`) using `@testing-library/react` +
-      `fireEvent` covering the same flow for regression coverage
+- [x] 6.3 Exercise the PWA plan editor (add a need with two goals, set different outcomes/interventions/notes per goal,
+      confirm each goal's state is independent) — verified two ways: (1) live in a real browser via the `agent-browser`
+      CLI against the running Vite dev server (added two goals, set goal 1 met with an intervention and note, goal 2
+      unmet with a different task and note, screenshot confirmed no cross-goal bleed), and (2) an automated interaction
+      test (`packages/pwa/src/components/NeedCard.test.tsx`) using `@testing-library/react` + `fireEvent` covering the
+      same flow for regression coverage
 - [ ] 6.4 Run `/opsx:archive` to sync specs and archive the change once implementation is complete

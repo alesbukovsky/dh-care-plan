@@ -1,10 +1,4 @@
-# converter Specification
-
-## Purpose
-
-TBD - defines `convertData`, the pure `Plan`→`Template` mapping function in `packages/core/src/converter.ts`.
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: `convertData` converts a Plan into flattened Template data
 

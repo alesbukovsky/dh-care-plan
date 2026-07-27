@@ -40,7 +40,7 @@ registry.add(Statement, { id: "Statement" });
 
 export const Template = z.object({
 	patient: Patient,
-	appointments: z.array(z.string()),
+	appointments: z.string(),
 	assessments: z.array(Assessment),
 	statements: z.array(Statement),
 });

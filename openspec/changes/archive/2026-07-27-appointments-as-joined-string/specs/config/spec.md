@@ -1,11 +1,4 @@
-# config Specification
-
-## Purpose
-
-TBD - defines `Config`, the user-overridable formatting and text mapping configuration used when converting a `Plan`
-into `Template` data, its defaults, validation, and schema/sample helpers.
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: `Config` holds user-overridable formatting and text choices with built-in defaults
 

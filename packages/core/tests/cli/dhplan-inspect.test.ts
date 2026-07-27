@@ -57,7 +57,7 @@ describe("dhplan inspect", () => {
 		expect(exitCode).toBe(0);
 		expect(JSON.parse(stdout)).toEqual({
 			patient: { initials: "J.D.", dob: "01/01/1990", chartId: "12345" },
-			appointments: ["07/01/2026"],
+			appointments: "07/01/2026",
 			assessments: [
 				{ need: "flossing", isMet: true },
 				{ need: "brushing", isMet: false },

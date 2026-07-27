@@ -75,7 +75,9 @@ export function convertData(plan: Plan, config: Config = DEFAULT_CONFIG): Templa
 			...plan.patient,
 			dob: dateStr(plan.patient.dob, config.format.date),
 		},
-		appointments: plan.appointments.map((date) => dateStr(date, config.format.date)),
+		appointments: plan.appointments
+			.map((date) => dateStr(date, config.format.date))
+			.join(config.format.appointment),
 		assessments,
 		statements,
 	};

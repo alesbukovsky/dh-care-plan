@@ -7,7 +7,8 @@
 		"dhplan": "./cli/dhplan.ts"
 	},
 	"exports": {
-		".": "./src/index.ts"
+		".": "./src/index.ts",
+		"./schema": "./src/schema/index.ts"
 	},
 	"dependencies": {
 		"angular-expressions": "1.5.5",

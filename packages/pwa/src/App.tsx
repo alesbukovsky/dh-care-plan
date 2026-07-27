@@ -1,4 +1,4 @@
-import type { Plan } from "dh-care-plan";
+import type { Plan } from "dh-care-plan/schema";
 import { useState } from "react";
 import CaseStudyPane from "./components/CaseStudyPane";
 import CommandBar from "./components/CommandBar";

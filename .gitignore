@@ -1,5 +1,7 @@
 .build
 .cache
+.cf
+.wrangler
 .claude
 .DS_Store
 .env

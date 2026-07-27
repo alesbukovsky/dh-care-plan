@@ -11,6 +11,9 @@
 		"test:all": "bun run test:core && bun run test:pwa",
 		"test:core": "cd packages/core && bun test --coverage",
 		"test:pwa": "bun run --cwd packages/pwa test",
+		"verify": "bun run lint && bun run test:all && bun run build",
+		"deploy:cf": "bun run verify && bun run --cwd packages/pwa deploy:cf",
+		"deploy:cf:preview": "bun run verify && bun run --cwd packages/pwa deploy:cf:preview",
 		"lint": "biome lint --error-on-warnings .",
 		"lint:fix": "biome check --write --error-on-warnings ."
 	},

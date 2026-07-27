@@ -1,4 +1,4 @@
-import type { Plan } from "dh-care-plan";
+import type { Plan } from "dh-care-plan/schema";
 import { countFilled, Field, type FieldDefinition, FieldGroup, StringListField } from "./fields";
 import Section from "./Section";
 

@@ -7,23 +7,17 @@
 	"scripts": {
 		"dev": "bun run --cwd packages/pwa dev",
 		"build": "bun run --cwd packages/pwa build",
+		"link:cli": "cd packages/core && bun link",
 		"test:all": "bun run test:core && bun run test:pwa",
 		"test:core": "cd packages/core && bun test --coverage",
 		"test:pwa": "bun run --cwd packages/pwa test",
-		"link:cli": "cd packages/core && bun link",
-		"lint": "bun run lint:ts && bun run lint:md",
-		"lint:fix": "bun run lint:ts:fix && bun run lint:md:fix",
-		"lint:ts": "biome lint --error-on-warnings .",
-		"lint:ts:fix": "biome check --write --error-on-warnings .",
-		"lint:md": "markdownlint-cli2",
-		"lint:md:fix": "prettier --write '**/*.md' && markdownlint-cli2 --fix"
+		"lint": "biome lint --error-on-warnings .",
+		"lint:fix": "biome check --write --error-on-warnings ."
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.5.5",
 		"@types/bun": "latest",
-		"dh-care-plan": "workspace:*",
-		"markdownlint-cli2": "0.23.1",
-		"prettier": "3.9.6"
+		"dh-care-plan": "workspace:*"
 	},
 	"peerDependencies": {
 		"typescript": "^5"

@@ -26,6 +26,10 @@ function goalLabel(number: number, index: number): string {
 	return `${number}${String.fromCharCode(97 + index)}`;
 }
 
+function boolStr(value: boolean, config: Config): string {
+	return value ? config.format.bool.true : config.format.bool.false;
+}
+
 function goalDoneBy(
 	doneBy: { date?: string; relative?: string } | undefined,
 	config: Config,
@@ -46,7 +50,9 @@ function goalDoneBy(
 export function convertData(plan: Plan, config: Config = DEFAULT_CONFIG): Template {
 	const assessments = plan.needs.map((need) => ({
 		need: config.mapping.need[need.type],
-		isMet: need.isMet,
+		isUnmet: boolStr(!need.isMet, config),
+		relatedTo: need.relatedTo,
+		evidencedBy: need.evidencedBy,
 	}));
 
 	const unmetNeeds = plan.needs.filter((need) => !need.isMet);

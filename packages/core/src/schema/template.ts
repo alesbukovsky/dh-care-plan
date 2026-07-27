@@ -12,7 +12,9 @@ registry.add(Patient, { id: "Patient" });
 
 const Assessment = z.object({
 	need: z.string(),
-	isMet: z.boolean(),
+	isUnmet: z.string(),
+	relatedTo: z.string().optional(),
+	evidencedBy: z.string().optional(),
 });
 registry.add(Assessment, { id: "Assessment" });
 

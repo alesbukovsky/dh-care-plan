@@ -58,8 +58,16 @@ describe("dhplan inspect", () => {
 			patient: { initials: "J.D.", dob: "01/01/1990", chartId: "12345" },
 			appointments: "07/01/2026",
 			assessments: [
-				{ need: DEFAULT_CONFIG.mapping.need.maintenance, isMet: true },
-				{ need: DEFAULT_CONFIG.mapping.need.integrity, isMet: false },
+				{
+					need: DEFAULT_CONFIG.mapping.need.maintenance,
+					isUnmet: DEFAULT_CONFIG.format.bool.false,
+				},
+				{
+					need: DEFAULT_CONFIG.mapping.need.integrity,
+					isUnmet: DEFAULT_CONFIG.format.bool.true,
+					relatedTo: "gum disease",
+					evidencedBy: "x-ray",
+				},
 			],
 			statements: [
 				{

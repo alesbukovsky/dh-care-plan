@@ -52,8 +52,18 @@ describe("convertData", () => {
 		const data = convertData(validPlan);
 
 		expect(data.assessments).toEqual([
-			{ need: DEFAULT_CONFIG.mapping.need.maintenance, isMet: true },
-			{ need: DEFAULT_CONFIG.mapping.need.integrity, isMet: false },
+			{
+				need: DEFAULT_CONFIG.mapping.need.maintenance,
+				isUnmet: DEFAULT_CONFIG.format.bool.false,
+				relatedTo: undefined,
+				evidencedBy: undefined,
+			},
+			{
+				need: DEFAULT_CONFIG.mapping.need.integrity,
+				isUnmet: DEFAULT_CONFIG.format.bool.true,
+				relatedTo: "gum disease",
+				evidencedBy: "x-ray",
+			},
 		]);
 	});
 
@@ -84,6 +94,32 @@ describe("convertData", () => {
 
 		expect(data.assessments[0]?.need).toBe(DEFAULT_CONFIG.mapping.need.comfort);
 		expect(data.statements[0]?.need).toBe(DEFAULT_CONFIG.mapping.need.comfort);
+	});
+
+	test("maps assessment.isUnmet using a custom config.format.bool, not the default", () => {
+		const customConfig = {
+			...DEFAULT_CONFIG,
+			format: {
+				...DEFAULT_CONFIG.format,
+				bool: { true: "Outstanding", false: "Resolved" },
+			},
+		};
+
+		const data = convertData(validPlan, customConfig);
+
+		expect(data.assessments[0]?.isUnmet).toBe("Resolved");
+		expect(data.assessments[1]?.isUnmet).toBe("Outstanding");
+	});
+
+	test("leaves an assessment's relatedTo/evidencedBy undefined when the need has neither", () => {
+		const data = convertData({
+			patient: PATIENT,
+			appointments: APPOINTMENTS,
+			needs: [{ type: "maintenance", isMet: true }],
+		});
+
+		expect(data.assessments[0]?.relatedTo).toBeUndefined();
+		expect(data.assessments[0]?.evidencedBy).toBeUndefined();
 	});
 
 	test("gives an unmet need without goals an empty goals array", () => {

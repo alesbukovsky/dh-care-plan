@@ -25,7 +25,13 @@ const Goal = z.object({
 	doneBy: z.string(),
 });
 
+const Bool = z.object({
+	true: z.string(),
+	false: z.string(),
+});
+
 const Format = z.object({
+	bool: Bool,
 	date: z.string(),
 	goal: Goal,
 	appointment: z.string(),
@@ -53,6 +59,10 @@ export function getConfigSchema(): object {
 
 export const DEFAULT_CONFIG: Config = {
 	format: {
+		bool: {
+			true: "Yes",
+			false: "No",
+		},
 		date: "MM/DD/YYYY",
 		goal: {
 			doneBy: "{date}, {relative}",

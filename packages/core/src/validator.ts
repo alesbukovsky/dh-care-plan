@@ -117,7 +117,6 @@ export function validateTemplate(input: ArrayBuffer): ValidationResult {
 	try {
 		const doc = createTemplater(input, {
 			modules: [inspector],
-			nullGetter: () => "",
 		});
 		doc.render({});
 	} catch (error) {

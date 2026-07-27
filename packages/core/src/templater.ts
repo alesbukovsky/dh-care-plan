@@ -11,6 +11,7 @@ export function createTemplater(input: ArrayBuffer, options?: TemplaterOptions):
 	const zip = new PizZip(input);
 	return new Docxtemplater(zip, {
 		errorLogging: false,
+		nullGetter: () => "",
 		...options,
 		parser: expressionParser,
 		paragraphLoop: true,

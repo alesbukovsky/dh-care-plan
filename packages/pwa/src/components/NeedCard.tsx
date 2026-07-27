@@ -1,6 +1,7 @@
 import type { Need } from "dh-care-plan";
 import { useState } from "react";
 import type { NeedDefinition } from "../needs";
+import { inputClass } from "./fields";
 import { PlusIcon, TrashIcon } from "./icons";
 
 interface NeedCardProps {
@@ -35,9 +36,6 @@ const STATUS_PILL: Record<"met" | "unmet", { label: string; className: string }>
 	unmet: { label: "Unmet", className: "bg-[#F3E1D3] text-[#B85C2E]" },
 };
 const NOT_STARTED_PILL = { label: "Not started", className: "bg-[#EEEEEC] text-[#7C8B86]" };
-
-const inputClass =
-	"rounded-md border border-[#B9C3BD] bg-white px-2 py-1 text-sm text-[#1E2B27] outline-none focus:border-[#7C8B86]";
 
 export default function NeedCard({ definition, index, need, onChange }: NeedCardProps) {
 	const [expanded, setExpanded] = useState(false);
@@ -229,7 +227,7 @@ export default function NeedCard({ definition, index, need, onChange }: NeedCard
 															})
 														}
 														className={`flex-1 rounded-md border px-2 py-1.5 text-xs font-semibold ${
-															goal.outcome.status === status.value
+															goal.outcome?.status === status.value
 																? status.activeClass
 																: "border-[#B9C3BD] bg-white text-[#4B5B55]"
 														}`}
@@ -293,10 +291,13 @@ export default function NeedCard({ definition, index, need, onChange }: NeedCard
 													className={`w-full resize-none ${inputClass}`}
 													rows={2}
 													placeholder="How and when will this goal be reassessed?"
-													value={goal.outcome.note ?? ""}
+													value={goal.outcome?.note ?? ""}
 													onChange={(e) =>
 														updateGoal(goalIndex, {
-															outcome: { ...goal.outcome, note: e.target.value },
+															outcome: {
+																status: goal.outcome?.status ?? "unmet",
+																note: e.target.value,
+															},
 														})
 													}
 												/>

@@ -8,6 +8,8 @@ function getEmptyPlan(): Plan {
 	return {
 		patient: { initials: "", dob: "", chartId: "" },
 		appointments: [],
+		subjective: {},
+		objective: {},
 		needs: [],
 	};
 }

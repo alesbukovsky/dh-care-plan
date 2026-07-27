@@ -84,6 +84,8 @@ export const Goal = z.object({
 });
 registry.add(Goal, { id: "Goal" });
 
+export type Goal = z.infer<typeof Goal>;
+
 export const Need = z.object({
 	type: z.enum([
 		"image",
@@ -102,6 +104,8 @@ export const Need = z.object({
 	goals: z.array(Goal).optional(),
 });
 registry.add(Need, { id: "Need" });
+
+export type Need = z.infer<typeof Need>;
 
 export const Plan = z.object({
 	patient: Patient,

@@ -21,9 +21,17 @@ const TOGGLE_STATUSES = [
 	},
 ] as const;
 
-const STATUS_PILL: Record<Need["outcome"]["status"], { label: string; className: string }> = {
+const GOAL_TOGGLE_STATUSES = [
+	{ value: "met", label: "Goal is met", activeClass: "border-[#2F6F62] bg-[#2F6F62] text-white" },
+	{
+		value: "unmet",
+		label: "Goal is unmet",
+		activeClass: "border-[#B85C2E] bg-[#B85C2E] text-white",
+	},
+] as const;
+
+const STATUS_PILL: Record<"met" | "unmet", { label: string; className: string }> = {
 	met: { label: "Met", className: "bg-[#E4EFEA] text-[#1F4D43]" },
-	partial: { label: "Partial", className: "bg-[#F4E9D0] text-[#8A6A1F]" },
 	unmet: { label: "Unmet", className: "bg-[#F3E1D3] text-[#B85C2E]" },
 };
 const NOT_STARTED_PILL = { label: "Not started", className: "bg-[#EEEEEC] text-[#7C8B86]" };
@@ -35,9 +43,8 @@ export default function NeedCard({ definition, index, need, onChange }: NeedCard
 	const [expanded, setExpanded] = useState(false);
 
 	const goals = need?.goals ?? [];
-	const interventions = need?.interventions ?? [];
 
-	function setStatus(status: Need["outcome"]["status"]) {
+	function setStatus(status: "met" | "unmet") {
 		onChange({
 			type: definition.type,
 			name: definition.name,
@@ -45,8 +52,6 @@ export default function NeedCard({ definition, index, need, onChange }: NeedCard
 			relatedTo: need?.relatedTo,
 			evidencedBy: need?.evidencedBy,
 			goals: need?.goals,
-			interventions: need?.interventions,
-			outcome: { status, note: need?.outcome.note },
 		});
 		setExpanded(true);
 	}
@@ -59,7 +64,7 @@ export default function NeedCard({ definition, index, need, onChange }: NeedCard
 
 	function addGoal() {
 		if (!need) return;
-		onChange({ ...need, goals: [...goals, { task: "" }] });
+		onChange({ ...need, goals: [...goals, { task: "", outcome: { status: "unmet" } }] });
 	}
 
 	function removeGoal(goalIndex: number) {
@@ -67,25 +72,30 @@ export default function NeedCard({ definition, index, need, onChange }: NeedCard
 		onChange({ ...need, goals: goals.filter((_, i) => i !== goalIndex) });
 	}
 
-	function updateIntervention(interventionIndex: number, value: string) {
-		if (!need) return;
-		onChange({
-			...need,
+	function updateGoalIntervention(goalIndex: number, interventionIndex: number, value: string) {
+		const goal = goals[goalIndex];
+		if (!goal) return;
+		const interventions = goal.interventions ?? [];
+		updateGoal(goalIndex, {
 			interventions: interventions.map((v, i) => (i === interventionIndex ? value : v)),
 		});
 	}
 
-	function addIntervention() {
-		if (!need) return;
-		onChange({ ...need, interventions: [...interventions, ""] });
+	function addGoalIntervention(goalIndex: number) {
+		const goal = goals[goalIndex];
+		if (!goal) return;
+		updateGoal(goalIndex, { interventions: [...(goal.interventions ?? []), ""] });
 	}
 
-	function removeIntervention(interventionIndex: number) {
-		if (!need) return;
-		onChange({ ...need, interventions: interventions.filter((_, i) => i !== interventionIndex) });
+	function removeGoalIntervention(goalIndex: number, interventionIndex: number) {
+		const goal = goals[goalIndex];
+		if (!goal) return;
+		updateGoal(goalIndex, {
+			interventions: (goal.interventions ?? []).filter((_, i) => i !== interventionIndex),
+		});
 	}
 
-	const pill = need ? STATUS_PILL[need.outcome.status] : NOT_STARTED_PILL;
+	const pill = need ? STATUS_PILL[need.isMet ? "met" : "unmet"] : NOT_STARTED_PILL;
 
 	return (
 		<div className="rounded-[10px] border border-[#D8DED9] bg-[#FBFCFA]">
@@ -118,7 +128,7 @@ export default function NeedCard({ definition, index, need, onChange }: NeedCard
 								type="button"
 								onClick={() => setStatus(status.value)}
 								className={`flex-1 rounded-md border px-2 py-2 text-xs font-semibold ${
-									need?.outcome.status === status.value
+									need?.isMet === (status.value === "met")
 										? status.activeClass
 										: "border-[#B9C3BD] bg-white text-[#4B5B55]"
 								}`}
@@ -128,7 +138,7 @@ export default function NeedCard({ definition, index, need, onChange }: NeedCard
 						))}
 					</div>
 
-					{need?.outcome.status === "unmet" && (
+					{need?.isMet === false && (
 						<>
 							<div className="space-y-1 rounded-lg border border-dashed border-[#B9C3BD] bg-[#F6F5F0] px-3 pb-2 pt-3">
 								<div>
@@ -159,10 +169,13 @@ export default function NeedCard({ definition, index, need, onChange }: NeedCard
 								<p className="mb-1.5 font-mono text-xs uppercase tracking-wide text-[#7C8B86]">
 									Goals
 								</p>
-								<div className="space-y-2">
+								<div className="space-y-3">
 									{goals.map((goal, goalIndex) => (
-										// biome-ignore lint/suspicious/noArrayIndexKey: goals have no stable id in the schema
-										<div key={`goal-${goalIndex}`} className="space-y-2">
+										<div
+											// biome-ignore lint/suspicious/noArrayIndexKey: goals have no stable id in the schema
+											key={`goal-${goalIndex}`}
+											className="space-y-2 rounded-lg border border-[#D8DED9] bg-white p-3"
+										>
 											<div className="flex items-center gap-2">
 												<input
 													type="text"
@@ -205,6 +218,90 @@ export default function NeedCard({ definition, index, need, onChange }: NeedCard
 													}
 												/>
 											</div>
+
+											<div className="flex gap-2">
+												{GOAL_TOGGLE_STATUSES.map((status) => (
+													<button
+														key={status.value}
+														type="button"
+														onClick={() =>
+															updateGoal(goalIndex, {
+																outcome: { ...goal.outcome, status: status.value },
+															})
+														}
+														className={`flex-1 rounded-md border px-2 py-1.5 text-xs font-semibold ${
+															goal.outcome.status === status.value
+																? status.activeClass
+																: "border-[#B9C3BD] bg-white text-[#4B5B55]"
+														}`}
+													>
+														{status.label}
+													</button>
+												))}
+											</div>
+
+											<div>
+												<p className="mb-1.5 font-mono text-xs uppercase tracking-wide text-[#7C8B86]">
+													Interventions
+												</p>
+												<div className="space-y-2">
+													{(goal.interventions ?? []).map((intervention, interventionIndex) => (
+														<div
+															// biome-ignore lint/suspicious/noArrayIndexKey: interventions have no stable id in the schema
+															key={`intervention-${interventionIndex}`}
+															className="flex items-center gap-2"
+														>
+															<input
+																type="text"
+																className={`flex-1 ${inputClass}`}
+																placeholder="e.g. Provide oral hygiene instruction"
+																value={intervention}
+																onChange={(e) =>
+																	updateGoalIntervention(
+																		goalIndex,
+																		interventionIndex,
+																		e.target.value,
+																	)
+																}
+															/>
+															<button
+																type="button"
+																title="Remove intervention"
+																onClick={() =>
+																	removeGoalIntervention(goalIndex, interventionIndex)
+																}
+																className="rounded p-1 text-[#7C8B86] hover:bg-[#F0F0EC] hover:text-[#B85C2E]"
+															>
+																<TrashIcon />
+															</button>
+														</div>
+													))}
+												</div>
+												<button
+													type="button"
+													onClick={() => addGoalIntervention(goalIndex)}
+													className="mt-2 flex items-center gap-1 text-xs text-[#2F6F62] hover:underline"
+												>
+													<PlusIcon className="h-3.5 w-3.5" /> Add intervention
+												</button>
+											</div>
+
+											<div>
+												<p className="mb-1.5 font-mono text-xs uppercase tracking-wide text-[#7C8B86]">
+													Evaluation note
+												</p>
+												<textarea
+													className={`w-full resize-none ${inputClass}`}
+													rows={2}
+													placeholder="How and when will this goal be reassessed?"
+													value={goal.outcome.note ?? ""}
+													onChange={(e) =>
+														updateGoal(goalIndex, {
+															outcome: { ...goal.outcome, note: e.target.value },
+														})
+													}
+												/>
+											</div>
 										</div>
 									))}
 								</div>
@@ -215,59 +312,6 @@ export default function NeedCard({ definition, index, need, onChange }: NeedCard
 								>
 									<PlusIcon className="h-3.5 w-3.5" /> Add goal
 								</button>
-							</div>
-
-							<div>
-								<p className="mb-1.5 font-mono text-xs uppercase tracking-wide text-[#7C8B86]">
-									Interventions
-								</p>
-								<div className="space-y-2">
-									{interventions.map((intervention, interventionIndex) => (
-										<div
-											// biome-ignore lint/suspicious/noArrayIndexKey: interventions have no stable id in the schema
-											key={`intervention-${interventionIndex}`}
-											className="flex items-center gap-2"
-										>
-											<input
-												type="text"
-												className={`flex-1 ${inputClass}`}
-												placeholder="e.g. Provide oral hygiene instruction"
-												value={intervention}
-												onChange={(e) => updateIntervention(interventionIndex, e.target.value)}
-											/>
-											<button
-												type="button"
-												title="Remove intervention"
-												onClick={() => removeIntervention(interventionIndex)}
-												className="rounded p-1 text-[#7C8B86] hover:bg-[#F0F0EC] hover:text-[#B85C2E]"
-											>
-												<TrashIcon />
-											</button>
-										</div>
-									))}
-								</div>
-								<button
-									type="button"
-									onClick={addIntervention}
-									className="mt-2 flex items-center gap-1 text-xs text-[#2F6F62] hover:underline"
-								>
-									<PlusIcon className="h-3.5 w-3.5" /> Add intervention
-								</button>
-							</div>
-
-							<div>
-								<p className="mb-1.5 font-mono text-xs uppercase tracking-wide text-[#7C8B86]">
-									Evaluation note
-								</p>
-								<textarea
-									className={`w-full resize-none ${inputClass}`}
-									rows={2}
-									placeholder="How and when will this goal be reassessed?"
-									value={need.outcome.note ?? ""}
-									onChange={(e) =>
-										onChange({ ...need, outcome: { ...need.outcome, note: e.target.value } })
-									}
-								/>
 							</div>
 						</>
 					)}

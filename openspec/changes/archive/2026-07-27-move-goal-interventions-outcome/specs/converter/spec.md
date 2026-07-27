@@ -1,10 +1,4 @@
-# converter Specification
-
-## Purpose
-
-TBD - defines `convertData`, the pure `Plan`→`Template` mapping function in `packages/core/src/converter.ts`.
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: `convertData` converts a Plan into flattened Template data
 
@@ -136,4 +130,3 @@ its second parameter, defaulting to `DEFAULT_CONFIG` when omitted:
   `outcome.status`
 - **THEN** the resulting `Statement`'s `goals` array SHALL contain each goal's own `interventions` and `outcome`
   independently, with neither goal's values affecting the other's
-</content>

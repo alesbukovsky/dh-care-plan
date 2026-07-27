@@ -17,15 +17,14 @@ beforeAll(async () => {
 			patient: { initials: "J.D.", dob: "1990-01-01", chartId: "12345" },
 			appointments: ["2026-07-01"],
 			needs: [
-				{ type: "maintenance", name: "flossing", isMet: true, outcome: { status: "met" } },
+				{ type: "maintenance", name: "flossing", isMet: true },
 				{
 					type: "integrity",
 					name: "brushing",
 					isMet: false,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
-					goals: [{ task: "floss daily" }],
-					outcome: { status: "unmet" },
+					goals: [{ task: "floss daily", outcome: { status: "unmet" } }],
 				},
 			],
 		}),

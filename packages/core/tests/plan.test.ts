@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { Need } from "../src/schema/plan";
 
-const baseGoal = { task: "floss daily" };
+const baseGoal = { task: "floss daily", outcome: { status: "unmet" as const } };
 
 const PATIENT = { initials: "J.D.", dob: "1990-01-01", chartId: "12345" };
 
@@ -13,7 +13,6 @@ function needWithGoal(doneBy?: unknown) {
 		relatedTo: "gum disease",
 		evidencedBy: "x-ray",
 		goals: [doneBy === undefined ? baseGoal : { ...baseGoal, doneBy }],
-		outcome: { status: "unmet" as const },
 	};
 }
 

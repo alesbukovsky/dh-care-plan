@@ -16,25 +16,25 @@ const Assessment = z.object({
 });
 registry.add(Assessment, { id: "Assessment" });
 
-const Goal = z.object({
-	label: z.string(),
-	task: z.string(),
-	doneBy: z.string().optional(),
-});
-registry.add(Goal, { id: "Goal" });
-
 const Outcome = z.object({
 	label: z.string(),
 	note: z.string().optional(),
 });
+
+const Goal = z.object({
+	label: z.string(),
+	task: z.string(),
+	doneBy: z.string().optional(),
+	interventions: z.array(z.string()).optional(),
+	outcome: Outcome,
+});
+registry.add(Goal, { id: "Goal" });
 
 const Statement = z.object({
 	need: z.string(),
 	relatedTo: z.string(),
 	evidencedBy: z.string(),
 	goals: z.array(Goal),
-	interventions: z.array(z.string()).optional(),
-	outcome: Outcome,
 });
 registry.add(Statement, { id: "Statement" });
 

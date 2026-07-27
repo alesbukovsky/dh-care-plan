@@ -13,7 +13,6 @@ export function getPlanSample(): Plan {
 				type: "maintenance",
 				name: "flossing",
 				isMet: true,
-				outcome: { status: "met" },
 			},
 			{
 				type: "integrity",
@@ -22,11 +21,14 @@ export function getPlanSample(): Plan {
 				relatedTo: "gum disease",
 				evidencedBy: "x-ray",
 				goals: [
-					{ task: "floss daily", doneBy: { date: "2026-08-01", relative: "by next visit" } },
-					{ task: "brush twice a day" },
+					{
+						task: "floss daily",
+						doneBy: { date: "2026-08-01", relative: "by next visit" },
+						interventions: ["oral hygiene education"],
+						outcome: { status: "partial", note: "improving" },
+					},
+					{ task: "brush twice a day", outcome: { status: "unmet" } },
 				],
-				interventions: ["oral hygiene education"],
-				outcome: { status: "partial", note: "improving" },
 			},
 		],
 	};

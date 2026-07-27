@@ -61,12 +61,12 @@ export function convertData(plan: Plan, config: Config = DEFAULT_CONFIG): Templa
 				label: goalLabel(statementNumber, goalIndex),
 				task: goal.task,
 				doneBy: goalDoneBy(goal.doneBy, config),
+				interventions: goal.interventions ?? [],
+				outcome: {
+					label: config.mapping.outcome[goal.outcome.status],
+					note: goal.outcome.note,
+				},
 			})),
-			interventions: need.interventions ?? [],
-			outcome: {
-				label: config.mapping.outcome[need.outcome.status],
-				note: need.outcome.note,
-			},
 		};
 	});
 

@@ -18,7 +18,6 @@ const validPlan = {
 			type: "maintenance" as const,
 			name: "flossing",
 			isMet: true,
-			outcome: { status: "met" as const },
 		},
 		{
 			type: "integrity" as const,
@@ -26,9 +25,13 @@ const validPlan = {
 			isMet: false,
 			relatedTo: "gum disease",
 			evidencedBy: "x-ray",
-			goals: [{ task: "floss daily" }],
-			interventions: ["oral hygiene education"],
-			outcome: { status: "partial" as const, note: "improving" },
+			goals: [
+				{
+					task: "floss daily",
+					interventions: ["oral hygiene education"],
+					outcome: { status: "partial" as const, note: "improving" },
+				},
+			],
 		},
 	],
 };

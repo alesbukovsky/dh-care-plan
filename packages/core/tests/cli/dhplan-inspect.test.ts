@@ -16,15 +16,14 @@ beforeAll(async () => {
 			patient: { initials: "J.D.", dob: "1990-01-01", chartId: "12345" },
 			appointments: ["2026-07-01"],
 			needs: [
-				{ type: "maintenance", name: "flossing", isMet: true, outcome: { status: "met" } },
+				{ type: "maintenance", name: "flossing", isMet: true },
 				{
 					type: "integrity",
 					name: "brushing",
 					isMet: false,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
-					goals: [{ task: "floss daily" }],
-					outcome: { status: "unmet" },
+					goals: [{ task: "floss daily", outcome: { status: "unmet" } }],
 				},
 			],
 		}),
@@ -68,9 +67,14 @@ describe("dhplan inspect", () => {
 					need: DEFAULT_CONFIG.mapping.need.integrity,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
-					goals: [{ label: "1a", task: "floss daily" }],
-					interventions: [],
-					outcome: { label: "Not met" },
+					goals: [
+						{
+							label: "1a",
+							task: "floss daily",
+							interventions: [],
+							outcome: { label: "Not met" },
+						},
+					],
 				},
 			],
 		});
@@ -108,7 +112,7 @@ describe("dhplan inspect", () => {
 
 		expect(exitCode).toBe(0);
 		const data = JSON.parse(stdout);
-		expect(data.statements[0]?.outcome).toEqual({ label: "Pending" });
+		expect(data.statements[0]?.goals[0]?.outcome).toEqual({ label: "Pending" });
 	});
 
 	test("an invalid --config override file reports issues without printing template data", async () => {

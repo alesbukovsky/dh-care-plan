@@ -13,7 +13,6 @@ const validPlan = {
 			type: "maintenance" as const,
 			name: "flossing",
 			isMet: true,
-			outcome: { status: "met" as const },
 		},
 		{
 			type: "integrity" as const,
@@ -21,9 +20,13 @@ const validPlan = {
 			isMet: false,
 			relatedTo: "gum disease",
 			evidencedBy: "x-ray",
-			goals: [{ task: "floss daily" }],
-			interventions: ["oral hygiene education"],
-			outcome: { status: "partial" as const, note: "improving" },
+			goals: [
+				{
+					task: "floss daily",
+					interventions: ["oral hygiene education"],
+					outcome: { status: "partial" as const, note: "improving" },
+				},
+			],
 		},
 	],
 };
@@ -78,7 +81,6 @@ describe("convertData", () => {
 					isMet: false,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
-					outcome: { status: "unmet" },
 				},
 			],
 		});
@@ -97,7 +99,6 @@ describe("convertData", () => {
 					isMet: false,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
-					outcome: { status: "unmet" },
 				},
 			],
 		});
@@ -110,15 +111,17 @@ describe("convertData", () => {
 			patient: PATIENT,
 			appointments: APPOINTMENTS,
 			needs: [
-				{ type: "maintenance", name: "flossing", isMet: true, outcome: { status: "met" } },
+				{ type: "maintenance", name: "flossing", isMet: true },
 				{
 					type: "integrity",
 					name: "brushing",
 					isMet: false,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
-					goals: [{ task: "floss daily" }, { task: "brush twice a day" }],
-					outcome: { status: "partial" },
+					goals: [
+						{ task: "floss daily", outcome: { status: "partial" } },
+						{ task: "brush twice a day", outcome: { status: "partial" } },
+					],
 				},
 				{
 					type: "health",
@@ -126,18 +129,41 @@ describe("convertData", () => {
 					isMet: false,
 					relatedTo: "sugar intake",
 					evidencedBy: "diary",
-					goals: [{ task: "reduce sugar", doneBy: { date: "2026-08-01" } }],
-					outcome: { status: "unmet" },
+					goals: [
+						{
+							task: "reduce sugar",
+							doneBy: { date: "2026-08-01" },
+							outcome: { status: "unmet" },
+						},
+					],
 				},
 			],
 		});
 
 		expect(data.statements[0]?.goals).toEqual([
-			{ label: "1a", task: "floss daily", doneBy: undefined },
-			{ label: "1b", task: "brush twice a day", doneBy: undefined },
+			{
+				label: "1a",
+				task: "floss daily",
+				doneBy: undefined,
+				interventions: [],
+				outcome: { label: "Partially met", note: undefined },
+			},
+			{
+				label: "1b",
+				task: "brush twice a day",
+				doneBy: undefined,
+				interventions: [],
+				outcome: { label: "Partially met", note: undefined },
+			},
 		]);
 		expect(data.statements[1]?.goals).toEqual([
-			{ label: "2a", task: "reduce sugar", doneBy: "08/01/2026" },
+			{
+				label: "2a",
+				task: "reduce sugar",
+				doneBy: "08/01/2026",
+				interventions: [],
+				outcome: { label: "Not met", note: undefined },
+			},
 		]);
 	});
 
@@ -151,7 +177,6 @@ describe("convertData", () => {
 					name: "brushing",
 					isMet: false,
 					evidencedBy: "x-ray",
-					outcome: { status: "unmet" },
 				},
 			],
 		});
@@ -166,7 +191,6 @@ describe("convertData", () => {
 					name: "brushing",
 					isMet: false,
 					relatedTo: "gum disease",
-					outcome: { status: "unmet" },
 				},
 			],
 		});
@@ -206,10 +230,9 @@ describe("convertData", () => {
 					evidencedBy: "x-ray",
 					goals: [
 						doneBy === undefined
-							? { task: "brush twice a day" }
-							: { task: "brush twice a day", doneBy },
+							? { task: "brush twice a day", outcome: { status: "unmet" as const } }
+							: { task: "brush twice a day", doneBy, outcome: { status: "unmet" as const } },
 					],
-					outcome: { status: "unmet" },
 				},
 			],
 		});
@@ -251,9 +274,9 @@ describe("convertData", () => {
 							{
 								task: "brush twice a day",
 								doneBy: { date: "2026-08-01", relative: "by next visit" },
+								outcome: { status: "unmet" },
 							},
 						],
-						outcome: { status: "unmet" },
 					},
 				],
 			},
@@ -266,10 +289,10 @@ describe("convertData", () => {
 		expect(data.statements[0]?.goals[0]?.doneBy).toBe("by next visit (08/01/2026)");
 	});
 
-	test("copies interventions onto a statement, defaulting to an empty array", () => {
+	test("copies interventions onto a goal, defaulting to an empty array", () => {
 		const data = convertData(validPlan);
 
-		expect(data.statements[0]?.interventions).toEqual(["oral hygiene education"]);
+		expect(data.statements[0]?.goals[0]?.interventions).toEqual(["oral hygiene education"]);
 
 		const dataWithoutInterventions = convertData({
 			patient: PATIENT,
@@ -281,11 +304,11 @@ describe("convertData", () => {
 					isMet: false,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
-					outcome: { status: "unmet" },
+					goals: [{ task: "floss daily", outcome: { status: "unmet" } }],
 				},
 			],
 		});
-		expect(dataWithoutInterventions.statements[0]?.interventions).toEqual([]);
+		expect(dataWithoutInterventions.statements[0]?.goals[0]?.interventions).toEqual([]);
 	});
 
 	test("maps outcome status to a display label, one case per status", () => {
@@ -299,11 +322,11 @@ describe("convertData", () => {
 					isMet: false,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
-					outcome: { status: "met", note: "resolved" },
+					goals: [{ task: "floss daily", outcome: { status: "met", note: "resolved" } }],
 				},
 			],
 		});
-		expect(met.statements[0]?.outcome).toEqual({ label: "Met", note: "resolved" });
+		expect(met.statements[0]?.goals[0]?.outcome).toEqual({ label: "Met", note: "resolved" });
 
 		const partial = convertData({
 			patient: PATIENT,
@@ -315,11 +338,11 @@ describe("convertData", () => {
 					isMet: false,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
-					outcome: { status: "partial" },
+					goals: [{ task: "floss daily", outcome: { status: "partial" } }],
 				},
 			],
 		});
-		expect(partial.statements[0]?.outcome).toEqual({
+		expect(partial.statements[0]?.goals[0]?.outcome).toEqual({
 			label: "Partially met",
 			note: undefined,
 		});
@@ -334,11 +357,11 @@ describe("convertData", () => {
 					isMet: false,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
-					outcome: { status: "unmet" },
+					goals: [{ task: "floss daily", outcome: { status: "unmet" } }],
 				},
 			],
 		});
-		expect(unmet.statements[0]?.outcome).toEqual({ label: "Not met", note: undefined });
+		expect(unmet.statements[0]?.goals[0]?.outcome).toEqual({ label: "Not met", note: undefined });
 	});
 
 	test("uses a custom config's mapping.outcome labels instead of the defaults", () => {
@@ -361,16 +384,60 @@ describe("convertData", () => {
 						isMet: false,
 						relatedTo: "gum disease",
 						evidencedBy: "x-ray",
-						outcome: { status: "partial" },
+						goals: [{ task: "floss daily", outcome: { status: "partial" } }],
 					},
 				],
 			},
 			customConfig,
 		);
 
-		expect(data.statements[0]?.outcome).toEqual({
+		expect(data.statements[0]?.goals[0]?.outcome).toEqual({
 			label: "In progress",
 			note: undefined,
 		});
+	});
+
+	test("two goals on the same statement carry independent interventions and outcomes", () => {
+		const data = convertData({
+			patient: PATIENT,
+			appointments: APPOINTMENTS,
+			needs: [
+				{
+					type: "integrity",
+					name: "brushing",
+					isMet: false,
+					relatedTo: "gum disease",
+					evidencedBy: "x-ray",
+					goals: [
+						{
+							task: "floss daily",
+							interventions: ["oral hygiene education"],
+							outcome: { status: "met", note: "resolved" },
+						},
+						{
+							task: "brush twice a day",
+							outcome: { status: "unmet" },
+						},
+					],
+				},
+			],
+		});
+
+		expect(data.statements[0]?.goals).toEqual([
+			{
+				label: "1a",
+				task: "floss daily",
+				doneBy: undefined,
+				interventions: ["oral hygiene education"],
+				outcome: { label: "Met", note: "resolved" },
+			},
+			{
+				label: "1b",
+				task: "brush twice a day",
+				doneBy: undefined,
+				interventions: [],
+				outcome: { label: "Not met", note: undefined },
+			},
+		]);
 	});
 });

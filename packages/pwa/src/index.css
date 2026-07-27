@@ -1,1 +1,12 @@
 @import "tailwindcss";
+
+@theme {
+	--font-sans: "Public Sans", -apple-system, sans-serif;
+	--font-serif: "Newsreader", Georgia, serif;
+	--font-mono: "JetBrains Mono", monospace;
+}
+
+body {
+	font-family: var(--font-sans);
+	-webkit-font-smoothing: antialiased;
+}

@@ -8,7 +8,7 @@ export {
 	getConfigSchema,
 	resolveConfig,
 } from "./schema/config";
-export { getPlanSchema, Plan } from "./schema/plan";
+export { getPlanSchema, Need, Plan } from "./schema/plan";
 export { getTemplateSchema, Template } from "./schema/template";
 export type { ValidationIssue, ValidationResult } from "./validator";
 export { validateConfig, validateData, validateTemplate } from "./validator";

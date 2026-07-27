@@ -16,13 +16,14 @@
 		"lint:ts": "biome lint .",
 		"lint:ts:fix": "biome check --write .",
 		"lint:md": "markdownlint-cli2",
-		"lint:md:fix": "markdownlint-cli2 --fix"
+		"lint:md:fix": "prettier --write '**/*.md' && markdownlint-cli2 --fix"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.5.5",
 		"@types/bun": "latest",
 		"dh-care-plan": "workspace:*",
-		"markdownlint-cli2": "0.23.1"
+		"markdownlint-cli2": "0.23.1",
+		"prettier": "3.9.6"
 	},
 	"peerDependencies": {
 		"typescript": "^5"

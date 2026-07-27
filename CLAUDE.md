@@ -5,7 +5,7 @@
 - Do NOT make git commit unless explicitly asked.
 - Do NOT out code into specifications unless absolutely necessary to describe the objective.
 
-## Testing
+## Tools
 
-- Use `bun test:all` to verify both Core and PWA at once, NOT `bun test`.
-- Use `bun test:core` and `bun test:pwa` to test only Core or PWA, respectively.
+- `bun test:all`: verify both Core and PWA at once, do NOT use `bun test`.
+- `bun lint:fix`: run linter with auto-fix enabled

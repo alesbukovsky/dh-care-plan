@@ -1,7 +1,30 @@
+import type { Plan } from "dh-care-plan";
+import { useState } from "react";
+import CaseStudyPane from "./components/CaseStudyPane";
+import CommandBar from "./components/CommandBar";
+import PlanEditor from "./components/PlanEditor";
+
+function getEmptyPlan(): Plan {
+	return {
+		patient: { initials: "", dob: "", chartId: "" },
+		appointments: [],
+		needs: [],
+	};
+}
+
 export default function App() {
+	const [plan, setPlan] = useState(() => getEmptyPlan());
+	const [caseText, setCaseText] = useState("");
+	const [commandBarCollapsed, setCommandBarCollapsed] = useState(false);
+
 	return (
-		<main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-slate-900 p-8 text-slate-100">
-			<h1 className="text-3xl font-semibold">Care Plan</h1>
+		<main className="flex h-screen min-h-screen bg-[#F1F4F1] text-[#1E2B27]">
+			<CommandBar
+				collapsed={commandBarCollapsed}
+				onToggleCollapsed={() => setCommandBarCollapsed((prev) => !prev)}
+			/>
+			<CaseStudyPane value={caseText} onChange={setCaseText} />
+			<PlanEditor plan={plan} onChange={setPlan} />
 		</main>
 	);
 }

@@ -30,7 +30,7 @@ function expand(title: string) {
 	fireEvent.click(required(screen.getByRole("heading", { name: title }).closest("button")));
 }
 
-test("patient identifiers and appointments are editable", () => {
+test("patient identifiers are editable", () => {
 	render(<Harness />);
 	expand("Patient");
 
@@ -38,13 +38,7 @@ test("patient identifiers and appointments are editable", () => {
 	fireEvent.change(screen.getByLabelText("Chart ID"), { target: { value: "12345" } });
 	fireEvent.change(screen.getByLabelText("Date of birth"), { target: { value: "1990-01-01" } });
 
-	fireEvent.click(screen.getByRole("button", { name: "Add appointment" }));
-	fireEvent.change(required(screen.getAllByPlaceholderText("appointment date")[0]), {
-		target: { value: "2026-07-01" },
-	});
-
 	expect(latest.patient).toEqual({ initials: "J.D.", dob: "1990-01-01", chartId: "12345" });
-	expect(latest.appointments).toEqual(["2026-07-01"]);
 });
 
 test("age is derived from the date of birth and is not editable", () => {

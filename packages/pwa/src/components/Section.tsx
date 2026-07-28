@@ -21,7 +21,9 @@ export default function Section({
 		<div className="rounded-[10px] border border-[#D8DED9] bg-[#FBFCFA]">
 			<button
 				type="button"
-				className="flex w-full items-center gap-4 px-4 py-3 text-left"
+				className={`flex w-full items-center gap-4 rounded-t-[10px] bg-[#E7EDE8] px-4 py-3 text-left ${
+					expanded ? "" : "rounded-b-[10px]"
+				}`}
 				onClick={() => setExpanded((prev) => !prev)}
 			>
 				<div className="min-w-0 flex-1">

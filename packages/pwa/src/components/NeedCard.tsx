@@ -98,7 +98,9 @@ export default function NeedCard({ definition, index, need, onChange }: NeedCard
 		<div className="rounded-[10px] border border-[#D8DED9] bg-[#FBFCFA]">
 			<button
 				type="button"
-				className="flex w-full items-center gap-4 px-4 py-3 text-left"
+				className={`flex w-full items-center gap-4 rounded-t-[10px] bg-[#E7EDE8] px-4 py-3 text-left ${
+					expanded ? "" : "rounded-b-[10px]"
+				}`}
 				onClick={() => setExpanded((prev) => !prev)}
 			>
 				<span className="w-6 shrink-0 font-serif text-sm text-[#7C8B86]">

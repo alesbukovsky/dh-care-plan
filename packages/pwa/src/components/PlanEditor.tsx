@@ -31,9 +31,7 @@ export default function PlanEditor({ plan, onChange }: PlanEditorProps) {
 			<div className="space-y-3">
 				<PatientSection
 					patient={plan.patient}
-					appointments={plan.appointments}
 					onChangePatient={(patient) => onChange({ ...plan, patient })}
-					onChangeAppointments={(appointments) => onChange({ ...plan, appointments })}
 				/>
 				<SubjectiveSection
 					subjective={plan.subjective}

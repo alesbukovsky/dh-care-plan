@@ -8,7 +8,7 @@ import {
 	SettingsIcon,
 } from "./icons";
 
-const APP_VERSION = "0.1.0";
+const APP_VERSION = __APP_VERSION__;
 
 interface CommandAction {
 	key: string;

@@ -1,5 +1,5 @@
 import type { Plan } from "dh-care-plan/schema";
-import { DerivedField, Field, StringListField } from "./fields";
+import { DerivedField, Field } from "./fields";
 import Section from "./Section";
 
 type Patient = Plan["patient"];
@@ -18,22 +18,14 @@ export function calculateAge(dob: string, on: Date = new Date()): number | undef
 
 interface PatientSectionProps {
 	patient: Patient;
-	appointments: string[];
 	onChangePatient: (next: Patient) => void;
-	onChangeAppointments: (next: string[]) => void;
 }
 
-export default function PatientSection({
-	patient,
-	appointments,
-	onChangePatient,
-	onChangeAppointments,
-}: PatientSectionProps) {
-	const badge = patient.initials || `${appointments.length} appt`;
+export default function PatientSection({ patient, onChangePatient }: PatientSectionProps) {
 	const age = calculateAge(patient.dob);
 
 	return (
-		<Section title="Patient" hint="Identifiers and appointment dates" badge={badge}>
+		<Section title="Patient" hint="Personal information" badge={patient.initials}>
 			<div className="grid grid-cols-2 gap-3">
 				<Field
 					label="Initials"
@@ -61,14 +53,6 @@ export default function PatientSection({
 					value={age === undefined ? "—" : `${age} years`}
 				/>
 			</div>
-			<StringListField
-				label="Appointments"
-				type="date"
-				placeholder="appointment date"
-				addLabel="Add appointment"
-				values={appointments}
-				onChange={(next) => onChangeAppointments(next ?? [])}
-			/>
 		</Section>
 	);
 }

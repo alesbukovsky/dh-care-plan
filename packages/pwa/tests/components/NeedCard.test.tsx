@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import type { Need } from "dh-care-plan/schema";
 import { useState } from "react";
 import { expect, test } from "vitest";
-import NeedCard from "./NeedCard";
+import NeedCard from "../../src/components/NeedCard";
 
 const definition = { type: "health", name: "Health", def: "test need" } as const;
 

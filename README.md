@@ -27,3 +27,8 @@ pass, so the deploy step never runs against a broken tree.
 ## Gotchas
 
 - Use `bun test:all` to test both Core and PWA in one swing, `bun test` ignores override in `package.json`.
+
+## Ideas
+
+- Add BMI calculator next to BMI field.
+- Add slash shortcuts, e.g. `/i` for patient initials or `/n` for "Not needed".

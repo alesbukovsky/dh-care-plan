@@ -89,9 +89,18 @@ test("subjective fields are stored under their own keys", () => {
 
 test("objective groups, exam findings, and other findings are editable", () => {
 	render(<Harness />);
-	expand("Objective");
+	expand("Objective data");
+	for (const group of [
+		"Medical history",
+		"Extraoral / intraoral exams",
+		"Restorative assessment",
+		"Periodontal assessment",
+		"Other findings",
+	]) {
+		expand(group);
+	}
 
-	fireEvent.change(screen.getByLabelText("ASA classification"), { target: { value: "II" } });
+	fireEvent.change(screen.getByLabelText("ASA class"), { target: { value: "II" } });
 	fireEvent.change(screen.getByLabelText("Caries risk"), { target: { value: "low" } });
 	fireEvent.change(screen.getByLabelText("Gingival index (GI)"), { target: { value: "1.2" } });
 	fireEvent.change(screen.getByLabelText("Radiographic"), { target: { value: "none needed" } });

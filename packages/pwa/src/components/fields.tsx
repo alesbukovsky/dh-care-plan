@@ -1,4 +1,4 @@
-import { type ReactNode, useId } from "react";
+import { useId } from "react";
 import { PlusIcon, TrashIcon } from "./icons";
 
 export const inputClass =
@@ -11,6 +11,8 @@ export interface FieldDefinition<T> {
 	label: string;
 	placeholder: string;
 	multiline?: boolean;
+	/** Render narrower so two ("half") or three ("third") such fields share one line. */
+	width?: "half" | "third";
 }
 
 interface FieldProps {
@@ -20,6 +22,7 @@ interface FieldProps {
 	onChange: (next: string | undefined) => void;
 	multiline?: boolean;
 	type?: "text" | "date";
+	className?: string;
 }
 
 export function Field({
@@ -29,11 +32,12 @@ export function Field({
 	onChange,
 	multiline,
 	type = "text",
+	className,
 }: FieldProps) {
 	const id = useId();
 
 	return (
-		<div>
+		<div className={className}>
 			<label htmlFor={id} className={labelClass}>
 				{label}
 			</label>
@@ -146,42 +150,32 @@ export function StringListField({
 	);
 }
 
+const FIELD_SPAN = {
+	full: "col-span-6",
+	half: "col-span-3",
+	third: "col-span-2",
+} as const;
+
 interface FieldGroupProps<T extends object> {
-	title?: string;
 	fields: FieldDefinition<T>[];
 	value: T | undefined;
 	onChange: (next: T) => void;
-	children?: ReactNode;
 }
 
-export function FieldGroup<T extends object>({
-	title,
-	fields,
-	value,
-	onChange,
-	children,
-}: FieldGroupProps<T>) {
+export function FieldGroup<T extends object>({ fields, value, onChange }: FieldGroupProps<T>) {
 	return (
-		<div className="space-y-3">
-			{title && <p className="font-serif text-sm font-medium text-[#1E2B27]">{title}</p>}
+		<div className="grid grid-cols-6 gap-3">
 			{fields.map((field) => (
 				<Field
 					key={field.key}
 					label={field.label}
 					placeholder={field.placeholder}
 					multiline={field.multiline}
+					className={FIELD_SPAN[field.width ?? "full"]}
 					value={value?.[field.key] as string | undefined}
 					onChange={(next) => onChange({ ...value, [field.key]: next } as T)}
 				/>
 			))}
-			{children}
 		</div>
 	);
-}
-
-export function countFilled(value: Record<string, unknown> | undefined): number {
-	if (!value) return 0;
-	return Object.values(value).filter((entry) =>
-		Array.isArray(entry) ? entry.length > 0 : entry !== undefined && entry !== "",
-	).length;
 }

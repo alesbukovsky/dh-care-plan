@@ -1,16 +1,16 @@
 import type { Plan } from "dh-care-plan/schema";
-import { countFilled, Field, type FieldDefinition, FieldGroup, StringListField } from "./fields";
+import { Field, type FieldDefinition, FieldGroup, StringListField } from "./fields";
 import Section from "./Section";
+import Subsection from "./Subsection";
 
 type Objective = Plan["objective"];
 type Medical = NonNullable<Objective["medical"]>;
-type Exams = NonNullable<Objective["exams"]>;
 type Restorative = NonNullable<Objective["restorative"]>;
 type Periodontal = NonNullable<Objective["periodontal"]>;
 
 const MEDICAL_FIELDS: FieldDefinition<Medical>[] = [
-	{ key: "bmi", label: "BMI", placeholder: "e.g. 22.4" },
-	{ key: "asa", label: "ASA classification", placeholder: "e.g. II" },
+	{ key: "bmi", label: "BMI", placeholder: "e.g. 22.4", width: "half" },
+	{ key: "asa", label: "ASA class", placeholder: "e.g. II", width: "half" },
 	{
 		key: "medications",
 		label: "Medications",
@@ -24,7 +24,12 @@ const MEDICAL_FIELDS: FieldDefinition<Medical>[] = [
 		placeholder: "systemic findings",
 		multiline: true,
 	},
-	{ key: "referrals", label: "Referrals", placeholder: "medical referrals made", multiline: true },
+	{
+		key: "referrals",
+		label: "Need for referrals",
+		placeholder: "medical referrals made",
+		multiline: true,
+	},
 ];
 
 const RESTORATIVE_FIELDS: FieldDefinition<Restorative>[] = [
@@ -35,11 +40,11 @@ const RESTORATIVE_FIELDS: FieldDefinition<Restorative>[] = [
 		placeholder: "existing and defective restorations",
 		multiline: true,
 	},
-	{ key: "risk", label: "Caries risk", placeholder: "e.g. low" },
-	{ key: "occlusion", label: "Occlusion", placeholder: "e.g. class I" },
+	{ key: "risk", label: "Caries risk", placeholder: "e.g. low", width: "half" },
+	{ key: "occlusion", label: "Occlusion", placeholder: "e.g. class I", width: "half" },
 	{
 		key: "referrals",
-		label: "Referrals",
+		label: "Need for referrals",
 		placeholder: "restorative referrals made",
 		multiline: true,
 	},
@@ -48,40 +53,21 @@ const RESTORATIVE_FIELDS: FieldDefinition<Restorative>[] = [
 const PERIODONTAL_FIELDS: FieldDefinition<Periodontal>[] = [
 	{
 		key: "gingiva",
-		label: "Gingiva",
-		placeholder: "colour, contour, consistency",
+		label: "Gingiva description",
+		placeholder: "color, contour, consistency",
 		multiline: true,
 	},
-	{ key: "aap", label: "AAP classification", placeholder: "e.g. stage II grade B" },
-	{ key: "debridement", label: "Debridement", placeholder: "e.g. moderate, generalized" },
-	{ key: "gi", label: "Gingival index (GI)", placeholder: "e.g. 1.2" },
-	{ key: "pi", label: "Plaque index (PI)", placeholder: "e.g. 1.8" },
+	{ key: "aap", label: "AAP assessment", placeholder: "e.g. stage II grade B" },
+	{ key: "debridement", label: "Debridement Skill", placeholder: "e.g. 2", width: "third" },
+	{ key: "gi", label: "Gingival index (GI)", placeholder: "e.g. 1.2", width: "third" },
+	{ key: "pi", label: "Plaque index (PI)", placeholder: "e.g. 1.8", width: "third" },
 	{
 		key: "referrals",
-		label: "Referrals",
+		label: "Need for referrals",
 		placeholder: "periodontal referrals made",
 		multiline: true,
 	},
 ];
-
-const EXAMS_FIELDS: FieldDefinition<Exams>[] = [
-	{
-		key: "referrals",
-		label: "Referrals",
-		placeholder: "referrals from the exams",
-		multiline: true,
-	},
-];
-
-function countObjective(objective: Objective): number {
-	return (
-		countFilled(objective.medical) +
-		countFilled(objective.exams) +
-		countFilled(objective.restorative) +
-		countFilled(objective.periodontal) +
-		countFilled({ radiographic: objective.radiographic, diagnostic: objective.diagnostic })
-	);
-}
 
 interface ObjectiveSectionProps {
 	objective: Objective;
@@ -92,24 +78,16 @@ export default function ObjectiveSection({ objective, onChange }: ObjectiveSecti
 	const findings = objective.exams?.findings ?? [];
 
 	return (
-		<Section
-			title="Objective"
-			hint="Clinical findings from assessment"
-			badge={`${countObjective(objective)} filled`}
-		>
-			<FieldGroup
-				title="Medical"
-				fields={MEDICAL_FIELDS}
-				value={objective.medical}
-				onChange={(medical) => onChange({ ...objective, medical })}
-			/>
+		<Section title="Objective data" hint="Clinical findings from assessment">
+			<Subsection title="Medical history">
+				<FieldGroup
+					fields={MEDICAL_FIELDS}
+					value={objective.medical}
+					onChange={(medical) => onChange({ ...objective, medical })}
+				/>
+			</Subsection>
 
-			<FieldGroup
-				title="Extraoral / intraoral exams"
-				fields={EXAMS_FIELDS}
-				value={objective.exams}
-				onChange={(exams) => onChange({ ...objective, exams: { ...objective.exams, ...exams } })}
-			>
+			<Subsection title="Extraoral / intraoral exams">
 				<StringListField
 					label="Findings"
 					placeholder="e.g. no visible lesions"
@@ -119,39 +97,49 @@ export default function ObjectiveSection({ objective, onChange }: ObjectiveSecti
 						onChange({ ...objective, exams: { ...objective.exams, findings: next } })
 					}
 				/>
-			</FieldGroup>
-
-			<FieldGroup
-				title="Restorative"
-				fields={RESTORATIVE_FIELDS}
-				value={objective.restorative}
-				onChange={(restorative) => onChange({ ...objective, restorative })}
-			/>
-
-			<FieldGroup
-				title="Periodontal"
-				fields={PERIODONTAL_FIELDS}
-				value={objective.periodontal}
-				onChange={(periodontal) => onChange({ ...objective, periodontal })}
-			/>
-
-			<div className="space-y-3">
-				<p className="font-serif text-sm font-medium text-[#1E2B27]">Other findings</p>
 				<Field
-					label="Radiographic"
+					label="Need for referrals"
+					placeholder="referrals from the exams"
+					multiline
+					value={objective.exams?.referrals}
+					onChange={(referrals) =>
+						onChange({ ...objective, exams: { ...objective.exams, referrals } })
+					}
+				/>
+			</Subsection>
+
+			<Subsection title="Restorative assessment">
+				<FieldGroup
+					fields={RESTORATIVE_FIELDS}
+					value={objective.restorative}
+					onChange={(restorative) => onChange({ ...objective, restorative })}
+				/>
+			</Subsection>
+
+			<Subsection title="Periodontal assessment">
+				<FieldGroup
+					fields={PERIODONTAL_FIELDS}
+					value={objective.periodontal}
+					onChange={(periodontal) => onChange({ ...objective, periodontal })}
+				/>
+			</Subsection>
+
+			<Subsection title="Other findings">
+				<Field
+					label="Radiographic needs"
 					placeholder="radiographs taken and findings"
 					multiline
 					value={objective.radiographic}
 					onChange={(radiographic) => onChange({ ...objective, radiographic })}
 				/>
 				<Field
-					label="Diagnostic"
+					label="Diagnostic needs"
 					placeholder="diagnostic tests and results"
 					multiline
 					value={objective.diagnostic}
 					onChange={(diagnostic) => onChange({ ...objective, diagnostic })}
 				/>
-			</div>
+			</Subsection>
 		</Section>
 	);
 }

@@ -72,7 +72,7 @@ test("age accounts for a birthday that has not happened yet this year", () => {
 
 test("subjective fields are stored under their own keys", () => {
 	render(<Harness />);
-	expand("Subjective");
+	expand("Subjective data");
 
 	fireEvent.change(screen.getByLabelText("Chief complaint"), {
 		target: { value: "sensitive teeth" },
@@ -112,7 +112,7 @@ test("objective groups, exam findings, and other findings are editable", () => {
 
 test("clearing a field drops it from the plan", () => {
 	render(<Harness />);
-	expand("Subjective");
+	expand("Subjective data");
 
 	const complaint = screen.getByLabelText("Chief complaint");
 	fireEvent.change(complaint, { target: { value: "sensitive teeth" } });

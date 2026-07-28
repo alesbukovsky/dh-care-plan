@@ -103,7 +103,9 @@ test("objective groups, exam findings, and other findings are editable", () => {
 	fireEvent.change(screen.getByLabelText("ASA class"), { target: { value: "II" } });
 	fireEvent.change(screen.getByLabelText("Caries risk"), { target: { value: "low" } });
 	fireEvent.change(screen.getByLabelText("Gingival index (GI)"), { target: { value: "1.2" } });
-	fireEvent.change(screen.getByLabelText("Radiographic"), { target: { value: "none needed" } });
+	fireEvent.change(screen.getByLabelText("Radiographic needs"), {
+		target: { value: "none needed" },
+	});
 
 	fireEvent.click(screen.getByRole("button", { name: "Add finding" }));
 	fireEvent.change(required(screen.getAllByPlaceholderText("e.g. no visible lesions")[0]), {
@@ -117,6 +119,86 @@ test("objective groups, exam findings, and other findings are editable", () => {
 		exams: { findings: ["no visible caries"] },
 		radiographic: "none needed",
 	});
+});
+
+test("exam findings are edited and removed by position, and the last one drops the list", () => {
+	render(<Harness />);
+	expand("Objective data");
+	expand("Extraoral / intraoral exams");
+
+	fireEvent.click(screen.getByRole("button", { name: "Add finding" }));
+	fireEvent.click(screen.getByRole("button", { name: "Add finding" }));
+	const findings = screen.getAllByPlaceholderText("e.g. no visible lesions");
+	fireEvent.change(required(findings[0]), { target: { value: "no visible lesions" } });
+	fireEvent.change(required(findings[1]), { target: { value: "tonsils within normal limits" } });
+
+	expect(latest.objective.exams?.findings).toEqual([
+		"no visible lesions",
+		"tonsils within normal limits",
+	]);
+
+	fireEvent.click(required(screen.getAllByRole("button", { name: "Remove findings entry" })[0]));
+
+	expect(latest.objective.exams?.findings).toEqual(["tonsils within normal limits"]);
+
+	fireEvent.click(screen.getByRole("button", { name: "Remove findings entry" }));
+
+	expect(latest.objective.exams?.findings).toBeUndefined();
+});
+
+test("exam referrals and diagnostic needs are stored under their own keys", () => {
+	render(<Harness />);
+	expand("Objective data");
+	expand("Extraoral / intraoral exams");
+	expand("Other findings");
+
+	fireEvent.change(screen.getByLabelText("Need for referrals"), {
+		target: { value: "oral surgery" },
+	});
+	fireEvent.change(screen.getByLabelText("Diagnostic needs"), {
+		target: { value: "pulp vitality test" },
+	});
+
+	expect(latest.objective).toEqual({
+		exams: { referrals: "oral surgery" },
+		diagnostic: "pulp vitality test",
+	});
+});
+
+test("assessing a need adds it to the plan and counts it in the badge", () => {
+	render(<Harness />);
+
+	expect(screen.getByText("0 assessed / 0 unmet")).toBeInTheDocument();
+
+	expand("Wholesome facial image");
+	fireEvent.click(screen.getByRole("button", { name: "Need is unmet" }));
+
+	expect(latest.needs).toEqual([{ type: "image", isMet: false }]);
+	expect(screen.getByText("1 assessed / 1 unmet")).toBeInTheDocument();
+
+	// changing the status of an assessed need replaces it rather than appending
+	fireEvent.click(screen.getByRole("button", { name: "Need is met" }));
+
+	expect(latest.needs).toEqual([{ type: "image", isMet: true }]);
+	expect(screen.getByText("1 assessed / 0 unmet")).toBeInTheDocument();
+
+	expand("Freedom from anxiety / stress");
+	fireEvent.click(required(screen.getAllByRole("button", { name: "Need is unmet" })[1]));
+
+	expect(latest.needs).toEqual([
+		{ type: "image", isMet: true },
+		{ type: "peace", isMet: false },
+	]);
+	expect(screen.getByText("2 assessed / 1 unmet")).toBeInTheDocument();
+
+	// updating a need other than the first leaves the earlier ones alone
+	fireEvent.click(required(screen.getAllByRole("button", { name: "Need is met" })[1]));
+
+	expect(latest.needs).toEqual([
+		{ type: "image", isMet: true },
+		{ type: "peace", isMet: true },
+	]);
+	expect(screen.getByText("2 assessed / 0 unmet")).toBeInTheDocument();
 });
 
 test("clearing a field drops it from the plan", () => {

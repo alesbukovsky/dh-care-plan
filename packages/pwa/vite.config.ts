@@ -42,6 +42,13 @@ export default defineConfig({
 			reporter: ["text", "lcov", "html"],
 			include: ["src/**/*.{ts,tsx}"],
 			exclude: ["src/main.tsx"],
+			// a ratchet, not a target: raise these as coverage improves
+			thresholds: {
+				statements: 95,
+				branches: 90,
+				functions: 95,
+				lines: 99,
+			},
 		},
 	},
 });

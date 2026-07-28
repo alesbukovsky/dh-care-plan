@@ -16,7 +16,7 @@ function Icon(props: SVGProps<SVGSVGElement>) {
 	);
 }
 
-export function ImportIcon(props: SVGProps<SVGSVGElement>) {
+export function DownloadIcon(props: SVGProps<SVGSVGElement>) {
 	return (
 		<Icon {...props}>
 			<path d="M12 3v11" />
@@ -26,7 +26,7 @@ export function ImportIcon(props: SVGProps<SVGSVGElement>) {
 	);
 }
 
-export function ExportIcon(props: SVGProps<SVGSVGElement>) {
+export function UploadIcon(props: SVGProps<SVGSVGElement>) {
 	return (
 		<Icon {...props}>
 			<path d="M12 14V3" />

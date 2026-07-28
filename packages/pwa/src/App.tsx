@@ -3,6 +3,7 @@ import { useState } from "react";
 import CaseStudyPane from "./components/CaseStudyPane";
 import CommandBar from "./components/CommandBar";
 import PlanEditor from "./components/PlanEditor";
+import { exportPlan } from "./export";
 
 function getEmptyPlan(): Plan {
 	return {
@@ -24,6 +25,7 @@ export default function App() {
 			<CommandBar
 				collapsed={commandBarCollapsed}
 				onToggleCollapsed={() => setCommandBarCollapsed((prev) => !prev)}
+				onExport={() => void exportPlan(plan)}
 			/>
 			<CaseStudyPane value={caseText} onChange={setCaseText} />
 			<PlanEditor plan={plan} onChange={setPlan} />

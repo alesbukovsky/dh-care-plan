@@ -28,6 +28,12 @@ pass, so the deploy step never runs against a broken tree.
 
 - Use `bun test:all` to test both Core and PWA in one swing, `bun test` ignores override in `package.json`.
 
+# To do 
+
+- Should "patient" be renamed to "client"?
+- Should "export / import" be renamed to "download / upload"?
+- The plan data JSON needs to carry test of the case study to be fully importable back.
+
 ## Ideas
 
 - Add BMI calculator next to BMI field.

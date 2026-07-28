@@ -22,11 +22,21 @@ const TOGGLE_STATUSES = [
 	},
 ] as const;
 
-const GOAL_TOGGLE_STATUSES = [
-	{ value: "met", label: "Goal is met", activeClass: "border-[#2F6F62] bg-[#2F6F62] text-white" },
+const GOAL_OUTCOME_STATUSES = [
+	{
+		value: undefined,
+		label: "TBD",
+		activeClass: "border-[#C9C9C4] bg-[#DFDFDA] text-[#5C6B66]",
+	},
+	{ value: "met", label: "Met", activeClass: "border-[#2F6F62] bg-[#2F6F62] text-white" },
+	{
+		value: "partial",
+		label: "Partially met",
+		activeClass: "border-[#C08A2E] bg-[#C08A2E] text-white",
+	},
 	{
 		value: "unmet",
-		label: "Goal is unmet",
+		label: "Not met",
 		activeClass: "border-[#B85C2E] bg-[#B85C2E] text-white",
 	},
 ] as const;
@@ -61,7 +71,7 @@ export default function NeedCard({ definition, index, need, onChange }: NeedCard
 
 	function addGoal() {
 		if (!need) return;
-		onChange({ ...need, goals: [...goals, { task: "", outcome: { status: "unmet" } }] });
+		onChange({ ...need, goals: [...goals, { task: "" }] });
 	}
 
 	function removeGoal(goalIndex: number) {
@@ -139,7 +149,7 @@ export default function NeedCard({ definition, index, need, onChange }: NeedCard
 
 					{need?.isMet === false && (
 						<>
-							<div className="space-y-1 rounded-lg border border-dashed border-[#B9C3BD] bg-[#F6F5F0] px-3 pb-2 pt-3">
+							<div className="space-y-1 rounded-lg border border-[#B9C3BD] bg-[#EDEBE1] px-3 pb-2 pt-3">
 								<div>
 									<p className="mb-1 font-serif italic text-[#4B5B55]">
 										Unmet human need for {definition.name.toLowerCase()}, related to
@@ -157,7 +167,7 @@ export default function NeedCard({ definition, index, need, onChange }: NeedCard
 									<textarea
 										className={`w-full resize-none ${inputClass}`}
 										rows={2}
-										placeholder="clinical signs / client report"
+										placeholder="clinical signs / patient report"
 										value={need.evidencedBy ?? ""}
 										onChange={(e) => onChange({ ...need, evidencedBy: e.target.value })}
 									/>
@@ -173,13 +183,14 @@ export default function NeedCard({ definition, index, need, onChange }: NeedCard
 										<div
 											// biome-ignore lint/suspicious/noArrayIndexKey: goals have no stable id in the schema
 											key={`goal-${goalIndex}`}
-											className="space-y-2 rounded-lg border border-[#D8DED9] bg-white p-3"
+											className="space-y-2 rounded-lg border border-[#D8DED9] bg-[#F6F5F0] p-3"
 										>
+											<p className="font-serif italic text-[#4B5B55]">The patient will</p>
 											<div className="flex items-center gap-2">
 												<input
 													type="text"
 													className={`flex-1 ${inputClass}`}
-													placeholder="e.g. Client will floss daily"
+													placeholder="e.g. floss daily"
 													value={goal.task}
 													onChange={(e) => updateGoal(goalIndex, { task: e.target.value })}
 												/>
@@ -207,7 +218,7 @@ export default function NeedCard({ definition, index, need, onChange }: NeedCard
 												<span className="font-serif italic text-[#7C8B86]">or</span>
 												<input
 													type="text"
-													className={`w-48 shrink-0 ${inputClass}`}
+													className={`w-64 shrink-0 ${inputClass}`}
 													placeholder="relative term, e.g. by next visit"
 													value={goal.doneBy?.relative ?? ""}
 													onChange={(e) =>
@@ -216,27 +227,6 @@ export default function NeedCard({ definition, index, need, onChange }: NeedCard
 														})
 													}
 												/>
-											</div>
-
-											<div className="flex gap-2">
-												{GOAL_TOGGLE_STATUSES.map((status) => (
-													<button
-														key={status.value}
-														type="button"
-														onClick={() =>
-															updateGoal(goalIndex, {
-																outcome: { ...goal.outcome, status: status.value },
-															})
-														}
-														className={`flex-1 rounded-md border px-2 py-1.5 text-xs font-semibold ${
-															goal.outcome?.status === status.value
-																? status.activeClass
-																: "border-[#B9C3BD] bg-white text-[#4B5B55]"
-														}`}
-													>
-														{status.label}
-													</button>
-												))}
 											</div>
 
 											<div>
@@ -253,7 +243,7 @@ export default function NeedCard({ definition, index, need, onChange }: NeedCard
 															<input
 																type="text"
 																className={`flex-1 ${inputClass}`}
-																placeholder="e.g. Provide oral hygiene instruction"
+																placeholder="e.g. provide oral hygiene instruction"
 																value={intervention}
 																onChange={(e) =>
 																	updateGoalIntervention(
@@ -287,12 +277,45 @@ export default function NeedCard({ definition, index, need, onChange }: NeedCard
 
 											<div>
 												<p className="mb-1.5 font-mono text-xs uppercase tracking-wide text-[#7C8B86]">
-													Evaluation note
+													Outcome
+												</p>
+												<div className="flex gap-2">
+													{GOAL_OUTCOME_STATUSES.map((status) => (
+														<button
+															key={status.label}
+															type="button"
+															onClick={() =>
+																updateGoal(goalIndex, {
+																	outcome: status.value
+																		? { note: goal.outcome?.note, status: status.value }
+																		: undefined,
+																})
+															}
+															className={`flex-1 rounded-md border px-2 py-1.5 text-xs font-semibold ${
+																goal.outcome?.status === status.value
+																	? status.activeClass
+																	: "border-[#B9C3BD] bg-white text-[#4B5B55]"
+															}`}
+														>
+															{status.label}
+														</button>
+													))}
+												</div>
+											</div>
+
+											<div>
+												<p className="mb-1.5 font-mono text-xs uppercase tracking-wide text-[#7C8B86]">
+													Outcome evaluation
 												</p>
 												<textarea
-													className={`w-full resize-none ${inputClass}`}
+													className={`w-full resize-none ${inputClass} disabled:cursor-not-allowed disabled:opacity-60`}
 													rows={2}
-													placeholder="How and when will this goal be reassessed?"
+													disabled={!goal.outcome}
+													placeholder={
+														goal.outcome
+															? "how and when will this goal be reassessed?"
+															: "set an outcome to add a note"
+													}
 													value={goal.outcome?.note ?? ""}
 													onChange={(e) =>
 														updateGoal(goalIndex, {

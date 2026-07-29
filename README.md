@@ -2,35 +2,22 @@
 
 ## Deploy
 
-The PWA is fully static and is served by an assets-only Cloudflare Worker
-(`packages/pwa/wrangler.jsonc`, Worker name `dhplan`, so the default URL is
-`dhplan.<account-subdomain>.workers.dev`). Renaming the Worker changes that URL;
-Cloudflare treats the new name as a separate Worker, so delete the old one.
-
-One-time setup:
-
-1. `bunx wrangler login` (or export `CLOUDFLARE_API_TOKEN` with the
-   *Edit Cloudflare Workers* permission, plus `CLOUDFLARE_ACCOUNT_ID` if the
-   token can reach more than one account).
-2. Optional: `bunx wrangler telemetry disable`.
-
-Every deploy:
-
-- `bun run deploy` — lint, test Core + PWA, build, then publish to the live URL.
-- `bun run deploy:preview` — same gates, but uploads a new Worker version that
-  gets its own preview URL without shifting production traffic. Promote it from
-  the Cloudflare dashboard, or roll back with `bunx wrangler rollback`.
-
-Both scripts refuse to publish unless lint, tests and the type-checked build all
-pass, so the deploy step never runs against a broken tree.
+- Create `.cf` file in the project root and export `CLOUDFLARE_API_TOKEN` within.
+- `bun run deploy`: runs lint, all tests and publishes to the live URL.
+- `bun run deploy:preview`: same gates, but uploads a new Worker version that gets its own preview URL without shifting 
+  production traffic. Promote it from the Cloudflare dashboard, or roll back with `bunx wrangler rollback`.
 
 ## Gotchas
 
 - Use `bun test:all` to test both Core and PWA in one swing, `bun test` ignores override in `package.json`.
 
+- The two packages run on different test runners, which is why `test:core` and `test:pwa` do not look alike. Core 
+  uses bun's built-in runner. The PWA needs Vite's transform and a `jsdom` environment. This also means the coverage 
+  is configured, if needed,  in two places: `packages/core/bunfig.toml` for Core and `packages/pwa/vite.config.ts` 
+  for the PWA.
+
 # To do 
 
-- Should "patient" be renamed to "client"?
 - Should "export / import" be renamed to "download / upload"?
 - The plan data JSON needs to carry test of the case study to be fully importable back.
 

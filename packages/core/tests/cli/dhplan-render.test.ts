@@ -153,4 +153,12 @@ describe("dhplan render", () => {
 		expect(stderr.length).toBeGreaterThan(0);
 		expect(await Bun.file(outputPath).exists()).toBe(false);
 	});
+
+	test("a failure the CLI has no message for is rethrown, not turned into an exit code", async () => {
+		// Writing to a directory fails in a way no command branch anticipates, so it
+		// has to surface as a crash rather than a misleading validation message.
+		await expect(
+			runCli(["render", join(dir, "valid-plan.json"), join(dir, "no-tags.docx"), dir]),
+		).rejects.toThrow();
+	});
 });

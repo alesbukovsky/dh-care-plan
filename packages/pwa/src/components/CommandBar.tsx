@@ -27,11 +27,17 @@ const ACTIONS: CommandAction[] = [
 interface CommandBarProps {
 	collapsed: boolean;
 	onToggleCollapsed: () => void;
+	onImport: () => void;
 	onExport: () => void;
 }
 
-export default function CommandBar({ collapsed, onToggleCollapsed, onExport }: CommandBarProps) {
-	const handlers: Record<string, () => void> = { export: onExport };
+export default function CommandBar({
+	collapsed,
+	onToggleCollapsed,
+	onImport,
+	onExport,
+}: CommandBarProps) {
+	const handlers: Record<string, () => void> = { import: onImport, export: onExport };
 
 	return (
 		<nav
@@ -62,7 +68,7 @@ export default function CommandBar({ collapsed, onToggleCollapsed, onExport }: C
 						type="button"
 						title={disabled ? `${label} (coming soon)` : label}
 						disabled={disabled}
-						onClick={handlers[key] ?? (() => {})}
+						onClick={handlers[key]}
 						className={`flex items-center gap-2 rounded px-2 py-2 text-sm ${
 							disabled
 								? "cursor-not-allowed text-[#6F8F86]"

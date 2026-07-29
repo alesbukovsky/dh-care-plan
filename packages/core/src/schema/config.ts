@@ -80,7 +80,3 @@ export const DEFAULT_CONFIG: Config = {
 		},
 	},
 };
-
-export function resolveConfig(config?: Config): Config {
-	return config ?? DEFAULT_CONFIG;
-}

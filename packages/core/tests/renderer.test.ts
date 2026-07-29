@@ -1,18 +1,19 @@
 import { describe, expect, test } from "bun:test";
-import { render } from "../src/renderer";
+import type PizZip from "pizzip";
+import { createTemplater, describeTemplaterError, render } from "../src/renderer";
 import { DEFAULT_CONFIG } from "../src/schema/config";
+import type { Plan } from "../src/schema/plan";
 import { buildDocx } from "./helpers/docx-fixture";
 
-function jsonBuffer(value: unknown): ArrayBuffer {
-	return new TextEncoder().encode(JSON.stringify(value)).buffer as ArrayBuffer;
+function renderedText(doc: ReturnType<typeof createTemplater>): string {
+	const document = (doc.getZip() as PizZip).files["word/document.xml"];
+	if (!document) throw new Error("rendered docx is missing word/document.xml");
+	return document.asText();
 }
 
-const PATIENT = { initials: "J.D.", dob: "1990-01-01", chartId: "12345" };
-const APPOINTMENTS = ["2026-07-01", "2026-08-01"];
-
-const validPlan = {
-	patient: PATIENT,
-	appointments: APPOINTMENTS,
+const validPlan: Plan = {
+	patient: { initials: "J.D.", dob: "1990-01-01", chartId: "12345" },
+	appointments: ["2026-07-01", "2026-08-01"],
 	subjective: { complaint: "sensitive teeth" },
 	objective: {
 		medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
@@ -20,11 +21,11 @@ const validPlan = {
 	},
 	needs: [
 		{
-			type: "maintenance" as const,
+			type: "maintenance",
 			isMet: true,
 		},
 		{
-			type: "integrity" as const,
+			type: "integrity",
 			isMet: false,
 			relatedTo: "gum disease",
 			evidencedBy: "x-ray",
@@ -32,7 +33,7 @@ const validPlan = {
 				{
 					task: "floss daily",
 					interventions: ["oral hygiene education"],
-					outcome: { status: "partial" as const, note: "improving" },
+					outcome: { status: "partial", note: "improving" },
 				},
 			],
 		},
@@ -40,92 +41,123 @@ const validPlan = {
 };
 
 describe("render", () => {
-	test("returns plan issues without touching the template when the plan is invalid", () => {
-		const invalidPlan = jsonBuffer("not an object");
-		const docx = buildDocx("<w:p><w:r><w:t>Hello {undefinedTag}</w:t></w:r></w:p>");
-
-		const result = render(invalidPlan, docx);
-
-		expect(result.success).toBe(false);
-		if (!result.success) {
-			expect(result.issues.length).toBeGreaterThan(0);
-		}
-	});
-
-	test("returns template issues when the plan is valid but the template is not", () => {
-		const docx = buildDocx("<w:p><w:r><w:t>Hello {undefinedTag}</w:t></w:r></w:p>");
-
-		const result = render(jsonBuffer(validPlan), docx);
-
-		expect(result.success).toBe(false);
-		if (!result.success) {
-			expect(result.issues).toEqual([
-				{ path: "undefinedTag", message: "not defined in Template" },
-			]);
-		}
-	});
-
-	test("renders successfully when both plan and template are valid", () => {
+	test("renders a valid plan into a valid template", () => {
 		const docx = buildDocx("<w:p><w:r><w:t>Hello world</w:t></w:r></w:p>");
 
-		const result = render(jsonBuffer(validPlan), docx);
+		const result = render(validPlan, docx);
 
-		expect(result.success).toBe(true);
-		if (result.success) {
+		expect(result.ok).toBe(true);
+		if (result.ok) {
 			expect(result.output).toBeInstanceOf(Uint8Array);
 			expect(result.output.length).toBeGreaterThan(0);
 		}
 	});
 
-	test("reports a docxtemplater processing failure as an issue rather than throwing", () => {
-		// This template fails docxtemplater processing (an unclosed loop tag).
-		// Since `convertData` currently always returns `{}`, the same
-		// data is used both by `validateTemplate`'s internal render check and
-		// by `render()`'s own render step, so this is caught at the
-		// validation step today — but the important behavior under test is
-		// that `render()` never throws and always returns an issue instead.
+	test("reports a docxtemplater processing failure instead of throwing", () => {
 		const docx = buildDocx("<w:p><w:r><w:t>{#loop1}unclosed</w:t></w:r></w:p>");
 
-		const result = render(jsonBuffer(validPlan), docx);
+		const result = render(validPlan, docx);
 
-		expect(result.success).toBe(false);
-		if (!result.success) {
-			expect(result.issues[0]?.message).toContain("unclosed");
+		expect(result.ok).toBe(false);
+		if (!result.ok) {
+			expect(result.message).toContain("unclosed");
 		}
 	});
 
-	test("renders using the default config when no config is given", () => {
-		const docx = buildDocx("<w:p><w:r><w:t>Hello world</w:t></w:r></w:p>");
+	test("reports a read failure for a non-.docx template rather than throwing", () => {
+		const notADocx = new TextEncoder().encode("not a zip file").buffer as ArrayBuffer;
 
-		const result = render(jsonBuffer(validPlan), docx);
+		const result = render(validPlan, notADocx);
 
-		expect(result.success).toBe(true);
+		expect(result.ok).toBe(false);
+		if (!result.ok) {
+			expect(result.message).toBeTruthy();
+		}
 	});
 
-	test("renders using a valid config override", () => {
+	test("renders using the default config when none is given", () => {
 		const docx = buildDocx("<w:p><w:r><w:t>Hello world</w:t></w:r></w:p>");
-		const config = jsonBuffer({
+
+		expect(render(validPlan, docx).ok).toBe(true);
+	});
+
+	test("renders using a config override", () => {
+		const docx = buildDocx("<w:p><w:r><w:t>Hello world</w:t></w:r></w:p>");
+		const config = {
 			...DEFAULT_CONFIG,
 			mapping: {
 				...DEFAULT_CONFIG.mapping,
 				outcome: { met: "Achieved", partial: "In progress", unmet: "Pending", undefined: "TBD" },
 			},
-		});
+		};
 
-		const result = render(jsonBuffer(validPlan), docx, config);
-
-		expect(result.success).toBe(true);
+		expect(render(validPlan, docx, config).ok).toBe(true);
 	});
 
-	test("returns config issues without rendering when the config override is invalid", () => {
-		const docx = buildDocx("<w:p><w:r><w:t>Hello world</w:t></w:r></w:p>");
-		const invalidConfig = jsonBuffer({ mapping: { outcome: { met: "Achieved" } } });
+	test("renders a template whose tags are undefined in Template, leaving them blank", () => {
+		// `render` no longer lints the template — that is `checkTemplate`'s job — so an
+		// unknown tag is filled by `nullGetter` rather than reported.
+		const docx = buildDocx("<w:p><w:r><w:t>Hello {undefinedTag}</w:t></w:r></w:p>");
 
-		const result = render(jsonBuffer(validPlan), docx, invalidConfig);
+		expect(render(validPlan, docx).ok).toBe(true);
+	});
+});
 
-		expect(result.success).toBe(false);
-		if (!result.success) {
-			expect(result.issues.length).toBeGreaterThan(0);
-		}
+describe("createTemplater", () => {
+	test("the lower filter lowercases a string tag value", () => {
+		const docx = buildDocx("<w:p><w:r><w:t>{name | lower}</w:t></w:r></w:p>");
+
+		const doc = createTemplater(docx);
+		doc.render({ name: "JOHN DOE" });
+
+		expect(renderedText(doc)).toContain("john doe");
+	});
+
+	test("the lower filter passes non-string values through unchanged", () => {
+		const docx = buildDocx("<w:p><w:r><w:t>{count | lower}</w:t></w:r></w:p>");
+
+		const doc = createTemplater(docx);
+		doc.render({ count: 42 });
+
+		expect(renderedText(doc)).toContain("42");
+	});
+
+	test("defaults a missing tag to an empty string instead of throwing", () => {
+		const docx = buildDocx("<w:p><w:r><w:t>Hello {missing}</w:t></w:r></w:p>");
+
+		const doc = createTemplater(docx);
+		expect(() => doc.render({})).not.toThrow();
+		expect(renderedText(doc)).toContain("Hello ");
+	});
+});
+
+describe("describeTemplaterError", () => {
+	test("joins explanations from multiple nested errors", () => {
+		const error = {
+			message: "top-level message",
+			properties: {
+				errors: [
+					{ message: "err1", properties: { explanation: "explanation one" } },
+					{ message: "err2", properties: { explanation: "explanation two" } },
+				],
+			},
+		};
+
+		expect(describeTemplaterError(error)).toBe("explanation one\nexplanation two");
+	});
+
+	test("falls back to a nested error's message when it has no explanation", () => {
+		const error = {
+			message: "top-level message",
+			properties: { errors: [{ message: "err1" }] },
+		};
+
+		expect(describeTemplaterError(error)).toBe("err1");
+	});
+
+	test("falls back to the top-level message when there are no nested errors", () => {
+		const error = { message: "top-level message" };
+
+		expect(describeTemplaterError(error)).toBe("top-level message");
 	});
 });

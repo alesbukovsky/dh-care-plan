@@ -10,6 +10,9 @@
 		".": "./src/index.ts",
 		"./schema": "./src/schema/index.ts"
 	},
+	"scripts": {
+		"typecheck": "tsc --noEmit"
+	},
 	"dependencies": {
 		"angular-expressions": "1.5.5",
 		"commander": "15.0.0",

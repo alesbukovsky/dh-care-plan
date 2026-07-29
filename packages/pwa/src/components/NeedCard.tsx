@@ -50,8 +50,6 @@ const NOT_STARTED_PILL = { label: "Not started", className: "bg-[#EEEEEC] text-[
 export default function NeedCard({ definition, index, need, onChange }: NeedCardProps) {
 	const [expanded, setExpanded] = useState(false);
 
-	const goals = need?.goals ?? [];
-
 	function setStatus(status: "met" | "unmet") {
 		onChange({
 			type: definition.type,
@@ -61,45 +59,6 @@ export default function NeedCard({ definition, index, need, onChange }: NeedCard
 			goals: need?.goals,
 		});
 		setExpanded(true);
-	}
-
-	function updateGoal(goalIndex: number, patch: Partial<Goal>) {
-		if (!need) return;
-		const nextGoals = goals.map((goal, i) => (i === goalIndex ? { ...goal, ...patch } : goal));
-		onChange({ ...need, goals: nextGoals });
-	}
-
-	function addGoal() {
-		if (!need) return;
-		onChange({ ...need, goals: [...goals, { task: "" }] });
-	}
-
-	function removeGoal(goalIndex: number) {
-		if (!need) return;
-		onChange({ ...need, goals: goals.filter((_, i) => i !== goalIndex) });
-	}
-
-	function updateGoalIntervention(goalIndex: number, interventionIndex: number, value: string) {
-		const goal = goals[goalIndex];
-		if (!goal) return;
-		const interventions = goal.interventions ?? [];
-		updateGoal(goalIndex, {
-			interventions: interventions.map((v, i) => (i === interventionIndex ? value : v)),
-		});
-	}
-
-	function addGoalIntervention(goalIndex: number) {
-		const goal = goals[goalIndex];
-		if (!goal) return;
-		updateGoal(goalIndex, { interventions: [...(goal.interventions ?? []), ""] });
-	}
-
-	function removeGoalIntervention(goalIndex: number, interventionIndex: number) {
-		const goal = goals[goalIndex];
-		if (!goal) return;
-		updateGoal(goalIndex, {
-			interventions: (goal.interventions ?? []).filter((_, i) => i !== interventionIndex),
-		});
 	}
 
 	const pill = need ? STATUS_PILL[need.isMet ? "met" : "unmet"] : NOT_STARTED_PILL;
@@ -174,174 +133,207 @@ export default function NeedCard({ definition, index, need, onChange }: NeedCard
 								</div>
 							</div>
 
+							<GoalsEditor need={need} onChange={onChange} />
+						</>
+					)}
+				</div>
+			)}
+		</div>
+	);
+}
+
+interface GoalsEditorProps {
+	need: Need;
+	onChange: (next: Need) => void;
+}
+
+/**
+ * Split out of NeedCard so goal editing works against a need that is known to
+ * exist, rather than re-checking for one at every callback.
+ */
+function GoalsEditor({ need, onChange }: GoalsEditorProps) {
+	const goals = need.goals ?? [];
+
+	function updateGoal(goalIndex: number, patch: Partial<Goal>) {
+		const nextGoals = goals.map((goal, i) => (i === goalIndex ? { ...goal, ...patch } : goal));
+		onChange({ ...need, goals: nextGoals });
+	}
+
+	function addGoal() {
+		onChange({ ...need, goals: [...goals, { task: "" }] });
+	}
+
+	function removeGoal(goalIndex: number) {
+		onChange({ ...need, goals: goals.filter((_, i) => i !== goalIndex) });
+	}
+
+	return (
+		<div>
+			<p className="mb-1.5 font-mono text-xs uppercase tracking-wide text-[#7C8B86]">Goals</p>
+			<div className="space-y-3">
+				{goals.map((goal, goalIndex) => {
+					const interventions = goal.interventions ?? [];
+					const outcome = goal.outcome;
+					return (
+						<div
+							// biome-ignore lint/suspicious/noArrayIndexKey: goals have no stable id in the schema
+							key={`goal-${goalIndex}`}
+							className="space-y-2 rounded-lg border border-[#D8DED9] bg-[#F6F5F0] p-3"
+						>
+							<p className="font-serif italic text-[#4B5B55]">The patient will</p>
+							<div className="flex items-center gap-2">
+								<input
+									type="text"
+									className={`flex-1 ${inputClass}`}
+									placeholder="e.g. floss daily"
+									value={goal.task}
+									onChange={(e) => updateGoal(goalIndex, { task: e.target.value })}
+								/>
+								<button
+									type="button"
+									title="Remove goal"
+									onClick={() => removeGoal(goalIndex)}
+									className="rounded p-1 text-[#7C8B86] hover:bg-[#F0F0EC] hover:text-[#B85C2E]"
+								>
+									<TrashIcon />
+								</button>
+							</div>
+							<div className="flex flex-wrap items-center gap-2">
+								<span className="font-serif italic text-[#7C8B86]">by</span>
+								<input
+									type="date"
+									className={`w-32 shrink-0 ${inputClass}`}
+									value={goal.doneBy?.date ?? ""}
+									onChange={(e) =>
+										updateGoal(goalIndex, {
+											doneBy: { ...goal.doneBy, date: e.target.value || undefined },
+										})
+									}
+								/>
+								<span className="font-serif italic text-[#7C8B86]">or</span>
+								<input
+									type="text"
+									className={`w-64 shrink-0 ${inputClass}`}
+									placeholder="relative term, e.g. by next visit"
+									value={goal.doneBy?.relative ?? ""}
+									onChange={(e) =>
+										updateGoal(goalIndex, {
+											doneBy: { ...goal.doneBy, relative: e.target.value || undefined },
+										})
+									}
+								/>
+							</div>
+
 							<div>
 								<p className="mb-1.5 font-mono text-xs uppercase tracking-wide text-[#7C8B86]">
-									Goals
+									Interventions
 								</p>
-								<div className="space-y-3">
-									{goals.map((goal, goalIndex) => (
+								<div className="space-y-2">
+									{interventions.map((intervention, interventionIndex) => (
 										<div
-											// biome-ignore lint/suspicious/noArrayIndexKey: goals have no stable id in the schema
-											key={`goal-${goalIndex}`}
-											className="space-y-2 rounded-lg border border-[#D8DED9] bg-[#F6F5F0] p-3"
+											// biome-ignore lint/suspicious/noArrayIndexKey: interventions have no stable id in the schema
+											key={`intervention-${interventionIndex}`}
+											className="flex items-center gap-2"
 										>
-											<p className="font-serif italic text-[#4B5B55]">The patient will</p>
-											<div className="flex items-center gap-2">
-												<input
-													type="text"
-													className={`flex-1 ${inputClass}`}
-													placeholder="e.g. floss daily"
-													value={goal.task}
-													onChange={(e) => updateGoal(goalIndex, { task: e.target.value })}
-												/>
-												<button
-													type="button"
-													title="Remove goal"
-													onClick={() => removeGoal(goalIndex)}
-													className="rounded p-1 text-[#7C8B86] hover:bg-[#F0F0EC] hover:text-[#B85C2E]"
-												>
-													<TrashIcon />
-												</button>
-											</div>
-											<div className="flex flex-wrap items-center gap-2">
-												<span className="font-serif italic text-[#7C8B86]">by</span>
-												<input
-													type="date"
-													className={`w-32 shrink-0 ${inputClass}`}
-													value={goal.doneBy?.date ?? ""}
-													onChange={(e) =>
-														updateGoal(goalIndex, {
-															doneBy: { ...goal.doneBy, date: e.target.value || undefined },
-														})
-													}
-												/>
-												<span className="font-serif italic text-[#7C8B86]">or</span>
-												<input
-													type="text"
-													className={`w-64 shrink-0 ${inputClass}`}
-													placeholder="relative term, e.g. by next visit"
-													value={goal.doneBy?.relative ?? ""}
-													onChange={(e) =>
-														updateGoal(goalIndex, {
-															doneBy: { ...goal.doneBy, relative: e.target.value || undefined },
-														})
-													}
-												/>
-											</div>
-
-											<div>
-												<p className="mb-1.5 font-mono text-xs uppercase tracking-wide text-[#7C8B86]">
-													Interventions
-												</p>
-												<div className="space-y-2">
-													{(goal.interventions ?? []).map((intervention, interventionIndex) => (
-														<div
-															// biome-ignore lint/suspicious/noArrayIndexKey: interventions have no stable id in the schema
-															key={`intervention-${interventionIndex}`}
-															className="flex items-center gap-2"
-														>
-															<input
-																type="text"
-																className={`flex-1 ${inputClass}`}
-																placeholder="e.g. provide oral hygiene instruction"
-																value={intervention}
-																onChange={(e) =>
-																	updateGoalIntervention(
-																		goalIndex,
-																		interventionIndex,
-																		e.target.value,
-																	)
-																}
-															/>
-															<button
-																type="button"
-																title="Remove intervention"
-																onClick={() =>
-																	removeGoalIntervention(goalIndex, interventionIndex)
-																}
-																className="rounded p-1 text-[#7C8B86] hover:bg-[#F0F0EC] hover:text-[#B85C2E]"
-															>
-																<TrashIcon />
-															</button>
-														</div>
-													))}
-												</div>
-												<button
-													type="button"
-													onClick={() => addGoalIntervention(goalIndex)}
-													className="mt-2 flex items-center gap-1 text-xs text-[#2F6F62] hover:underline"
-												>
-													<PlusIcon className="h-3.5 w-3.5" /> Add intervention
-												</button>
-											</div>
-
-											<div>
-												<p className="mb-1.5 font-mono text-xs uppercase tracking-wide text-[#7C8B86]">
-													Outcome
-												</p>
-												<div className="flex gap-2">
-													{GOAL_OUTCOME_STATUSES.map((status) => (
-														<button
-															key={status.label}
-															type="button"
-															onClick={() =>
-																updateGoal(goalIndex, {
-																	outcome: status.value
-																		? { note: goal.outcome?.note, status: status.value }
-																		: undefined,
-																})
-															}
-															className={`flex-1 rounded-md border px-2 py-1.5 text-xs font-semibold ${
-																goal.outcome?.status === status.value
-																	? status.activeClass
-																	: "border-[#B9C3BD] bg-white text-[#4B5B55]"
-															}`}
-														>
-															{status.label}
-														</button>
-													))}
-												</div>
-											</div>
-
-											<div>
-												<p className="mb-1.5 font-mono text-xs uppercase tracking-wide text-[#7C8B86]">
-													Outcome evaluation
-												</p>
-												<textarea
-													className={`w-full resize-none ${inputClass} disabled:cursor-not-allowed disabled:opacity-60`}
-													rows={2}
-													disabled={!goal.outcome}
-													placeholder={
-														goal.outcome
-															? "how and when will this goal be reassessed?"
-															: "set an outcome to add a note"
-													}
-													value={goal.outcome?.note ?? ""}
-													onChange={(e) =>
-														updateGoal(goalIndex, {
-															outcome: {
-																status: goal.outcome?.status ?? "unmet",
-																note: e.target.value,
-															},
-														})
-													}
-												/>
-											</div>
+											<input
+												type="text"
+												className={`flex-1 ${inputClass}`}
+												placeholder="e.g. provide oral hygiene instruction"
+												value={intervention}
+												onChange={(e) =>
+													updateGoal(goalIndex, {
+														interventions: interventions.map((v, i) =>
+															i === interventionIndex ? e.target.value : v,
+														),
+													})
+												}
+											/>
+											<button
+												type="button"
+												title="Remove intervention"
+												onClick={() =>
+													updateGoal(goalIndex, {
+														interventions: interventions.filter((_, i) => i !== interventionIndex),
+													})
+												}
+												className="rounded p-1 text-[#7C8B86] hover:bg-[#F0F0EC] hover:text-[#B85C2E]"
+											>
+												<TrashIcon />
+											</button>
 										</div>
 									))}
 								</div>
 								<button
 									type="button"
-									onClick={addGoal}
+									onClick={() => updateGoal(goalIndex, { interventions: [...interventions, ""] })}
 									className="mt-2 flex items-center gap-1 text-xs text-[#2F6F62] hover:underline"
 								>
-									<PlusIcon className="h-3.5 w-3.5" /> Add goal
+									<PlusIcon className="h-3.5 w-3.5" /> Add intervention
 								</button>
 							</div>
-						</>
-					)}
-				</div>
-			)}
+
+							<div>
+								<p className="mb-1.5 font-mono text-xs uppercase tracking-wide text-[#7C8B86]">
+									Outcome
+								</p>
+								<div className="flex gap-2">
+									{GOAL_OUTCOME_STATUSES.map((status) => (
+										<button
+											key={status.label}
+											type="button"
+											onClick={() =>
+												updateGoal(goalIndex, {
+													outcome: status.value
+														? { note: outcome?.note, status: status.value }
+														: undefined,
+												})
+											}
+											className={`flex-1 rounded-md border px-2 py-1.5 text-xs font-semibold ${
+												outcome?.status === status.value
+													? status.activeClass
+													: "border-[#B9C3BD] bg-white text-[#4B5B55]"
+											}`}
+										>
+											{status.label}
+										</button>
+									))}
+								</div>
+							</div>
+
+							<div>
+								<p className="mb-1.5 font-mono text-xs uppercase tracking-wide text-[#7C8B86]">
+									Outcome evaluation
+								</p>
+								<textarea
+									className={`w-full resize-none ${inputClass} disabled:cursor-not-allowed disabled:opacity-60`}
+									rows={2}
+									disabled={!outcome}
+									placeholder={
+										outcome
+											? "how and when will this goal be reassessed?"
+											: "set an outcome to add a note"
+									}
+									value={outcome?.note ?? ""}
+									// Without an outcome there is no status to attach a note to, which is
+									// what the disabled state above is saying.
+									onChange={
+										outcome &&
+										((e) =>
+											updateGoal(goalIndex, { outcome: { ...outcome, note: e.target.value } }))
+									}
+								/>
+							</div>
+						</div>
+					);
+				})}
+			</div>
+			<button
+				type="button"
+				onClick={addGoal}
+				className="mt-2 flex items-center gap-1 text-xs text-[#2F6F62] hover:underline"
+			>
+				<PlusIcon className="h-3.5 w-3.5" /> Add goal
+			</button>
 		</div>
 	);
 }

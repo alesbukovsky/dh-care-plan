@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import { checkTemplate } from "../src/renderer";
 import { buildDocx } from "./helpers/docx-fixture";
 

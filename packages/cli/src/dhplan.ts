@@ -1,5 +1,6 @@
-import { Argument, Command, CommanderError } from "commander";
-import type { Config, ParseResult, TemplateIssue } from "../src";
+#!/usr/bin/env node
+import { readFile as readFileBytes, writeFile } from "node:fs/promises";
+import type { Config, ParseResult, TemplateIssue } from "@dh-care-plan/core";
 import {
 	checkTemplate,
 	convertData,
@@ -12,15 +13,14 @@ import {
 	parseConfig,
 	parsePlan,
 	render,
-} from "../src";
+} from "@dh-care-plan/core";
+import { Argument, Command, CommanderError } from "commander";
 
 const SCHEMA_TYPES = ["plan", "template", "config"] as const;
 type SchemaType = (typeof SCHEMA_TYPES)[number];
 
-/** The non-ok arms of a `ParseResult`, named so a printer can take one as a parameter. */
 type ParseProblem = Extract<ParseResult<unknown>, { ok: false }>;
 
-/** Where the CLI's output goes. Callers include their own newlines. */
 export interface CliIo {
 	write(text: string): void;
 	writeError(text: string): void;
@@ -32,6 +32,52 @@ export interface CliIo {
  */
 class CliFailure extends Error {}
 
+function printLine(io: CliIo, path: string, message: string): void {
+	io.writeError(path ? `${path}: ${message}\n` : `${message}\n`);
+}
+
+/** Core hands back structured facts; the CLI is the one that turns them into text. */
+function printParseIssues(io: CliIo, problem: ParseProblem): void {
+	if (problem.reason === "json") {
+		printLine(io, "", `Invalid JSON: ${problem.message}`);
+		return;
+	}
+	for (const issue of problem.issues) {
+		printLine(io, issue.path.join("."), issue.message);
+	}
+}
+
+function printTemplateIssues(io: CliIo, issues: TemplateIssue[]): void {
+	for (const issue of issues) {
+		printLine(io, issue.path, issue.message);
+	}
+}
+
+async function readFile(io: CliIo, path: string, label: string): Promise<ArrayBuffer> {
+	try {
+		const bytes = await readFileBytes(path);
+		// Node hands back a Buffer over a pooled ArrayBuffer, so `bytes.buffer` on its own
+		// would carry unrelated bytes. Slice out the window this file actually occupies.
+		return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+	} catch (error: unknown) {
+		const message = error instanceof Error ? error.message : String(error);
+		io.writeError(`Failed to read ${label}: ${message}\n`);
+		throw new CliFailure();
+	}
+}
+
+/** Reads and parses a `--config` override, if one was given. */
+async function readConfigOption(io: CliIo, path: string | undefined): Promise<Config | undefined> {
+	if (!path) return undefined;
+
+	const parsed = parseConfig(await readFile(io, path, path));
+	if (!parsed.ok) {
+		printParseIssues(io, parsed);
+		throw new CliFailure();
+	}
+	return parsed.data;
+}
+
 function buildProgram(io: CliIo): Command {
 	const cli = new Command();
 
@@ -42,37 +88,6 @@ function buildProgram(io: CliIo): Command {
 		writeOut: (text) => io.write(text),
 		writeErr: (text) => io.writeError(text),
 	});
-
-	function printLine(path: string, message: string): void {
-		io.writeError(path ? `${path}: ${message}\n` : `${message}\n`);
-	}
-
-	/** Core hands back structured facts; the CLI is the one that turns them into text. */
-	function printParseIssues(problem: ParseProblem): void {
-		if (problem.reason === "json") {
-			printLine("", `Invalid JSON: ${problem.message}`);
-			return;
-		}
-		for (const issue of problem.issues) {
-			printLine(issue.path.join("."), issue.message);
-		}
-	}
-
-	function printTemplateIssues(issues: TemplateIssue[]): void {
-		for (const issue of issues) {
-			printLine(issue.path, issue.message);
-		}
-	}
-
-	async function readFile(path: string, label: string): Promise<ArrayBuffer> {
-		try {
-			return await Bun.file(path).arrayBuffer();
-		} catch (error: unknown) {
-			const message = error instanceof Error ? error.message : String(error);
-			io.writeError(`Failed to read ${label}: ${message}\n`);
-			throw new CliFailure();
-		}
-	}
 
 	cli
 		.command("schema")
@@ -101,7 +116,7 @@ function buildProgram(io: CliIo): Command {
 		.addArgument(new Argument("<type>", "which schema to validate against").choices(SCHEMA_TYPES))
 		.argument("<file>", "path to the file to validate")
 		.action(async (type: SchemaType, file: string) => {
-			const buffer = await readFile(file, file);
+			const buffer = await readFile(io, file, file);
 
 			if (type === "template") {
 				const check = checkTemplate(buffer);
@@ -109,7 +124,7 @@ function buildProgram(io: CliIo): Command {
 					io.write(`${file} is valid\n`);
 					return;
 				}
-				printTemplateIssues(check.issues);
+				printTemplateIssues(io, check.issues);
 				throw new CliFailure();
 			}
 
@@ -118,21 +133,9 @@ function buildProgram(io: CliIo): Command {
 				io.write(`${file} is valid\n`);
 				return;
 			}
-			printParseIssues(parsed);
+			printParseIssues(io, parsed);
 			throw new CliFailure();
 		});
-
-	/** Reads and parses a `--config` override, if one was given. */
-	async function readConfigOption(path: string | undefined): Promise<Config | undefined> {
-		if (!path) return undefined;
-
-		const parsed = parseConfig(await readFile(path, path));
-		if (!parsed.ok) {
-			printParseIssues(parsed);
-			throw new CliFailure();
-		}
-		return parsed.data;
-	}
 
 	cli
 		.command("render")
@@ -148,34 +151,34 @@ function buildProgram(io: CliIo): Command {
 				outputPath: string,
 				options: { config?: string },
 			) => {
-				const planBuffer = await readFile(planPath, planPath);
-				const templateBuffer = await readFile(templatePath, templatePath);
+				const planBuffer = await readFile(io, planPath, planPath);
+				const templateBuffer = await readFile(io, templatePath, templatePath);
 
 				const parsed = parsePlan(planBuffer);
 				if (!parsed.ok) {
-					printParseIssues(parsed);
+					printParseIssues(io, parsed);
 					throw new CliFailure();
 				}
 
-				const config = await readConfigOption(options.config);
+				const config = await readConfigOption(io, options.config);
 
 				// Checked separately so a bad tag is named precisely, rather than surfacing
 				// as whatever docxtemplater says when it hits it mid-render.
 				const check = checkTemplate(templateBuffer);
 				if (!check.ok) {
 					io.writeError("Failed to render output file\n");
-					printTemplateIssues(check.issues);
+					printTemplateIssues(io, check.issues);
 					throw new CliFailure();
 				}
 
 				const result = render(parsed.data, templateBuffer, config);
 				if (!result.ok) {
 					io.writeError("Failed to render output file\n");
-					printLine("", result.message);
+					printLine(io, "", result.message);
 					throw new CliFailure();
 				}
 
-				await Bun.write(outputPath, result.output);
+				await writeFile(outputPath, result.output);
 				io.write(`Wrote ${outputPath}\n`);
 			},
 		);
@@ -186,13 +189,13 @@ function buildProgram(io: CliIo): Command {
 		.argument("<plan>", "path to the plan JSON file")
 		.option("--config <file>", "path to a config override JSON file")
 		.action(async (planPath: string, options: { config?: string }) => {
-			const parsed = parsePlan(await readFile(planPath, planPath));
+			const parsed = parsePlan(await readFile(io, planPath, planPath));
 			if (!parsed.ok) {
-				printParseIssues(parsed);
+				printParseIssues(io, parsed);
 				throw new CliFailure();
 			}
 
-			const config = await readConfigOption(options.config);
+			const config = await readConfigOption(io, options.config);
 
 			io.write(`${JSON.stringify(convertData(parsed.data, config), null, 2)}\n`);
 		});
@@ -218,4 +221,14 @@ export async function runCli(args: string[], io: CliIo): Promise<number> {
 		if (error instanceof CommanderError) return error.exitCode;
 		throw error;
 	}
+}
+
+// Only when invoked as a command, so the tests can import `runCli` and drive it
+// in-process. The exit code is set rather than exited on, so piped output is
+// flushed before the process ends.
+if (import.meta.main) {
+	process.exitCode = await runCli(process.argv.slice(2), {
+		write: (text) => process.stdout.write(text),
+		writeError: (text) => process.stderr.write(text),
+	});
 }

@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import { Config, DEFAULT_CONFIG } from "../src";
 import { Goal, Need } from "../src/schema/plan";
 

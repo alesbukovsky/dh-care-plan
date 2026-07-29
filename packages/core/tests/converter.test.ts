@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import { convertData, dateStr } from "../src/converter";
 import { DEFAULT_CONFIG } from "../src/schema/config";
 

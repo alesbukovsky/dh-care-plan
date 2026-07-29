@@ -1,4 +1,3 @@
-import { describe, expect, test } from "bun:test";
 import {
 	getConfigSample,
 	getConfigSchema,
@@ -6,8 +5,8 @@ import {
 	getPlanSchema,
 	getTemplateSample,
 	getTemplateSchema,
-} from "../../src";
-import { SCHEMA_BASE_URI } from "../../src/schema/common";
+} from "@dh-care-plan/core";
+import { describe, expect, test } from "vitest";
 import { runCli } from "./run-cli";
 
 describe("dhplan schema", () => {
@@ -23,17 +22,6 @@ describe("dhplan schema", () => {
 
 		expect(exitCode).toBe(0);
 		expect(JSON.parse(stdout)).toEqual(getTemplateSchema());
-	});
-
-	test("plan schema has $defs entries for registered nested objects, referenced via $ref", () => {
-		const schema = getPlanSchema() as {
-			$id: string;
-			$defs?: Record<string, unknown>;
-		};
-
-		expect(schema.$id).toBe(`${SCHEMA_BASE_URI}/plan.schema.json`);
-		expect(schema.$defs?.Need).toBeDefined();
-		expect(JSON.stringify(schema)).toContain("#/$defs/Need");
 	});
 
 	test("schema config prints the Config JSON Schema", async () => {

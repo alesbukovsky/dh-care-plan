@@ -1,5 +1,5 @@
+import type { Need } from "@dh-care-plan/core/schema";
 import { fireEvent, render, screen } from "@testing-library/react";
-import type { Need } from "dh-care-plan/schema";
 import { useState } from "react";
 import { expect, test } from "vitest";
 import NeedCard from "../../src/components/NeedCard";

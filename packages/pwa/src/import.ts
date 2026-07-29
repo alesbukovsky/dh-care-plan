@@ -1,5 +1,5 @@
-import { parsePlan, type SchemaIssue } from "dh-care-plan";
-import type { Plan } from "dh-care-plan/schema";
+import { parsePlan, type SchemaIssue } from "@dh-care-plan/core";
+import type { Plan } from "@dh-care-plan/core/schema";
 
 export interface ImportIssue {
 	/** Where the problem is, in the words the UI uses, e.g. `Patient → Date of birth`. */

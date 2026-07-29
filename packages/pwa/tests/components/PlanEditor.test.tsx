@@ -1,5 +1,5 @@
+import type { Plan } from "@dh-care-plan/core/schema";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import type { Plan } from "dh-care-plan/schema";
 import { useState } from "react";
 import { afterEach, expect, test, vi } from "vitest";
 import { calculateAge } from "../../src/components/PatientSection";

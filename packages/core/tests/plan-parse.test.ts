@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import { parseConfig, parseJson, parsePlan } from "../src/parser";
 import { DEFAULT_CONFIG } from "../src/schema/config";
 import type { Plan } from "../src/schema/plan";

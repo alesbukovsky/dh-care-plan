@@ -1,4 +1,4 @@
-import { DEFAULT_CONFIG, type Need } from "dh-care-plan/schema";
+import { DEFAULT_CONFIG, type Need } from "@dh-care-plan/core/schema";
 
 export type NeedType = Need["type"];
 

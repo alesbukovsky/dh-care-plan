@@ -1,4 +1,4 @@
-import type { Plan } from "dh-care-plan/schema";
+import type { Plan } from "@dh-care-plan/core/schema";
 import { DerivedField, Field } from "./fields";
 import Section from "./Section";
 

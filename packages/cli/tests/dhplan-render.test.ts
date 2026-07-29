@@ -1,9 +1,10 @@
-import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { DEFAULT_CONFIG } from "../../src/schema/config";
-import { buildDocx } from "../helpers/docx-fixture";
+import { DEFAULT_CONFIG } from "@dh-care-plan/core";
+import { afterAll, beforeAll, describe, expect, test } from "vitest";
+import { buildDocx } from "./helpers/docx-fixture";
+import { fileExists, writeFixture } from "./helpers/fs";
 import { runCli } from "./run-cli";
 
 let dir: string;
@@ -11,7 +12,7 @@ let dir: string;
 beforeAll(async () => {
 	dir = await mkdtemp(join(tmpdir(), "dhplan-render-"));
 
-	await Bun.write(
+	await writeFixture(
 		join(dir, "valid-plan.json"),
 		JSON.stringify({
 			patient: { initials: "J.D.", dob: "1990-01-01", chartId: "12345" },
@@ -24,9 +25,9 @@ beforeAll(async () => {
 			needs: [{ type: "maintenance", isMet: true }],
 		}),
 	);
-	await Bun.write(join(dir, "malformed-plan.json"), "{ not json");
+	await writeFixture(join(dir, "malformed-plan.json"), "{ not json");
 
-	await Bun.write(
+	await writeFixture(
 		join(dir, "valid-config.json"),
 		JSON.stringify({
 			...DEFAULT_CONFIG,
@@ -36,16 +37,16 @@ beforeAll(async () => {
 			},
 		}),
 	);
-	await Bun.write(
+	await writeFixture(
 		join(dir, "invalid-config.json"),
 		JSON.stringify({ mapping: { outcome: { met: "Achieved" } } }),
 	);
 
-	await Bun.write(
+	await writeFixture(
 		join(dir, "no-tags.docx"),
 		buildDocx("<w:p><w:r><w:t>Hello world</w:t></w:r></w:p>"),
 	);
-	await Bun.write(
+	await writeFixture(
 		join(dir, "with-tag.docx"),
 		buildDocx("<w:p><w:r><w:t>Hello {name}</w:t></w:r></w:p>"),
 	);
@@ -68,7 +69,7 @@ describe("dhplan render", () => {
 
 		expect(exitCode).toBe(0);
 		expect(stdout).toContain(outputPath);
-		expect(await Bun.file(outputPath).exists()).toBe(true);
+		expect(await fileExists(outputPath)).toBe(true);
 	});
 
 	test("an invalid plan reports issues and does not write the output", async () => {
@@ -84,7 +85,7 @@ describe("dhplan render", () => {
 		expect(exitCode).not.toBe(0);
 		expect(stdout.trim()).toBe("");
 		expect(stderr.length).toBeGreaterThan(0);
-		expect(await Bun.file(outputPath).exists()).toBe(false);
+		expect(await fileExists(outputPath)).toBe(false);
 	});
 
 	test("an invalid template reports issues and does not write the output", async () => {
@@ -100,7 +101,7 @@ describe("dhplan render", () => {
 		expect(exitCode).not.toBe(0);
 		expect(stdout.trim()).toBe("");
 		expect(stderr).toContain("not defined in Template");
-		expect(await Bun.file(outputPath).exists()).toBe(false);
+		expect(await fileExists(outputPath)).toBe(false);
 	});
 
 	test("a nonexistent input file reports a read error and does not write the output", async () => {
@@ -116,7 +117,7 @@ describe("dhplan render", () => {
 		expect(exitCode).not.toBe(0);
 		expect(stdout.trim()).toBe("");
 		expect(stderr.length).toBeGreaterThan(0);
-		expect(await Bun.file(outputPath).exists()).toBe(false);
+		expect(await fileExists(outputPath)).toBe(false);
 	});
 
 	test("renders with a valid --config override file", async () => {
@@ -133,7 +134,7 @@ describe("dhplan render", () => {
 
 		expect(exitCode).toBe(0);
 		expect(stdout).toContain(outputPath);
-		expect(await Bun.file(outputPath).exists()).toBe(true);
+		expect(await fileExists(outputPath)).toBe(true);
 	});
 
 	test("an invalid --config override file reports issues and does not write the output", async () => {
@@ -151,7 +152,7 @@ describe("dhplan render", () => {
 		expect(exitCode).not.toBe(0);
 		expect(stdout.trim()).toBe("");
 		expect(stderr.length).toBeGreaterThan(0);
-		expect(await Bun.file(outputPath).exists()).toBe(false);
+		expect(await fileExists(outputPath)).toBe(false);
 	});
 
 	test("a failure the CLI has no message for is rethrown, not turned into an exit code", async () => {

@@ -1,4 +1,4 @@
-import type { Plan } from "dh-care-plan/schema";
+import type { Plan } from "@dh-care-plan/core/schema";
 import { expect, test } from "vitest";
 import { readPlanFile } from "../src/import";
 

@@ -1,5 +1,5 @@
-import { describe, expect, test } from "bun:test";
 import type PizZip from "pizzip";
+import { describe, expect, test } from "vitest";
 import { createTemplater, describeTemplaterError, render } from "../src/renderer";
 import { DEFAULT_CONFIG } from "../src/schema/config";
 import type { Plan } from "../src/schema/plan";

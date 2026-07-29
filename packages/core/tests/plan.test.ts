@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import { Need } from "../src/schema/plan";
 
 const baseGoal = { task: "floss daily", outcome: { status: "unmet" as const } };

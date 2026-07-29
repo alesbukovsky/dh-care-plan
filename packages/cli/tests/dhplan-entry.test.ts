@@ -1,5 +1,5 @@
-import { describe, expect, test } from "bun:test";
-import { getPlanSchema } from "../../src";
+import { getPlanSchema } from "@dh-care-plan/core";
+import { describe, expect, test } from "vitest";
 import { runCliProcess } from "./run-cli";
 
 // The rest of the CLI tests run the program in-process; these run the real

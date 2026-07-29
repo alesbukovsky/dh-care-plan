@@ -1,29 +1,27 @@
 {
-	"name": "dh-care-plan-workspace",
+	"name": "@dh-care-plan/workspace",
 	"private": true,
-	"workspaces": [
-		"packages/*"
-	],
 	"scripts": {
-		"dev": "bun run --cwd packages/pwa dev",
-		"build": "bun run --cwd packages/pwa build",
-		"link:cli": "cd packages/core && bun link",
-		"check": "bun run --cwd packages/core typecheck && bun run --cwd packages/pwa typecheck",
-		"test:all": "bun run check && bun run test:core && bun run test:pwa",
-		"test:core": "cd packages/core && bun test --coverage",
-		"test:pwa": "bun run --cwd packages/pwa test",
-		"verify": "bun run lint && bun run test:all && bun run build",
-		"deploy:cf": "bun run verify && bun run --cwd packages/pwa deploy:cf",
-		"deploy:cf:preview": "bun run verify && bun run --cwd packages/pwa deploy:cf:preview",
+		"build:core": "pnpm --filter @dh-care-plan/core run build",
+		"build:cli": "pnpm run build:core && pnpm --filter @dh-care-plan/cli run build",
+		"build:pwa": "pnpm run build:core && pnpm --filter @dh-care-plan/pwa run build",
 		"lint": "biome lint --error-on-warnings .",
-		"lint:fix": "biome check --write --error-on-warnings ."
+		"lint:fix": "biome check --write --error-on-warnings .",
+		"test": "pnpm run build:core && pnpm -r --stream --workspace-concurrency=1 run test",
+		"dev": "pnpm run build:core && pnpm --filter @dh-care-plan/pwa run dev",
+		"serve": "pnpm run build:core && pnpm --filter @dh-care-plan/pwa run serve",
+		"link:cli": "pnpm run build:cli && pnpm --filter @dh-care-plan/cli exec pnpm link --global",
+		"deploy": "pnpm run test && pnpm run build:pwa && pnpm --filter @dh-care-plan/pwa run deploy",
+		"deploy:shadow": "pnpm run test && pnpm run build:pwa && pnpm --filter @dh-care-plan/pwa run deploy:shadow"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.5.5",
-		"@types/bun": "latest",
-		"dh-care-plan": "workspace:*"
+		"@biomejs/biome": "2.5.5"
 	},
 	"peerDependencies": {
 		"typescript": "^5"
+	},
+	"engines": {
+		"node": ">=24",
+		"pnpm": ">=11"
 	}
 }

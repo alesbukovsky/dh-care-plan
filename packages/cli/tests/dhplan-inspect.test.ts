@@ -1,8 +1,9 @@
-import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { DEFAULT_CONFIG } from "../../src/schema/config";
+import { DEFAULT_CONFIG } from "@dh-care-plan/core";
+import { afterAll, beforeAll, describe, expect, test } from "vitest";
+import { writeFixture } from "./helpers/fs";
 import { runCli } from "./run-cli";
 
 let dir: string;
@@ -10,7 +11,7 @@ let dir: string;
 beforeAll(async () => {
 	dir = await mkdtemp(join(tmpdir(), "dhplan-inspect-"));
 
-	await Bun.write(
+	await writeFixture(
 		join(dir, "valid-plan.json"),
 		JSON.stringify({
 			patient: { initials: "J.D.", dob: "1990-01-01", chartId: "12345" },
@@ -32,9 +33,9 @@ beforeAll(async () => {
 			],
 		}),
 	);
-	await Bun.write(join(dir, "malformed-plan.json"), "{ not json");
+	await writeFixture(join(dir, "malformed-plan.json"), "{ not json");
 
-	await Bun.write(
+	await writeFixture(
 		join(dir, "valid-config.json"),
 		JSON.stringify({
 			...DEFAULT_CONFIG,
@@ -44,7 +45,7 @@ beforeAll(async () => {
 			},
 		}),
 	);
-	await Bun.write(
+	await writeFixture(
 		join(dir, "invalid-config.json"),
 		JSON.stringify({ mapping: { outcome: { unmet: "Pending" } } }),
 	);

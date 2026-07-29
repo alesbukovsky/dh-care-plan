@@ -1,4 +1,4 @@
-import type { Plan } from "dh-care-plan/schema";
+import type { Plan } from "@dh-care-plan/core/schema";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import { exportPlan, planFileName } from "../src/export";
 

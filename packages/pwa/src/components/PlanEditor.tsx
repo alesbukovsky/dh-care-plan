@@ -1,4 +1,4 @@
-import type { Need, Plan } from "dh-care-plan/schema";
+import type { Need, Plan } from "@dh-care-plan/core/schema";
 import { NEEDS } from "../needs";
 import NeedCard from "./NeedCard";
 import ObjectiveSection from "./ObjectiveSection";

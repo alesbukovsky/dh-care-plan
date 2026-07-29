@@ -1,0 +1,33 @@
+{
+	"name": "@dh-care-plan/cli",
+	"version": "0.1.0",
+	"type": "module",
+	"bin": {
+		"dhplan": "./dist/dhplan.js"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"files": [
+		"dist"
+	],
+	"engines": {
+		"node": ">=24"
+	},
+	"scripts": {
+		"build": "tsup",
+		"test": "pnpm run build && tsc --noEmit && vitest run --coverage"
+	},
+	"dependencies": {
+		"@dh-care-plan/core": "workspace:0.1.0",
+		"commander": "15.0.0"
+	},
+	"devDependencies": {
+		"@types/node": "26.1.2",
+		"@vitest/coverage-v8": "4.1.10",
+		"pizzip": "3.2.0",
+		"tsup": "8.5.1",
+		"typescript": "5.9.3",
+		"vitest": "4.1.10"
+	}
+}

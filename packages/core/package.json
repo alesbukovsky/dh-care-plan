@@ -1,27 +1,44 @@
 {
-	"name": "dh-care-plan",
+	"name": "@dh-care-plan/core",
 	"version": "0.1.0",
-	"module": "src/index.ts",
 	"type": "module",
-	"bin": {
-		"dhplan": "./cli/dhplan.ts"
-	},
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
 	"exports": {
-		".": "./src/index.ts",
-		"./schema": "./src/schema/index.ts"
+		".": {
+			"types": "./dist/index.d.ts",
+			"default": "./dist/index.js"
+		},
+		"./schema": {
+			"types": "./dist/schema.d.ts",
+			"default": "./dist/schema.js"
+		}
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"files": [
+		"dist"
+	],
+	"engines": {
+		"node": ">=18"
 	},
 	"scripts": {
-		"typecheck": "tsc --noEmit"
+		"build": "tsup",
+		"test": "tsc --noEmit && vitest run --coverage"
 	},
 	"dependencies": {
 		"angular-expressions": "1.5.5",
-		"commander": "15.0.0",
 		"docxtemplater": "3.69.2",
 		"lodash": "4.17.23",
 		"pizzip": "3.2.0",
 		"zod": "4.4.3"
 	},
-	"peerDependencies": {
-		"typescript": "^5"
+	"devDependencies": {
+		"@types/node": "26.1.2",
+		"@vitest/coverage-v8": "4.1.10",
+		"tsup": "8.5.1",
+		"typescript": "5.9.3",
+		"vitest": "4.1.10"
 	}
 }

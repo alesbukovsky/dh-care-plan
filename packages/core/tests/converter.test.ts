@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { convertData, dateStr } from "../src/converter";
 import { DEFAULT_CONFIG } from "../src/schema/config";
+import { DEFAULT_PLAN, Need } from "../src/schema/plan";
 
 const PATIENT = { initials: "J.D.", dob: "1990-01-01", chartId: "12345" };
 const APPOINTMENTS = ["2026-07-01", "2026-08-01"];
@@ -254,6 +255,36 @@ describe("convertData", () => {
 
 		expect(data.patient).toEqual({ ...PATIENT, dob: "01/01/1990" });
 		expect(data.appointments).toBe("07/01/2026, 08/01/2026");
+	});
+
+	test("renders missing patient fields as empty text", () => {
+		const data = convertData({ ...validPlan, patient: {} });
+
+		expect(data.patient).toEqual({ initials: "", dob: "", chartId: "" });
+	});
+
+	test("lists an unassessed need as not met, without a diagnosis statement", () => {
+		const data = convertData({ ...validPlan, needs: [{ type: "health" }] });
+
+		expect(data.assessments).toEqual([
+			{
+				need: DEFAULT_CONFIG.mapping.need.health,
+				isMet: false,
+				relatedTo: undefined,
+				evidencedBy: undefined,
+			},
+		]);
+		expect(data.statements).toEqual([]);
+	});
+
+	test("converts a brand new plan into an empty document", () => {
+		const data = convertData(DEFAULT_PLAN);
+
+		expect(data.patient).toEqual({ initials: "", dob: "", chartId: "" });
+		expect(data.appointments).toBe("");
+		expect(data.assessments).toHaveLength(Need.shape.type.options.length);
+		expect(data.assessments.every((assessment) => assessment.isMet === false)).toBe(true);
+		expect(data.statements).toEqual([]);
 	});
 
 	test("formats dates using a custom config.format.date pattern", () => {

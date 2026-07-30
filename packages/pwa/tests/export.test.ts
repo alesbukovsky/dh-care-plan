@@ -1,4 +1,4 @@
-import type { Plan } from "@dh-care-plan/core";
+import { DEFAULT_PLAN, type Plan } from "@dh-care-plan/core";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import { exportPlan, planFileName } from "../src/export";
 
@@ -6,11 +6,8 @@ const TODAY = new Date("2026-07-28T10:00:00Z");
 
 function makePlan(patient: Partial<Plan["patient"]> = {}): Plan {
 	return {
-		patient: { initials: "", dob: "", chartId: "", ...patient },
-		appointments: [],
-		subjective: {},
-		objective: {},
-		needs: [],
+		...DEFAULT_PLAN,
+		patient,
 	};
 }
 

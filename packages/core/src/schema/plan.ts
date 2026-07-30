@@ -4,9 +4,9 @@ import { SCHEMA_BASE_URI } from "./common";
 const registry = z.registry<{ id?: string }>();
 
 const Patient = z.object({
-	initials: z.string(),
-	dob: z.iso.date(),
-	chartId: z.string(),
+	initials: z.string().optional(),
+	dob: z.iso.date().optional(),
+	chartId: z.string().optional(),
 });
 registry.add(Patient, { id: "Patient" });
 
@@ -98,7 +98,7 @@ export const Need = z.object({
 		"responsibility",
 		"maintenance",
 	]),
-	isMet: z.boolean(),
+	isMet: z.boolean().optional(),
 	relatedTo: z.string().optional(),
 	evidencedBy: z.string().optional(),
 	goals: z.array(Goal).optional(),
@@ -106,6 +106,8 @@ export const Need = z.object({
 registry.add(Need, { id: "Need" });
 
 export type Need = z.infer<typeof Need>;
+
+export const NEED_TYPES = Need.shape.type.options;
 
 export const Plan = z.object({
 	patient: Patient,
@@ -124,3 +126,11 @@ export function getPlanSchema(): object {
 		...json,
 	};
 }
+
+export const DEFAULT_PLAN: Plan = {
+	patient: {},
+	appointments: [],
+	subjective: {},
+	objective: {},
+	needs: NEED_TYPES.map((type) => ({ type })),
+};

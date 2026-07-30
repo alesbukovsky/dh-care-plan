@@ -5,5 +5,5 @@ export type { RenderResult, TemplateIssue, TemplateResult } from "./renderer";
 export { checkTemplate, render } from "./renderer";
 export { getConfigSample, getPlanSample, getTemplateSample } from "./sampler";
 export { Config, DEFAULT_CONFIG, getConfigSchema } from "./schema/config";
-export { Goal, getPlanSchema, Need, Plan } from "./schema/plan";
+export { DEFAULT_PLAN, Goal, getPlanSchema, NEED_TYPES, Need, Plan } from "./schema/plan";
 export { getTemplateSchema, Template } from "./schema/template";

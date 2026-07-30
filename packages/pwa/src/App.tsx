@@ -1,4 +1,4 @@
-import type { Plan } from "@dh-care-plan/core";
+import { DEFAULT_PLAN } from "@dh-care-plan/core";
 import { type ChangeEvent, useRef, useState } from "react";
 import CaseStudyPane from "./components/CaseStudyPane";
 import CommandBar from "./components/CommandBar";
@@ -7,18 +7,9 @@ import PlanEditor from "./components/PlanEditor";
 import { exportPlan } from "./export";
 import { type ImportFailure, readPlanFile } from "./import";
 
-function getEmptyPlan(): Plan {
-	return {
-		patient: { initials: "", dob: "", chartId: "" },
-		appointments: [],
-		subjective: {},
-		objective: {},
-		needs: [],
-	};
-}
-
 export default function App() {
-	const [plan, setPlan] = useState(() => getEmptyPlan());
+	// Cloned so editing this session never mutates the shared default.
+	const [plan, setPlan] = useState(() => structuredClone(DEFAULT_PLAN));
 	const [caseText, setCaseText] = useState("");
 	const [commandBarCollapsed, setCommandBarCollapsed] = useState(false);
 	const [importFailure, setImportFailure] = useState<ImportFailure | null>(null);

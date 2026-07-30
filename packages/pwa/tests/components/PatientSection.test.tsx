@@ -20,19 +20,18 @@ function expand() {
 	fireEvent.click(screen.getByRole("button", { name: /Patient/ }));
 }
 
-test("clearing a patient field keeps it as empty text rather than dropping it", () => {
+test("clearing a patient field drops it, since every one of them is optional", () => {
 	render(<Harness initial={patient} />);
 	expand();
 
-	// Field reports an emptied input as undefined; the patient shape has no room for that.
 	fireEvent.change(screen.getByLabelText("Initials"), { target: { value: "" } });
-	expect(latest).toEqual({ ...patient, initials: "" });
+	expect(latest).toEqual({ ...patient, initials: undefined });
 
 	fireEvent.change(screen.getByLabelText("Chart ID"), { target: { value: "" } });
-	expect(latest).toEqual({ ...patient, initials: "", chartId: "" });
+	expect(latest).toEqual({ ...patient, initials: undefined, chartId: undefined });
 
 	fireEvent.change(screen.getByLabelText("Date of birth"), { target: { value: "" } });
-	expect(latest).toEqual({ initials: "", chartId: "", dob: "" });
+	expect(latest).toEqual({});
 });
 
 test("age shows a dash until the date of birth is a real date", () => {
@@ -53,4 +52,6 @@ test("calculateAge counts whole years elapsed on the given day", () => {
 	// a date of birth in the future has no age to show
 	expect(calculateAge("2030-06-15", new Date("2020-06-15T00:00:00"))).toBeUndefined();
 	expect(calculateAge("not-a-date")).toBeUndefined();
+	// a plan may carry no date of birth at all
+	expect(calculateAge(undefined)).toBeUndefined();
 });

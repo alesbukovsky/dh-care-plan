@@ -1,3 +1,4 @@
+import { DEFAULT_PLAN } from "@dh-care-plan/core";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, expect, test, vi } from "vitest";
 import App from "../src/App";
@@ -38,7 +39,8 @@ test("exporting asks for a destination and writes the plan there", async () => {
 	fireEvent.click(screen.getByRole("button", { name: "Export data" }));
 
 	await waitFor(() => expect(showSaveFilePicker).toHaveBeenCalled());
-	expect(JSON.parse(write.mock.calls[0]?.[0] as string)).toMatchObject({ needs: [] });
+	// A brand new plan exports as the default: nothing filled in, every need listed.
+	expect(JSON.parse(write.mock.calls[0]?.[0] as string)).toEqual(DEFAULT_PLAN);
 });
 
 test("the unimplemented actions are disabled", () => {
@@ -103,7 +105,9 @@ test("dismissing the picker without a file changes nothing", async () => {
 	fireEvent.change(screen.getByLabelText("Care plan file"), { target: { files: [] } });
 
 	await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+	// The new plan lists every need, none of them assessed yet.
 	expect(screen.getByText("0 assessed / 0 unmet")).toBeInTheDocument();
+	expect(screen.getAllByText("Not started")).toHaveLength(DEFAULT_PLAN.needs.length);
 });
 
 test("importing an invalid plan explains the problems and leaves the editor alone", async () => {
@@ -114,7 +118,7 @@ test("importing an invalid plan explains the problems and leaves the editor alon
 	const dialog = await screen.findByRole("dialog");
 	expect(dialog).toHaveAccessibleName("Cannot import this file");
 	expect(screen.getByText(/“broken.json” is not a valid care plan/)).toBeInTheDocument();
-	expect(screen.getByText("Patient → Date of birth")).toBeInTheDocument();
+	expect(screen.getByText("Appointments")).toBeInTheDocument();
 	expect(
 		screen.getAllByText("This field is required, but the file does not have it.").length,
 	).toBeGreaterThan(1);
@@ -136,7 +140,7 @@ test("only the first dozen problems are listed, the rest are counted", async () 
 			appointments: [],
 			subjective: {},
 			objective: {},
-			needs: Array.from({ length: 14 }, () => ({ type: "health" })),
+			needs: Array.from({ length: 14 }, () => ({ type: "health", isMet: "yes" })),
 		}),
 	);
 

@@ -61,7 +61,8 @@ export default function NeedCard({ definition, index, need, onChange }: NeedCard
 		setExpanded(true);
 	}
 
-	const pill = need ? STATUS_PILL[need.isMet ? "met" : "unmet"] : NOT_STARTED_PILL;
+	const pill =
+		need?.isMet === undefined ? NOT_STARTED_PILL : STATUS_PILL[need.isMet ? "met" : "unmet"];
 
 	return (
 		<div className="rounded-[10px] border border-[#D8DED9] bg-[#FBFCFA]">

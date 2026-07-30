@@ -24,8 +24,8 @@ type FilePickerWindow = Window & {
 
 /** Builds a filename such as `plan-JD-A1234-2026-07-28.json`. */
 export function planFileName(plan: Plan, today: Date): string {
-	const slug = (value: string) =>
-		value
+	const slug = (value: string | undefined) =>
+		(value ?? "")
 			.replace(/\./g, "")
 			.replace(/[^A-Za-z0-9]+/g, "-")
 			.replace(/^-|-$/g, "");

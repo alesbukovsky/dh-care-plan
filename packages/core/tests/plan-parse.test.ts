@@ -66,10 +66,10 @@ describe("parsePlan", () => {
 	});
 
 	test("keeps the path structured, so callers can label each segment themselves", () => {
-		const result = parsePlan(JSON.stringify({ ...PLAN, needs: [{ type: "health" }] }));
+		const result = parsePlan(JSON.stringify({ ...PLAN, needs: [{ isMet: false }] }));
 
 		if (result.ok || result.reason !== "schema") throw new Error("expected a schema mismatch");
-		expect(result.issues[0]?.path).toEqual(["needs", 0, "isMet"]);
+		expect(result.issues[0]?.path).toEqual(["needs", 0, "type"]);
 	});
 });
 

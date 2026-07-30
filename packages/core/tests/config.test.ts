@@ -9,11 +9,14 @@ describe("DEFAULT_CONFIG", () => {
 });
 
 describe("Config's mapping shape aligns with Plan enums", () => {
-	test("Config's mapping.need keys match Need.type's enum values", () => {
+	// Checked against the enum itself, not NEED_TYPES, so this holds independently
+	// of the constant the code derives from it.
+	test("Config's mapping.need defines exactly one key per Need.type enum value", () => {
 		const needTypeValues = Need.shape.type.options;
 		const mappingNeedKeys = Object.keys(Config.shape.mapping.shape.need.shape);
 
 		expect(mappingNeedKeys.sort()).toEqual([...needTypeValues].sort());
+		expect(mappingNeedKeys).toHaveLength(needTypeValues.length);
 	});
 
 	test("Config's mapping.outcome keys match Outcome.status's enum values plus undefined", () => {

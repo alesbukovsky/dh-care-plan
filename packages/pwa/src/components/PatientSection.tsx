@@ -4,8 +4,8 @@ import Section from "./Section";
 
 type Patient = Plan["patient"];
 
-export function calculateAge(dob: string, on: Date = new Date()): number | undefined {
-	const [year, month, day] = dob.split("-").map(Number);
+export function calculateAge(dob: string | undefined, on: Date = new Date()): number | undefined {
+	const [year, month, day] = (dob ?? "").split("-").map(Number);
 	if (!year || !month || !day) return undefined;
 
 	let age = on.getFullYear() - year;
@@ -31,13 +31,13 @@ export default function PatientSection({ patient, onChangePatient }: PatientSect
 					label="Initials"
 					placeholder="e.g. J.D."
 					value={patient.initials}
-					onChange={(next) => onChangePatient({ ...patient, initials: next ?? "" })}
+					onChange={(next) => onChangePatient({ ...patient, initials: next })}
 				/>
 				<Field
 					label="Chart ID"
 					placeholder="e.g. 12345"
 					value={patient.chartId}
-					onChange={(next) => onChangePatient({ ...patient, chartId: next ?? "" })}
+					onChange={(next) => onChangePatient({ ...patient, chartId: next })}
 				/>
 			</div>
 			<div className="grid grid-cols-2 gap-3">
@@ -45,7 +45,7 @@ export default function PatientSection({ patient, onChangePatient }: PatientSect
 					label="Date of birth"
 					type="date"
 					value={patient.dob}
-					onChange={(next) => onChangePatient({ ...patient, dob: next ?? "" })}
+					onChange={(next) => onChangePatient({ ...patient, dob: next })}
 				/>
 				<DerivedField
 					label="Age"

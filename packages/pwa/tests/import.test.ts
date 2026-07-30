@@ -1,4 +1,4 @@
-import type { Plan } from "@dh-care-plan/core";
+import { DEFAULT_PLAN, type Plan } from "@dh-care-plan/core";
 import { expect, test } from "vitest";
 import { readPlanFile } from "../src/import";
 
@@ -61,11 +61,11 @@ test("missing fields are named with the labels the editor uses", async () => {
 	expect(result.issues).toEqual(
 		expect.arrayContaining([
 			{
-				field: "Patient → Date of birth",
+				field: "Appointments",
 				message: "This field is required, but the file does not have it.",
 			},
 			{
-				field: "Patient → Chart ID",
+				field: "Subjective data",
 				message: "This field is required, but the file does not have it.",
 			},
 			{
@@ -74,6 +74,8 @@ test("missing fields are named with the labels the editor uses", async () => {
 			},
 		]),
 	);
+	// The patient's own fields are all optional, so none of them are missing.
+	expect(result.issues.filter((issue) => issue.field.startsWith("Patient"))).toEqual([]);
 });
 
 test("a single problem is phrased in the singular", async () => {
@@ -233,16 +235,14 @@ test("every kind of wrong value is named in plain language", async () => {
 	]);
 });
 
-test("an empty plan exported before any editing is not importable", async () => {
-	const result = await readPlanFile(
-		planFile({
-			patient: { initials: "", dob: "", chartId: "" },
-			appointments: [],
-			subjective: {},
-			objective: {},
-			needs: [],
-		}),
-	);
+test("a brand new plan exported before any editing is importable again", async () => {
+	const result = await readPlanFile(planFile(DEFAULT_PLAN));
+
+	expect(result).toEqual({ ok: true, plan: DEFAULT_PLAN });
+});
+
+test("a patient field left empty by the editor is still rejected as a date", async () => {
+	const result = await readPlanFile(planFile({ ...DEFAULT_PLAN, patient: { dob: "" } }));
 
 	if (result.ok) throw new Error("expected the import to fail");
 	expect(result.issues).toEqual([

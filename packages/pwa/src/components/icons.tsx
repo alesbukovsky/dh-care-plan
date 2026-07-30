@@ -47,6 +47,16 @@ export function DocumentIcon(props: SVGProps<SVGSVGElement>) {
 	);
 }
 
+export function NewDocumentIcon(props: SVGProps<SVGSVGElement>) {
+	return (
+		<Icon {...props}>
+			<path d="M8 3.5h6l4 4V19a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6 19V5A1.5 1.5 0 0 1 7.5 3.5Z" />
+			<path d="M14 3.5V8h4.5" />
+			<path d="M12 12v5M9.5 14.5h5" />
+		</Icon>
+	);
+}
+
 export function SettingsIcon(props: SVGProps<SVGSVGElement>) {
 	return (
 		<Icon {...props}>

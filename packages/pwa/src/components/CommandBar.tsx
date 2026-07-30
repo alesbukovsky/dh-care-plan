@@ -4,6 +4,7 @@ import {
 	ChevronRightIcon,
 	DocumentIcon,
 	DownloadIcon,
+	NewDocumentIcon,
 	SettingsIcon,
 	UploadIcon,
 } from "./icons";
@@ -18,6 +19,7 @@ interface CommandAction {
 }
 
 const ACTIONS: CommandAction[] = [
+	{ key: "new", label: "New plan", Icon: NewDocumentIcon },
 	{ key: "import", label: "Import data", Icon: UploadIcon },
 	{ key: "export", label: "Export data", Icon: DownloadIcon },
 	{ key: "generate", label: "Generate plan", Icon: DocumentIcon, disabled: true },
@@ -27,6 +29,7 @@ const ACTIONS: CommandAction[] = [
 interface CommandBarProps {
 	collapsed: boolean;
 	onToggleCollapsed: () => void;
+	onNewPlan: () => void;
 	onImport: () => void;
 	onExport: () => void;
 }
@@ -34,10 +37,15 @@ interface CommandBarProps {
 export default function CommandBar({
 	collapsed,
 	onToggleCollapsed,
+	onNewPlan,
 	onImport,
 	onExport,
 }: CommandBarProps) {
-	const handlers: Record<string, () => void> = { import: onImport, export: onExport };
+	const handlers: Record<string, () => void> = {
+		new: onNewPlan,
+		import: onImport,
+		export: onExport,
+	};
 
 	return (
 		<nav

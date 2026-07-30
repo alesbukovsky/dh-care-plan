@@ -172,6 +172,72 @@ test("an unreadable file is reported without any field list", async () => {
 	expect(screen.queryByRole("listitem")).not.toBeInTheDocument();
 });
 
+async function importNamedPatient() {
+	pickFile(
+		planFile({
+			patient: { initials: "J.D.", dob: "2001-04-17", chartId: "A1234" },
+			appointments: [],
+			subjective: {},
+			objective: {},
+			needs: [{ type: "health", isMet: false }],
+		}),
+	);
+	await waitFor(() => expect(screen.getByText("J.D.")).toBeInTheDocument());
+}
+
+test("starting a new plan asks first and replaces the plan once confirmed", async () => {
+	render(<App />);
+	await importNamedPatient();
+
+	fireEvent.click(screen.getByRole("button", { name: "New plan" }));
+
+	const dialog = await screen.findByRole("dialog");
+	expect(dialog).toHaveAccessibleName("Start a new plan?");
+	// Still the imported plan until the user says yes.
+	expect(screen.getByText("J.D.")).toBeInTheDocument();
+
+	fireEvent.click(screen.getByRole("button", { name: "Start new plan" }));
+
+	expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+	expect(screen.queryByText("J.D.")).not.toBeInTheDocument();
+	expect(screen.getAllByText("Not started")).toHaveLength(DEFAULT_PLAN.needs.length);
+});
+
+test("a new plan returns the editor to its initial view", async () => {
+	render(<App />);
+
+	// Open a section that starts collapsed, so a stale view would be visible.
+	fireEvent.click(screen.getByRole("button", { name: /Patient/ }));
+	expect(screen.getByLabelText("Initials")).toBeInTheDocument();
+
+	fireEvent.click(screen.getByRole("button", { name: "New plan" }));
+	await screen.findByRole("dialog");
+	fireEvent.click(screen.getByRole("button", { name: "Start new plan" }));
+
+	expect(screen.queryByLabelText("Initials")).not.toBeInTheDocument();
+	// Human needs stays open one level: every need listed, each card collapsed.
+	expect(screen.getAllByText("Not started")).toHaveLength(DEFAULT_PLAN.needs.length);
+});
+
+test("cancelling or dismissing the new plan prompt keeps the current plan", async () => {
+	render(<App />);
+	await importNamedPatient();
+
+	fireEvent.click(screen.getByRole("button", { name: "New plan" }));
+	await screen.findByRole("dialog");
+	fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+
+	expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+	expect(screen.getByText("J.D.")).toBeInTheDocument();
+
+	fireEvent.click(screen.getByRole("button", { name: "New plan" }));
+	await screen.findByRole("dialog");
+	fireEvent.keyDown(document, { key: "Escape" });
+
+	expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+	expect(screen.getByText("J.D.")).toBeInTheDocument();
+});
+
 test("case study text is editable", () => {
 	render(<App />);
 

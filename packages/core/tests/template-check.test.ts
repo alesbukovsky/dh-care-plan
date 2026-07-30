@@ -67,7 +67,7 @@ describe("checkTemplate", () => {
 	});
 
 	test("reports a read failure for a non-.docx file", () => {
-		const notADocx = new TextEncoder().encode("not a zip file").buffer as ArrayBuffer;
+		const notADocx = new TextEncoder().encode("not a zip file");
 
 		expect(checkTemplate(notADocx).ok).toBe(false);
 	});

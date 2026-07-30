@@ -2,30 +2,36 @@
 	"name": "@dh-care-plan/core",
 	"version": "0.1.0",
 	"type": "module",
-	"main": "./dist/index.js",
-	"types": "./dist/index.d.ts",
+	"main": "./src/index.ts",
+	"types": "./src/index.ts",
 	"exports": {
 		".": {
+			"development": "./src/index.ts",
 			"types": "./dist/index.d.ts",
 			"default": "./dist/index.js"
-		},
-		"./schema": {
-			"types": "./dist/schema.d.ts",
-			"default": "./dist/schema.js"
 		}
 	},
 	"publishConfig": {
-		"access": "public"
+		"access": "public",
+		"main": "./dist/index.js",
+		"types": "./dist/index.d.ts",
+		"exports": {
+			".": {
+				"types": "./dist/index.d.ts",
+				"default": "./dist/index.js"
+			}
+		}
 	},
 	"files": [
 		"dist"
 	],
 	"engines": {
-		"node": ">=18"
+		"node": ">=24"
 	},
 	"scripts": {
-		"build": "tsup",
-		"test": "tsc --noEmit && vitest run --coverage"
+		"build": "tsdown",
+		"typecheck": "tsc --noEmit",
+		"test": "pnpm run typecheck && vitest run --coverage"
 	},
 	"dependencies": {
 		"angular-expressions": "1.5.5",
@@ -35,9 +41,9 @@
 		"zod": "4.4.3"
 	},
 	"devDependencies": {
-		"@types/node": "26.1.2",
+		"@types/node": "24.13.3",
 		"@vitest/coverage-v8": "4.1.10",
-		"tsup": "8.5.1",
+		"tsdown": "0.22.14",
 		"typescript": "5.9.3",
 		"vitest": "4.1.10"
 	}

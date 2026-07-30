@@ -1,4 +1,4 @@
-import type { Plan } from "@dh-care-plan/core/schema";
+import type { Plan } from "@dh-care-plan/core";
 import { type ChangeEvent, useRef, useState } from "react";
 import CaseStudyPane from "./components/CaseStudyPane";
 import CommandBar from "./components/CommandBar";

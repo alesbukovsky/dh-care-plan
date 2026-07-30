@@ -1,4 +1,4 @@
-import type { Plan } from "@dh-care-plan/core/schema";
+import type { Plan } from "@dh-care-plan/core";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { useState } from "react";
 import { expect, test } from "vitest";

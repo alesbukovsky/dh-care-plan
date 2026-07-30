@@ -1,8 +1,8 @@
 import { access, writeFile } from "node:fs/promises";
 
 /** Writes JSON text or a `buildDocx` fixture, so callers can pass either without ceremony. */
-export async function writeFixture(path: string, data: string | ArrayBuffer): Promise<void> {
-	await writeFile(path, typeof data === "string" ? data : new Uint8Array(data));
+export async function writeFixture(path: string, data: string | Uint8Array): Promise<void> {
+	await writeFile(path, data);
 }
 
 /** True when the path exists, for asserting whether the CLI produced its output file. */

@@ -1,4 +1,4 @@
-import type { Need } from "@dh-care-plan/core/schema";
+import type { Need } from "@dh-care-plan/core";
 import { useState } from "react";
 import type { NeedDefinition } from "../needs";
 import { inputClass } from "./fields";

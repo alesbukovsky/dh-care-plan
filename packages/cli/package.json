@@ -15,18 +15,19 @@
 		"node": ">=24"
 	},
 	"scripts": {
-		"build": "tsup",
-		"test": "pnpm run build && tsc --noEmit && vitest run --coverage"
+		"build": "tsdown",
+		"typecheck": "tsc --noEmit",
+		"test": "pnpm run build && pnpm run typecheck && vitest run --coverage"
 	},
 	"dependencies": {
 		"@dh-care-plan/core": "workspace:0.1.0",
 		"commander": "15.0.0"
 	},
 	"devDependencies": {
-		"@types/node": "26.1.2",
+		"@types/node": "24.13.3",
 		"@vitest/coverage-v8": "4.1.10",
 		"pizzip": "3.2.0",
-		"tsup": "8.5.1",
+		"tsdown": "0.22.14",
 		"typescript": "5.9.3",
 		"vitest": "4.1.10"
 	}

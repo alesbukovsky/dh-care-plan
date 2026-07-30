@@ -11,7 +11,7 @@ export type ParseResult<T> =
 	| { ok: false; reason: "json"; message: string }
 	| { ok: false; reason: "schema"; issues: SchemaIssue[]; raw: unknown };
 
-export function parseJson(input: ArrayBuffer | string): JsonResult {
+export function parseJson(input: Uint8Array | string): JsonResult {
 	const text = typeof input === "string" ? input : new TextDecoder().decode(input);
 	try {
 		return { ok: true, data: JSON.parse(text) };
@@ -22,7 +22,7 @@ export function parseJson(input: ArrayBuffer | string): JsonResult {
 
 export function parseWith<S extends z.ZodType>(
 	schema: S,
-	input: ArrayBuffer | string,
+	input: Uint8Array | string,
 ): ParseResult<z.output<S>> {
 	const json = parseJson(input);
 	if (!json.ok) return { ok: false, reason: "json", message: json.message };
@@ -33,10 +33,10 @@ export function parseWith<S extends z.ZodType>(
 	return { ok: false, reason: "schema", issues: res.error.issues, raw: json.data };
 }
 
-export function parsePlan(input: ArrayBuffer | string): ParseResult<Plan> {
+export function parsePlan(input: Uint8Array | string): ParseResult<Plan> {
 	return parseWith(Plan, input);
 }
 
-export function parseConfig(input: ArrayBuffer | string): ParseResult<Config> {
+export function parseConfig(input: Uint8Array | string): ParseResult<Config> {
 	return parseWith(Config, input);
 }

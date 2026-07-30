@@ -1,4 +1,4 @@
-import type { Plan } from "@dh-care-plan/core/schema";
+import type { Plan } from "@dh-care-plan/core";
 
 interface SaveFilePickerOptions {
 	suggestedName?: string;

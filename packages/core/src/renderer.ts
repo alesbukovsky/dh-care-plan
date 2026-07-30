@@ -16,7 +16,7 @@ export type TemplaterOptions = Omit<
 expressionParser.filters.lower = (input: unknown) =>
 	typeof input === "string" ? input.toLowerCase() : input;
 
-export function createTemplater(input: ArrayBuffer, options?: TemplaterOptions): Docxtemplater {
+export function createTemplater(input: Uint8Array, options?: TemplaterOptions): Docxtemplater {
 	const zip = new PizZip(input);
 	return new Docxtemplater(zip, {
 		errorLogging: false,
@@ -46,7 +46,7 @@ export function describeTemplaterError(error: unknown): string {
 
 export type RenderResult = { ok: true; output: Uint8Array } | { ok: false; message: string };
 
-export function render(plan: Plan, template: ArrayBuffer, config?: Config): RenderResult {
+export function render(plan: Plan, template: Uint8Array, config?: Config): RenderResult {
 	const data = convertData(plan, config);
 
 	try {
@@ -125,7 +125,7 @@ function collectUndefinedTags(
 	}
 }
 
-export function checkTemplate(input: ArrayBuffer): TemplateResult {
+export function checkTemplate(input: Uint8Array): TemplateResult {
 	const inspector = new InspectModule();
 
 	try {

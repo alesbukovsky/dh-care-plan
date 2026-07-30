@@ -65,7 +65,7 @@ describe("render", () => {
 	});
 
 	test("reports a read failure for a non-.docx template rather than throwing", () => {
-		const notADocx = new TextEncoder().encode("not a zip file").buffer as ArrayBuffer;
+		const notADocx = new TextEncoder().encode("not a zip file");
 
 		const result = render(validPlan, notADocx);
 

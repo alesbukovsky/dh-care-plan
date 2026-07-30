@@ -1,4 +1,4 @@
-import type { Plan } from "@dh-care-plan/core/schema";
+import type { Plan } from "@dh-care-plan/core";
 import { type FieldDefinition, FieldGroup } from "./fields";
 import Section from "./Section";
 

@@ -1,12 +1,11 @@
-import { defineConfig } from "tsup";
+import { defineConfig } from "tsdown";
 
 export default defineConfig({
 	entry: { dhplan: "src/dhplan.ts" },
 	format: ["esm"],
-	// `import.meta.main` in the entry guard needs Node 24, which is also the package's
-	// declared floor. Keep the two in step.
 	target: "node24",
 	dts: false,
+	fixedExtension: false,
 	sourcemap: true,
 	treeshake: true,
 	clean: true,

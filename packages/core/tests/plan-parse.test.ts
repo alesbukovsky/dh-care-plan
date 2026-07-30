@@ -11,8 +11,8 @@ const PLAN: Plan = {
 	needs: [{ type: "health", isMet: false }],
 };
 
-function encode(value: unknown): ArrayBuffer {
-	return new TextEncoder().encode(JSON.stringify(value)).buffer as ArrayBuffer;
+function encode(value: unknown): Uint8Array {
+	return new TextEncoder().encode(JSON.stringify(value));
 }
 
 describe("parseJson", () => {
@@ -134,8 +134,9 @@ describe("parseConfig", () => {
 
 	test("rejects malformed JSON", () => {
 		expect(parseConfig("{ not json")).toMatchObject({ ok: false, reason: "json" });
-		expect(
-			parseConfig(new TextEncoder().encode("{ not json").buffer as ArrayBuffer),
-		).toMatchObject({ ok: false, reason: "json" });
+		expect(parseConfig(new TextEncoder().encode("{ not json"))).toMatchObject({
+			ok: false,
+			reason: "json",
+		});
 	});
 });

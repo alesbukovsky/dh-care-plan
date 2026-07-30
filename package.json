@@ -3,16 +3,17 @@
 	"private": true,
 	"scripts": {
 		"build:core": "pnpm --filter @dh-care-plan/core run build",
-		"build:cli": "pnpm run build:core && pnpm --filter @dh-care-plan/cli run build",
-		"build:pwa": "pnpm run build:core && pnpm --filter @dh-care-plan/pwa run build",
+		"build:cli": "pnpm --filter \"@dh-care-plan/cli...\" run build",
+		"build:pwa": "pnpm --filter \"@dh-care-plan/pwa...\" run build",
 		"lint": "biome lint --error-on-warnings .",
 		"lint:fix": "biome check --write --error-on-warnings .",
-		"test": "pnpm run build:core && pnpm -r --stream --workspace-concurrency=1 run test",
-		"dev": "pnpm run build:core && pnpm --filter @dh-care-plan/pwa run dev",
-		"serve": "pnpm run build:core && pnpm --filter @dh-care-plan/pwa run serve",
-		"link:cli": "pnpm run build:cli && pnpm --filter @dh-care-plan/cli exec pnpm link --global",
+		"typecheck": "pnpm -r --stream --workspace-concurrency=1 run typecheck",
+		"test": "pnpm -r --stream --workspace-concurrency=1 run test",
+		"dev": "pnpm --filter @dh-care-plan/pwa run dev",
+		"serve": "pnpm --filter @dh-care-plan/pwa run serve",
+		"link:cli": "pnpm run build:cli && ln -sf \"$PWD/packages/cli/dist/dhplan.js\" \"$PNPM_HOME/bin/dhplan\" && echo \"Linked dhplan -> $PNPM_HOME/bin/dhplan\"",
 		"deploy": "pnpm run test && pnpm run build:pwa && pnpm --filter @dh-care-plan/pwa run deploy",
-		"deploy:shadow": "pnpm run test && pnpm run build:pwa && pnpm --filter @dh-care-plan/pwa run deploy:shadow"
+		"deploy:stage": "pnpm run test && pnpm run build:pwa && pnpm --filter @dh-care-plan/pwa run deploy:stage"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.5.5"

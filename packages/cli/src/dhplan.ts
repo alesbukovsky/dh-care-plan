@@ -26,63 +26,53 @@ export interface CliIo {
 	writeError(text: string): void;
 }
 
-/**
- * Thrown once a problem has been reported, so the command unwinds to an exit
- * code without the caller having to thread one back out of every branch.
- */
-class CliFailure extends Error {}
+class CliError extends Error {}
 
-function printLine(io: CliIo, path: string, message: string): void {
+function writeError(io: CliIo, path: string, message: string): void {
 	io.writeError(path ? `${path}: ${message}\n` : `${message}\n`);
 }
 
-/** Core hands back structured facts; the CLI is the one that turns them into text. */
-function printParseIssues(io: CliIo, problem: ParseProblem): void {
+function writeParseProblem(io: CliIo, problem: ParseProblem): void {
 	if (problem.reason === "json") {
-		printLine(io, "", `Invalid JSON: ${problem.message}`);
+		io.writeError(`Invalid JSON: ${problem.message}\n`);
 		return;
 	}
 	for (const issue of problem.issues) {
-		printLine(io, issue.path.join("."), issue.message);
+		writeError(io, issue.path.join("."), issue.message);
 	}
 }
 
-function printTemplateIssues(io: CliIo, issues: TemplateIssue[]): void {
+function writeTemplateIssues(io: CliIo, issues: TemplateIssue[]): void {
 	for (const issue of issues) {
-		printLine(io, issue.path, issue.message);
+		writeError(io, issue.path, issue.message);
 	}
 }
 
-async function readFile(io: CliIo, path: string, label: string): Promise<ArrayBuffer> {
+async function readFile(io: CliIo, path: string, label: string): Promise<Uint8Array> {
 	try {
-		const bytes = await readFileBytes(path);
-		// Node hands back a Buffer over a pooled ArrayBuffer, so `bytes.buffer` on its own
-		// would carry unrelated bytes. Slice out the window this file actually occupies.
-		return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
-	} catch (error: unknown) {
-		const message = error instanceof Error ? error.message : String(error);
+		return await readFileBytes(path);
+	} catch (err: unknown) {
+		const message = err instanceof Error ? err.message : String(err);
 		io.writeError(`Failed to read ${label}: ${message}\n`);
-		throw new CliFailure();
+		throw new CliError();
 	}
 }
 
-/** Reads and parses a `--config` override, if one was given. */
-async function readConfigOption(io: CliIo, path: string | undefined): Promise<Config | undefined> {
+async function readConfig(io: CliIo, path: string | undefined): Promise<Config | undefined> {
 	if (!path) return undefined;
 
 	const parsed = parseConfig(await readFile(io, path, path));
 	if (!parsed.ok) {
-		printParseIssues(io, parsed);
-		throw new CliFailure();
+		writeParseProblem(io, parsed);
+		throw new CliError();
 	}
 	return parsed.data;
 }
 
-function buildProgram(io: CliIo): Command {
+function buildCli(io: CliIo): Command {
 	const cli = new Command();
 
 	cli.name("dhplan").description("Dental hygiene care plan builder CLI");
-	// Exiting is the caller's job, so the CLI stays runnable in-process.
 	cli.exitOverride();
 	cli.configureOutput({
 		writeOut: (text) => io.write(text),
@@ -106,8 +96,8 @@ function buildProgram(io: CliIo): Command {
 				config: getConfigSchema,
 			};
 
-			const document = options.sample ? samples[type]() : schemas[type]();
-			io.write(`${JSON.stringify(document, null, 2)}\n`);
+			const doc = options.sample ? samples[type]() : schemas[type]();
+			io.write(`${JSON.stringify(doc, null, 2)}\n`);
 		});
 
 	cli
@@ -124,8 +114,8 @@ function buildProgram(io: CliIo): Command {
 					io.write(`${file} is valid\n`);
 					return;
 				}
-				printTemplateIssues(io, check.issues);
-				throw new CliFailure();
+				writeTemplateIssues(io, check.issues);
+				throw new CliError();
 			}
 
 			const parsed = type === "plan" ? parsePlan(buffer) : parseConfig(buffer);
@@ -133,8 +123,8 @@ function buildProgram(io: CliIo): Command {
 				io.write(`${file} is valid\n`);
 				return;
 			}
-			printParseIssues(io, parsed);
-			throw new CliFailure();
+			writeParseProblem(io, parsed);
+			throw new CliError();
 		});
 
 	cli
@@ -156,26 +146,24 @@ function buildProgram(io: CliIo): Command {
 
 				const parsed = parsePlan(planBuffer);
 				if (!parsed.ok) {
-					printParseIssues(io, parsed);
-					throw new CliFailure();
+					writeParseProblem(io, parsed);
+					throw new CliError();
 				}
 
-				const config = await readConfigOption(io, options.config);
+				const config = await readConfig(io, options.config);
 
-				// Checked separately so a bad tag is named precisely, rather than surfacing
-				// as whatever docxtemplater says when it hits it mid-render.
 				const check = checkTemplate(templateBuffer);
 				if (!check.ok) {
 					io.writeError("Failed to render output file\n");
-					printTemplateIssues(io, check.issues);
-					throw new CliFailure();
+					writeTemplateIssues(io, check.issues);
+					throw new CliError();
 				}
 
 				const result = render(parsed.data, templateBuffer, config);
 				if (!result.ok) {
 					io.writeError("Failed to render output file\n");
-					printLine(io, "", result.message);
-					throw new CliFailure();
+					io.writeError(`${result.message}\n`);
+					throw new CliError();
 				}
 
 				await writeFile(outputPath, result.output);
@@ -191,11 +179,11 @@ function buildProgram(io: CliIo): Command {
 		.action(async (planPath: string, options: { config?: string }) => {
 			const parsed = parsePlan(await readFile(io, planPath, planPath));
 			if (!parsed.ok) {
-				printParseIssues(io, parsed);
-				throw new CliFailure();
+				writeParseProblem(io, parsed);
+				throw new CliError();
 			}
 
-			const config = await readConfigOption(io, options.config);
+			const config = await readConfig(io, options.config);
 
 			io.write(`${JSON.stringify(convertData(parsed.data, config), null, 2)}\n`);
 		});
@@ -203,9 +191,8 @@ function buildProgram(io: CliIo): Command {
 	return cli;
 }
 
-/** Runs one CLI invocation and returns the exit code it should produce. */
 export async function runCli(args: string[], io: CliIo): Promise<number> {
-	const cli = buildProgram(io);
+	const cli = buildCli(io);
 
 	if (args.length === 0) {
 		cli.outputHelp();
@@ -215,17 +202,13 @@ export async function runCli(args: string[], io: CliIo): Promise<number> {
 	try {
 		await cli.parseAsync(args, { from: "user" });
 		return 0;
-	} catch (error: unknown) {
-		if (error instanceof CliFailure) return 1;
-		// Commander has already reported bad usage, and asked-for help exits 0.
-		if (error instanceof CommanderError) return error.exitCode;
-		throw error;
+	} catch (err: unknown) {
+		if (err instanceof CliError) return 1;
+		if (err instanceof CommanderError) return err.exitCode;
+		throw err;
 	}
 }
 
-// Only when invoked as a command, so the tests can import `runCli` and drive it
-// in-process. The exit code is set rather than exited on, so piped output is
-// flushed before the process ends.
 if (import.meta.main) {
 	process.exitCode = await runCli(process.argv.slice(2), {
 		write: (text) => process.stdout.write(text),

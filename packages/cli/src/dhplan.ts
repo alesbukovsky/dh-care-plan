@@ -21,11 +21,13 @@ type SchemaType = (typeof SCHEMA_TYPES)[number];
 
 type ParseProblem = Extract<ParseResult<unknown>, { ok: false }>;
 
+// i/o seam so tests can capture stdout/stderr without spawning a subprocess
 export interface CliIo {
 	write(text: string): void;
 	writeError(text: string): void;
 }
 
+// marks an error as already reported to i/o, maps to exit code 1
 class CliError extends Error {}
 
 function writeError(io: CliIo, path: string, message: string): void {

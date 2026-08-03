@@ -15,6 +15,7 @@ import {
 	render,
 } from "@dh-care-plan/core";
 import { Argument, Command, CommanderError } from "commander";
+import pkg from "../package.json" with { type: "json" };
 
 const SCHEMA_TYPES = ["plan", "template", "config"] as const;
 type SchemaType = (typeof SCHEMA_TYPES)[number];
@@ -74,7 +75,7 @@ async function readConfig(io: CliIo, path: string | undefined): Promise<Config |
 function buildCli(io: CliIo): Command {
 	const cli = new Command();
 
-	cli.name("dhplan").description("Dental hygiene care plan builder CLI");
+	cli.name("dhplan").description("Dental hygiene care plan builder CLI").version(pkg.version);
 	cli.exitOverride();
 	cli.configureOutput({
 		writeOut: (text) => io.write(text),

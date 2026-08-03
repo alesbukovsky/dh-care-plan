@@ -69,7 +69,7 @@ export default function GenerateDialog({
 							Downloads as <span className="font-mono font-medium text-[#1E2B27]">{fileName}</span>
 						</p>
 						<p className="mt-0.5 text-xs leading-snug text-[#7C8B86]">
-							Your browser decides where, check its download settings.
+							Depending on you browser you may be able to select location later.
 						</p>
 					</div>
 				</div>

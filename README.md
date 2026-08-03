@@ -59,7 +59,8 @@ Vitest is used for all unit tests, Vite for the PWA and `tsdown` for the core an
 
 # To do 
 
-- Maintenance need is only allowed when ALL other needs are met.
+- Maintenance need is only allowed when ALL other needs are met. This may also need to change how undefined `isMet` 
+  flag is shown in final docx file.
 - Should "export / import" be renamed to "download / upload"?
 
 ## Ideas

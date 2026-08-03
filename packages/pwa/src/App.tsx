@@ -81,7 +81,7 @@ export default function App() {
 		setTemplateSelection({ name: file.name, template: templateResult.template });
 	}
 
-	function handleGenerate() {
+	async function handleGenerate() {
 		if (!templateSelection) return;
 
 		const rendered = renderPlan(plan, templateSelection.template);
@@ -90,7 +90,7 @@ export default function App() {
 			return;
 		}
 
-		downloadGeneratedPlan(plan, rendered.output);
+		await downloadGeneratedPlan(plan, rendered.output);
 		closeGenerateDialog();
 	}
 

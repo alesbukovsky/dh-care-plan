@@ -1,6 +1,6 @@
 import { type Config, checkTemplate, type Plan, render } from "@dh-care-plan/core";
 import { planFileName } from "./export";
-import { downloadFile } from "./files";
+import { saveFile } from "./files";
 import type { ImportIssue } from "./import";
 
 export interface GenerateFailure {
@@ -66,7 +66,12 @@ export function generatedPlanFileName(plan: Plan): string {
 	return planFileName(plan, new Date(), "docx");
 }
 
-/** Downloads a rendered plan. Where (or whether) the browser asks for a location is up to it. */
-export function downloadGeneratedPlan(plan: Plan, output: Uint8Array): void {
-	downloadFile(output, generatedPlanFileName(plan), DOCX_MIME);
+/**
+ * Asks the user where to save the rendered plan and writes it there. Resolves
+ * without writing anything when the user cancels the picker.
+ */
+export async function downloadGeneratedPlan(plan: Plan, output: Uint8Array): Promise<void> {
+	await saveFile(output, generatedPlanFileName(plan), DOCX_MIME, [
+		{ description: "Care plan document", accept: { [DOCX_MIME]: [".docx"] } },
+	]);
 }

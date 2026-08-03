@@ -1,4 +1,4 @@
-import { DEFAULT_PLAN, type Plan } from "@dh-care-plan/core";
+import { DEFAULT_PLAN, NEED_TYPES, type Plan } from "@dh-care-plan/core";
 import { expect, test } from "vitest";
 import { readPlanFile } from "../src/import";
 
@@ -52,29 +52,32 @@ test("an unreadable file is reported instead of thrown", async () => {
 	);
 });
 
-test("missing fields are named with the labels the editor uses", async () => {
+test("an empty plan is accepted so an unfilled DOCX can still be rendered", async () => {
+	const result = await readPlanFile(planFile({}));
+
+	expect(result).toEqual({
+		ok: true,
+		plan: {
+			patient: {},
+			subjective: {},
+			objective: {},
+			needs: NEED_TYPES.map((type) => ({ type })),
+		},
+	});
+});
+
+test("missing top-level sections are filled in rather than rejected", async () => {
 	const result = await readPlanFile(planFile({ patient: { initials: "JD" } }));
 
-	if (result.ok) throw new Error("expected the import to fail");
-	expect(result.summary).toContain("fields need attention");
-	expect(result.issues).toEqual(
-		expect.arrayContaining([
-			{
-				field: "Subjective data",
-				message: "This field is required, but the file does not have it.",
-			},
-			{
-				field: "Objective data",
-				message: "This field is required, but the file does not have it.",
-			},
-			{
-				field: "Human needs",
-				message: "This field is required, but the file does not have it.",
-			},
-		]),
-	);
-	// The patient's own fields are all optional, so none of them are missing.
-	expect(result.issues.filter((issue) => issue.field.startsWith("Patient"))).toEqual([]);
+	expect(result).toEqual({
+		ok: true,
+		plan: {
+			patient: { initials: "JD" },
+			subjective: {},
+			objective: {},
+			needs: NEED_TYPES.map((type) => ({ type })),
+		},
+	});
 });
 
 test("a single problem is phrased in the singular", async () => {
@@ -172,10 +175,6 @@ test("problems deep inside goals keep their full trail", async () => {
 	if (result.ok) throw new Error("expected the import to fail");
 	expect(result.issues).toEqual(
 		expect.arrayContaining([
-			{
-				field: "Human needs #1 → Goals #2 → Task",
-				message: "This field is required, but the file does not have it.",
-			},
 			{
 				field: "Human needs #1 → Goals #2 → Target date → Date",
 				message: 'Must be a date written as YYYY-MM-DD, but the file has text ("soon").',

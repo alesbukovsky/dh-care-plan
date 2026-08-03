@@ -1,6 +1,5 @@
 import { type Config, DEFAULT_CONFIG } from "./schema/config";
 import type { Plan } from "./schema/plan";
-import type { Template } from "./schema/template";
 
 function orEmpty(value: string | undefined): string {
 	return value ?? "";
@@ -32,7 +31,7 @@ function goalDoneBy(
 	return undefined;
 }
 
-export function convertData(plan: Plan, config: Config = DEFAULT_CONFIG): Template {
+export function convertData(plan: Plan, config: Config = DEFAULT_CONFIG) {
 	// An unassessed need still lists in the assessment table, where nothing worse
 	// than "not met" can be said about it, but it carries no diagnosis statement.
 	const assessments = plan.needs.map((need) => ({
@@ -53,7 +52,7 @@ export function convertData(plan: Plan, config: Config = DEFAULT_CONFIG): Templa
 			evidencedBy: orEmpty(need.evidencedBy),
 			goals: (need.goals ?? []).map((goal, goalInx) => ({
 				label: goalLabel(statementNo, goalInx),
-				task: goal.task,
+				task: orEmpty(goal.task),
 				doneBy: goalDoneBy(goal.doneBy, config),
 				interventions: goal.interventions ?? [],
 				outcome: {

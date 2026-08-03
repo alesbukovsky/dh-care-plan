@@ -20,7 +20,7 @@ describe("Config's mapping shape aligns with Plan enums", () => {
 	});
 
 	test("Config's mapping.outcome keys match Outcome.status's enum values plus undefined", () => {
-		const outcomeStatusValues = Goal.shape.outcome.unwrap().shape.status.options;
+		const outcomeStatusValues = Goal.shape.outcome.unwrap().shape.status.unwrap().options;
 		const mappingOutcomeKeys = Object.keys(Config.shape.mapping.shape.outcome.shape);
 
 		expect(mappingOutcomeKeys.sort()).toEqual([...outcomeStatusValues, "undefined"].sort());

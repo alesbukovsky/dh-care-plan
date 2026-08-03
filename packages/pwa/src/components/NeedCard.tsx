@@ -187,7 +187,7 @@ function GoalsEditor({ need, onChange }: GoalsEditorProps) {
 									type="text"
 									className={`flex-1 ${inputClass}`}
 									placeholder="e.g. floss daily"
-									value={goal.task}
+									value={goal.task ?? ""}
 									onChange={(e) => updateGoal(goalIndex, { task: e.target.value })}
 								/>
 								<button

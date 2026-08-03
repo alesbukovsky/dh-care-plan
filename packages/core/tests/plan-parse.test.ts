@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { parseConfig, parseJson, parsePlan } from "../src/parser";
 import { DEFAULT_CONFIG } from "../src/schema/config";
-import type { Plan } from "../src/schema/plan";
+import { NEED_TYPES, type Plan } from "../src/schema/plan";
 
 const PLAN: Plan = {
 	patient: { initials: "J.D.", dob: "2001-04-17", chartId: "A1234" },
@@ -40,7 +40,24 @@ describe("parsePlan", () => {
 
 	test("distinguishes unparseable JSON from a schema mismatch", () => {
 		expect(parsePlan("{")).toMatchObject({ ok: false, reason: "json" });
-		expect(parsePlan("{}")).toMatchObject({ ok: false, reason: "schema" });
+		expect(parsePlan(JSON.stringify("not an object"))).toMatchObject({
+			ok: false,
+			reason: "schema",
+		});
+	});
+
+	test("fills in an empty plan so an unfilled DOCX can still render", () => {
+		const result = parsePlan("{}");
+
+		expect(result).toEqual({
+			ok: true,
+			data: {
+				patient: {},
+				subjective: {},
+				objective: {},
+				needs: NEED_TYPES.map((type) => ({ type })),
+			},
+		});
 	});
 
 	test("rejects a non-object value", () => {

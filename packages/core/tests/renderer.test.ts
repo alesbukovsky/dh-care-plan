@@ -1,5 +1,6 @@
 import type PizZip from "pizzip";
 import { describe, expect, test } from "vitest";
+import { parsePlan } from "../src/parser";
 import { createTemplater, describeTemplaterError, render } from "../src/renderer";
 import { DEFAULT_CONFIG } from "../src/schema/config";
 import type { Plan } from "../src/schema/plan";
@@ -49,6 +50,22 @@ describe("render", () => {
 		if (result.ok) {
 			expect(result.output).toBeInstanceOf(Uint8Array);
 			expect(result.output.length).toBeGreaterThan(0);
+		}
+	});
+
+	test("renders an empty plan into a blank but valid docx", () => {
+		const parsed = parsePlan("{}");
+		if (!parsed.ok) throw new Error("expected an empty plan to parse");
+		const docx = buildDocx(
+			"<w:p><w:r><w:t>{patient.initials} {subjective.complaint}</w:t></w:r></w:p>",
+		);
+
+		const result = render(parsed.data, docx);
+
+		expect(result.ok).toBe(true);
+		if (result.ok) {
+			const doc = createTemplater(result.output);
+			expect(renderedText(doc)).not.toContain("undefined");
 		}
 	});
 

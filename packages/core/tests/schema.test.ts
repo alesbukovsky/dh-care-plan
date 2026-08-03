@@ -39,6 +39,19 @@ describe("getTemplateSchema", () => {
 	});
 });
 
+describe("Template", () => {
+	test("assembles a basic structure from an empty object", () => {
+		expect(Template.parse({})).toEqual({
+			patient: {},
+			subjective: {},
+			objective: {},
+			assessments: [],
+			statements: [],
+			appointments: {},
+		});
+	});
+});
+
 describe("getConfigSchema", () => {
 	test("carries the public $id for the config schema", () => {
 		expect((getConfigSchema() as { $id: string }).$id).toBe(

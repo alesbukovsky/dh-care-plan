@@ -74,12 +74,12 @@ const Objective = z.object({
 registry.add(Objective, { id: "Objective" });
 
 const Outcome = z.object({
-	status: z.enum(["met", "partial", "unmet"]),
+	status: z.enum(["met", "partial", "unmet"]).optional(),
 	note: z.string().optional(),
 });
 
 export const Goal = z.object({
-	task: z.string(),
+	task: z.string().optional(),
 	doneBy: z
 		.object({
 			date: z.iso.date().optional(),
@@ -125,19 +125,18 @@ export const Appointment = z.object({
 });
 registry.add(Appointment, { id: "Appointment" });
 
-const Appointments = z.object({
-	interval: z.string().optional(),
-	planned: z.array(Appointment).optional(),
-});
-registry.add(Appointments, { id: "Appointments" });
-
 export const Plan = z.object({
 	study: z.string().optional(),
-	patient: Patient,
-	subjective: Subjective,
-	objective: Objective,
-	needs: z.array(Need),
-	appointments: Appointments.optional(),
+	patient: Patient.default(() => ({})),
+	subjective: Subjective.default(() => ({})),
+	objective: Objective.default(() => ({})),
+	needs: z.array(Need).default(() => NEED_TYPES.map((type) => ({ type }))),
+	appointments: z
+		.object({
+			interval: z.string().optional(),
+			planned: z.array(Appointment).optional(),
+		})
+		.optional(),
 });
 
 export type Plan = z.infer<typeof Plan>;
@@ -150,9 +149,4 @@ export function getPlanSchema(): object {
 	};
 }
 
-export const DEFAULT_PLAN: Plan = {
-	patient: {},
-	subjective: {},
-	objective: {},
-	needs: NEED_TYPES.map((type) => ({ type })),
-};
+export const DEFAULT_PLAN: Plan = Plan.parse({});

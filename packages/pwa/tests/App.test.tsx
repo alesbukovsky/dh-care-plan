@@ -113,14 +113,16 @@ test("dismissing the picker without a file changes nothing", async () => {
 test("importing an invalid plan explains the problems and leaves the editor alone", async () => {
 	render(<App />);
 
-	pickFile(planFile({ patient: { initials: "JD" } }, "broken.json"));
+	pickFile(planFile({ patient: { initials: "JD" }, needs: [{}, {}] }, "broken.json"));
 
 	const dialog = await screen.findByRole("dialog");
 	expect(dialog).toHaveAccessibleName("Cannot import this file");
 	expect(screen.getByText(/“broken.json” is not a valid care plan/)).toBeInTheDocument();
-	expect(within(dialog).getByText("Subjective data")).toBeInTheDocument();
+	expect(within(dialog).getByText("Human needs #1 → Need type")).toBeInTheDocument();
 	expect(
-		screen.getAllByText("This field is required, but the file does not have it.").length,
+		screen.getAllByText(
+			"Must be one of: image, peace, integrity, health, comfort, dentition, understanding, responsibility, maintenance.",
+		).length,
 	).toBeGreaterThan(1);
 
 	fireEvent.click(screen.getByRole("button", { name: "Close" }));
@@ -151,7 +153,7 @@ test("only the first dozen problems are listed, the rest are counted", async () 
 test("the error dialog closes on Escape", async () => {
 	render(<App />);
 
-	pickFile(planFile({ nope: true }));
+	pickFile(planFile({ needs: "none" }));
 
 	await screen.findByRole("dialog");
 	fireEvent.keyDown(document, { key: "Escape" });

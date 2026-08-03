@@ -4,9 +4,9 @@ import { SCHEMA_BASE_URI } from "./common";
 const registry = z.registry<{ id?: string }>();
 
 const Patient = z.object({
-	initials: z.string(),
-	dob: z.string(),
-	chartId: z.string(),
+	initials: z.string().optional(),
+	dob: z.string().optional(),
+	chartId: z.string().optional(),
 });
 registry.add(Patient, { id: "Patient" });
 
@@ -68,21 +68,21 @@ const Objective = z.object({
 registry.add(Objective, { id: "Objective" });
 
 const Assessment = z.object({
-	need: z.string(),
-	isMet: z.boolean(),
+	need: z.string().optional(),
+	isMet: z.boolean().optional(),
 	relatedTo: z.string().optional(),
 	evidencedBy: z.string().optional(),
 });
 registry.add(Assessment, { id: "Assessment" });
 
 const Outcome = z.object({
-	label: z.string(),
+	label: z.string().optional(),
 	note: z.string().optional(),
 });
 
 const Goal = z.object({
-	label: z.string(),
-	task: z.string(),
+	label: z.string().optional(),
+	task: z.string().optional(),
 	doneBy: z.string().optional(),
 	interventions: z.array(z.string()).optional(),
 	outcome: Outcome.optional(),
@@ -90,11 +90,11 @@ const Goal = z.object({
 registry.add(Goal, { id: "Goal" });
 
 const Statement = z.object({
-	label: z.string(),
-	need: z.string(),
-	relatedTo: z.string(),
-	evidencedBy: z.string(),
-	goals: z.array(Goal),
+	label: z.string().optional(),
+	need: z.string().optional(),
+	relatedTo: z.string().optional(),
+	evidencedBy: z.string().optional(),
+	goals: z.array(Goal).optional(),
 });
 registry.add(Statement, { id: "Statement" });
 
@@ -108,20 +108,19 @@ export const Appointment = z.object({
 });
 registry.add(Appointment, { id: "Appointment" });
 
-const Appointments = z.object({
-	interval: z.string().optional(),
-	planned: z.array(Appointment),
-});
-registry.add(Appointments, { id: "Appointments" });
-
 export const Template = z.object({
-	patient: Patient,
+	patient: Patient.default(() => ({})),
 	visits: z.string().optional(),
-	subjective: Subjective,
-	objective: Objective,
-	assessments: z.array(Assessment),
-	statements: z.array(Statement),
-	appointments: Appointments,
+	subjective: Subjective.default(() => ({})),
+	objective: Objective.default(() => ({})),
+	assessments: z.array(Assessment).default(() => []),
+	statements: z.array(Statement).default(() => []),
+	appointments: z
+		.object({
+			interval: z.string().optional(),
+			planned: z.array(Appointment).optional(),
+		})
+		.default(() => ({})),
 });
 
 export type Template = z.infer<typeof Template>;

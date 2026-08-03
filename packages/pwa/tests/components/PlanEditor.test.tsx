@@ -17,7 +17,6 @@ let latest: Plan;
 function Harness() {
 	const [plan, setPlan] = useState<Plan>({
 		patient: { initials: "", dob: "", chartId: "" },
-		appointments: [],
 		subjective: {},
 		objective: {},
 		needs: [],
@@ -170,6 +169,7 @@ test("assessing a need adds it to the plan and counts it in the badge", () => {
 
 	expect(screen.getByText("0 assessed / 0 unmet")).toBeInTheDocument();
 
+	expand("Human needs");
 	expand("Wholesome facial image");
 	fireEvent.click(screen.getByRole("button", { name: "Need is unmet" }));
 

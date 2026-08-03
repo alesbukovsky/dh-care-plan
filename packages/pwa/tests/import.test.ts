@@ -4,7 +4,6 @@ import { readPlanFile } from "../src/import";
 
 const VALID_PLAN: Plan = {
 	patient: { initials: "J.D.", dob: "2001-04-17", chartId: "A1234" },
-	appointments: ["2026-07-28"],
 	subjective: { complaint: "Sensitivity on the lower left" },
 	objective: { medical: { bmi: "22.4" } },
 	needs: [{ type: "health", isMet: false, goals: [{ task: "Reduce plaque score" }] }],
@@ -61,11 +60,11 @@ test("missing fields are named with the labels the editor uses", async () => {
 	expect(result.issues).toEqual(
 		expect.arrayContaining([
 			{
-				field: "Appointments",
+				field: "Subjective data",
 				message: "This field is required, but the file does not have it.",
 			},
 			{
-				field: "Subjective data",
+				field: "Objective data",
 				message: "This field is required, but the file does not have it.",
 			},
 			{
@@ -124,7 +123,7 @@ test("bad dates spell out the expected format", async () => {
 		planFile({
 			...VALID_PLAN,
 			patient: { ...VALID_PLAN.patient, dob: "17/04/2001" },
-			appointments: ["2026-13-01"],
+			objective: { ...VALID_PLAN.objective, visits: [{ date: "2026-13-01" }] },
 		}),
 	);
 
@@ -135,7 +134,7 @@ test("bad dates spell out the expected format", async () => {
 			message: 'Must be a date written as YYYY-MM-DD, but the file has text ("17/04/2001").',
 		},
 		{
-			field: "Appointments #1",
+			field: "Objective data → Visits #1 → Date",
 			message: 'Must be a date written as YYYY-MM-DD, but the file has text ("2026-13-01").',
 		},
 	]);

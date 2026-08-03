@@ -73,10 +73,9 @@ describe("DEFAULT_PLAN", () => {
 		expect(DEFAULT_PLAN.needs).toEqual(Need.shape.type.options.map((type) => ({ type })));
 	});
 
-	test("holds nothing else: no patient, appointments, or findings", () => {
+	test("holds nothing else: no patient or findings", () => {
 		expect(DEFAULT_PLAN).toMatchObject({
 			patient: {},
-			appointments: [],
 			subjective: {},
 			objective: {},
 		});
@@ -87,7 +86,6 @@ describe("Plan with the new Goal.doneBy shape", () => {
 	test("parses a full plan using the object doneBy shape", () => {
 		const plan = {
 			patient: PATIENT,
-			appointments: ["2026-07-01"],
 			needs: [needWithGoal({ date: "2026-08-01", relative: "by next visit" })],
 		};
 

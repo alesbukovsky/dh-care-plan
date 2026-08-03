@@ -5,7 +5,6 @@ import type { Plan } from "../src/schema/plan";
 
 const PLAN: Plan = {
 	patient: { initials: "J.D.", dob: "2001-04-17", chartId: "A1234" },
-	appointments: ["2026-07-28"],
 	subjective: { complaint: "Sensitivity" },
 	objective: {},
 	needs: [{ type: "health", isMet: false }],

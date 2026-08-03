@@ -1,7 +1,6 @@
 import { type Plan, parsePlan, type SchemaIssue } from "@dh-care-plan/core";
 
 export interface ImportIssue {
-	/** Where the problem is, in the words the UI uses, e.g. `Patient → Date of birth`. */
 	field: string;
 	message: string;
 }
@@ -14,11 +13,9 @@ export interface ImportFailure {
 
 export type ImportResult = { ok: true; plan: Plan } | ImportFailure;
 
-/** Plan field names as they are labelled in the editor. */
 const FIELD_LABELS: Record<string, string> = {
 	aap: "AAP classification",
 	allergies: "Allergies",
-	appointments: "Appointments",
 	asa: "ASA classification",
 	bmi: "BMI",
 	caries: "Caries",
@@ -65,7 +62,6 @@ const FIELD_LABELS: Record<string, string> = {
 	type: "Need type",
 };
 
-/** `chiefComplaint` becomes `Chief complaint`. */
 function humanize(segment: string): string {
 	const words = segment.replace(/([a-z0-9])([A-Z])/g, "$1 $2").toLowerCase();
 	return words.charAt(0).toUpperCase() + words.slice(1);
@@ -73,14 +69,12 @@ function humanize(segment: string): string {
 
 type Path = readonly PropertyKey[];
 
-/** Renders a schema path as a trail of labels, e.g. `Human needs #1 → Goals #2 → Task`. */
 function describePath(path: Path): string {
 	if (path.length === 0) return "The file";
 
 	let trail = "";
 	for (const segment of path) {
 		if (typeof segment === "number") {
-			// Array indices belong to the field just named, not to a step of their own.
 			trail += ` #${segment + 1}`;
 			continue;
 		}
@@ -115,7 +109,6 @@ function describeValue(value: unknown): string {
 	}
 	if (typeof value === "object") return "a group of fields";
 	if (typeof value === "boolean") return `a true/false value (${value})`;
-	// JSON has nothing else left.
 	return `a number (${String(value)})`;
 }
 
@@ -144,10 +137,6 @@ function fail(summary: string, issues: ImportIssue[] = []): ImportFailure {
 	return { ok: false, summary, issues };
 }
 
-/**
- * Reads a care plan out of a file the user picked, describing every problem in
- * plain language when the file cannot be used.
- */
 export async function readPlanFile(file: File): Promise<ImportResult> {
 	let text: string;
 	try {

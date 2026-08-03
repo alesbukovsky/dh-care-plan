@@ -29,7 +29,8 @@ const Goal = z.object({
 const Format = z.object({
 	date: z.string(),
 	goal: Goal,
-	appointment: z.string(),
+	visits: z.string(),
+	vitals: z.string(),
 });
 
 const Mapping = z.object({
@@ -58,7 +59,8 @@ export const DEFAULT_CONFIG: Config = {
 		goal: {
 			doneBy: "{date} / {relative}",
 		},
-		appointment: ", ",
+		visits: ", ",
+		vitals: "Appointment {date}: {vitals}",
 	},
 	mapping: {
 		need: {

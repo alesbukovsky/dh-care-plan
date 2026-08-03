@@ -8,7 +8,6 @@ export function getPlanSample(): Plan {
 	return {
 		study: "case study text",
 		patient: { initials: "J.D.", dob: "1990-01-01", chartId: "12345" },
-		appointments: ["2026-07-01", "2026-08-01"],
 		subjective: {
 			complaint: "sensitive teeth",
 			personal: "no relevant personal history",
@@ -45,6 +44,10 @@ export function getPlanSample(): Plan {
 			},
 			radiographic: "none needed",
 			diagnostic: "none needed",
+			visits: [
+				{ date: "2026-08-01", vitals: "BP 120/80, pulse 72" },
+				{ date: "2026-07-01", vitals: "BP 118/76, pulse 70" },
+			],
 		},
 		needs: [
 			{

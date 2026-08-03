@@ -203,7 +203,7 @@ function GoalsEditor({ need, onChange }: GoalsEditorProps) {
 								<span className="font-serif italic text-[#7C8B86]">by</span>
 								<input
 									type="date"
-									className={`w-32 shrink-0 ${inputClass}`}
+									className={`w-36 shrink-0 ${inputClass}`}
 									value={goal.doneBy?.date ?? ""}
 									onChange={(e) =>
 										updateGoal(goalIndex, {

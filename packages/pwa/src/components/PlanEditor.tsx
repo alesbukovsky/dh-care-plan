@@ -47,7 +47,6 @@ export default function PlanEditor({ plan, onChange }: PlanEditorProps) {
 					title="Human needs"
 					hint="Assessment, diagnoses, goals, and interventions"
 					badge={`${assessedCount} assessed / ${unmetCount} unmet`}
-					defaultExpanded
 				>
 					<div className="space-y-3">
 						{NEEDS.map((definition, index) => (

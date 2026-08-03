@@ -1,5 +1,5 @@
 import { DEFAULT_PLAN } from "@dh-care-plan/core";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, expect, test, vi } from "vitest";
 import App from "../src/App";
 
@@ -78,7 +78,6 @@ test("importing a valid plan fills the editor", async () => {
 	const input = pickFile(
 		planFile({
 			patient: { initials: "J.D.", dob: "2001-04-17", chartId: "A1234" },
-			appointments: [],
 			subjective: { complaint: "Sensitivity on the lower left" },
 			objective: {},
 			needs: [{ type: "health", isMet: false }],
@@ -107,6 +106,7 @@ test("dismissing the picker without a file changes nothing", async () => {
 	await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
 	// The new plan lists every need, none of them assessed yet.
 	expect(screen.getByText("0 assessed / 0 unmet")).toBeInTheDocument();
+	fireEvent.click(screen.getByRole("button", { name: /Human needs/ }));
 	expect(screen.getAllByText("Not started")).toHaveLength(DEFAULT_PLAN.needs.length);
 });
 
@@ -118,7 +118,7 @@ test("importing an invalid plan explains the problems and leaves the editor alon
 	const dialog = await screen.findByRole("dialog");
 	expect(dialog).toHaveAccessibleName("Cannot import this file");
 	expect(screen.getByText(/“broken.json” is not a valid care plan/)).toBeInTheDocument();
-	expect(screen.getByText("Appointments")).toBeInTheDocument();
+	expect(within(dialog).getByText("Subjective data")).toBeInTheDocument();
 	expect(
 		screen.getAllByText("This field is required, but the file does not have it.").length,
 	).toBeGreaterThan(1);
@@ -137,7 +137,6 @@ test("only the first dozen problems are listed, the rest are counted", async () 
 	pickFile(
 		planFile({
 			patient: { initials: "JD", dob: "2001-04-17", chartId: "A1234" },
-			appointments: [],
 			subjective: {},
 			objective: {},
 			needs: Array.from({ length: 14 }, () => ({ type: "health", isMet: "yes" })),
@@ -176,7 +175,6 @@ async function importNamedPatient() {
 	pickFile(
 		planFile({
 			patient: { initials: "J.D.", dob: "2001-04-17", chartId: "A1234" },
-			appointments: [],
 			subjective: {},
 			objective: {},
 			needs: [{ type: "health", isMet: false }],
@@ -200,6 +198,7 @@ test("starting a new plan asks first and replaces the plan once confirmed", asyn
 
 	expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 	expect(screen.queryByText("J.D.")).not.toBeInTheDocument();
+	fireEvent.click(screen.getByRole("button", { name: /Human needs/ }));
 	expect(screen.getAllByText("Not started")).toHaveLength(DEFAULT_PLAN.needs.length);
 });
 
@@ -215,7 +214,8 @@ test("a new plan returns the editor to its initial view", async () => {
 	fireEvent.click(screen.getByRole("button", { name: "Start new plan" }));
 
 	expect(screen.queryByLabelText("Initials")).not.toBeInTheDocument();
-	// Human needs stays open one level: every need listed, each card collapsed.
+	// Every section, including Human needs, returns to its collapsed initial state.
+	fireEvent.click(screen.getByRole("button", { name: /Human needs/ }));
 	expect(screen.getAllByText("Not started")).toHaveLength(DEFAULT_PLAN.needs.length);
 });
 

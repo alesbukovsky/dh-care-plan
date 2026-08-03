@@ -1,5 +1,6 @@
 import type { Plan } from "@dh-care-plan/core";
-import { Field, type FieldDefinition, FieldGroup, StringListField } from "./fields";
+import { Field, type FieldDefinition, FieldGroup, inputClass, StringListField } from "./fields";
+import { PlusIcon, TrashIcon } from "./icons";
 import Section from "./Section";
 import Subsection from "./Subsection";
 
@@ -7,6 +8,7 @@ type Objective = Plan["objective"];
 type Medical = NonNullable<Objective["medical"]>;
 type Restorative = NonNullable<Objective["restorative"]>;
 type Periodontal = NonNullable<Objective["periodontal"]>;
+type Visit = NonNullable<Objective["visits"]>[number];
 
 const MEDICAL_FIELDS: FieldDefinition<Medical>[] = [
 	{ key: "bmi", label: "BMI", placeholder: "e.g. 22.4", width: "half" },
@@ -140,6 +142,78 @@ export default function ObjectiveSection({ objective, onChange }: ObjectiveSecti
 					onChange={(diagnostic) => onChange({ ...objective, diagnostic })}
 				/>
 			</Subsection>
+
+			<Subsection title="Visits">
+				<VisitsEditor objective={objective} onChange={onChange} />
+			</Subsection>
 		</Section>
+	);
+}
+
+interface VisitsEditorProps {
+	objective: Objective;
+	onChange: (next: Objective) => void;
+}
+
+function VisitsEditor({ objective, onChange }: VisitsEditorProps) {
+	const visits = objective.visits ?? [];
+
+	function updateVisit(index: number, patch: Partial<Visit>) {
+		onChange({
+			...objective,
+			visits: visits.map((visit, i) => (i === index ? { ...visit, ...patch } : visit)),
+		});
+	}
+
+	function addVisit() {
+		onChange({ ...objective, visits: [...visits, {}] });
+	}
+
+	function removeVisit(index: number) {
+		const next = visits.filter((_, i) => i !== index);
+		onChange({ ...objective, visits: next.length > 0 ? next : undefined });
+	}
+
+	return (
+		<div>
+			<div className="space-y-2">
+				{visits.map((visit, index) => (
+					<div
+						// biome-ignore lint/suspicious/noArrayIndexKey: visits have no stable id in the schema
+						key={`visit-${index}`}
+						className="flex items-center gap-2"
+					>
+						<input
+							type="date"
+							className={`w-36 shrink-0 ${inputClass}`}
+							value={visit.date ?? ""}
+							onChange={(event) => updateVisit(index, { date: event.target.value || undefined })}
+						/>
+						<input
+							type="text"
+							className={`flex-1 ${inputClass}`}
+							placeholder="vitals, e.g. BP 120/80, pulse 72"
+							value={visit.vitals ?? ""}
+							onChange={(event) => updateVisit(index, { vitals: event.target.value || undefined })}
+						/>
+						<button
+							type="button"
+							title="Remove visit"
+							onClick={() => removeVisit(index)}
+							className="rounded p-1 text-[#7C8B86] hover:bg-[#F0F0EC] hover:text-[#B85C2E]"
+						>
+							<TrashIcon />
+						</button>
+					</div>
+				))}
+			</div>
+			<button
+				type="button"
+				onClick={addVisit}
+				className="mt-2 flex items-center gap-1 text-xs text-[#2F6F62] hover:underline"
+			>
+				<PlusIcon className="h-3.5 w-3.5" /> Add visit
+			</button>
+		</div>
 	);
 }

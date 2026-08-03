@@ -22,6 +22,7 @@ const Subjective = z.object({
 registry.add(Subjective, { id: "Subjective" });
 
 const Medical = z.object({
+	vitals: z.array(z.string()).optional(),
 	bmi: z.string().optional(),
 	medications: z.string().optional(),
 	allergies: z.string().optional(),
@@ -99,7 +100,7 @@ registry.add(Statement, { id: "Statement" });
 
 export const Template = z.object({
 	patient: Patient,
-	appointments: z.string(),
+	visits: z.string().optional(),
 	subjective: Subjective,
 	objective: Objective,
 	assessments: z.array(Assessment),

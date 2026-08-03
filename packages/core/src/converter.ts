@@ -64,17 +64,37 @@ export function convertData(plan: Plan, config: Config = DEFAULT_CONFIG): Templa
 		};
 	});
 
+	const sortedVisits = (plan.objective.visits ?? [])
+		.filter((visit): visit is { date: string; vitals?: string } => visit.date !== undefined)
+		.toSorted((a, b) => a.date.localeCompare(b.date));
+
+	const visits = sortedVisits
+		.map((visit) => dateStr(visit.date, config.format.date))
+		.join(config.format.visits);
+
+	const vitals = sortedVisits
+		.filter((visit): visit is { date: string; vitals: string } => visit.vitals !== undefined)
+		.map((visit) =>
+			config.format.vitals
+				.replace("{date}", dateStr(visit.date, config.format.date))
+				.replace("{vitals}", visit.vitals),
+		);
+
 	return {
 		patient: {
 			initials: orEmpty(plan.patient.initials),
 			chartId: orEmpty(plan.patient.chartId),
 			dob: plan.patient.dob ? dateStr(plan.patient.dob, config.format.date) : "",
 		},
-		appointments: plan.appointments
-			.map((date) => dateStr(date, config.format.date))
-			.join(config.format.appointment),
+		visits: visits || undefined,
 		subjective: plan.subjective,
-		objective: plan.objective,
+		objective: {
+			...plan.objective,
+			medical:
+				plan.objective.medical || vitals.length
+					? { ...plan.objective.medical, vitals: vitals.length ? vitals : undefined }
+					: plan.objective.medical,
+		},
 		assessments,
 		statements,
 	};

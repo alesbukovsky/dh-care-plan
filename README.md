@@ -59,6 +59,7 @@ Vitest is used for all unit tests, Vite for the PWA and `tsdown` for the core an
 
 # To do 
 
+- Maintenance need is only allowed when ALL other needs are met.
 - Should "export / import" be renamed to "download / upload"?
 
 ## Ideas

@@ -4,11 +4,9 @@ import { DEFAULT_CONFIG } from "../src/schema/config";
 import { DEFAULT_PLAN, Need } from "../src/schema/plan";
 
 const PATIENT = { initials: "J.D.", dob: "1990-01-01", chartId: "12345" };
-const APPOINTMENTS = ["2026-07-01", "2026-08-01"];
 
 const validPlan = {
 	patient: PATIENT,
-	appointments: APPOINTMENTS,
 	subjective: { complaint: "sensitive teeth" },
 	objective: {
 		medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
@@ -87,7 +85,6 @@ describe("convertData", () => {
 	test("derives both assessment.need and statement.need from config.mapping.need for the same need", () => {
 		const data = convertData({
 			patient: PATIENT,
-			appointments: APPOINTMENTS,
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
 				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
@@ -110,7 +107,6 @@ describe("convertData", () => {
 	test("leaves an assessment's relatedTo/evidencedBy undefined when the need has neither", () => {
 		const data = convertData({
 			patient: PATIENT,
-			appointments: APPOINTMENTS,
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
 				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
@@ -126,7 +122,6 @@ describe("convertData", () => {
 	test("gives an unmet need without goals an empty goals array", () => {
 		const data = convertData({
 			patient: PATIENT,
-			appointments: APPOINTMENTS,
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
 				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
@@ -148,7 +143,6 @@ describe("convertData", () => {
 	test("labels goals with <statement number><goal letter>, based on position among statements", () => {
 		const data = convertData({
 			patient: PATIENT,
-			appointments: APPOINTMENTS,
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
 				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
@@ -212,7 +206,6 @@ describe("convertData", () => {
 	test("defaults a missing relatedTo or evidencedBy to an empty string", () => {
 		const data = convertData({
 			patient: PATIENT,
-			appointments: APPOINTMENTS,
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
 				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
@@ -230,7 +223,6 @@ describe("convertData", () => {
 
 		const data2 = convertData({
 			patient: PATIENT,
-			appointments: APPOINTMENTS,
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
 				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
@@ -250,11 +242,88 @@ describe("convertData", () => {
 		});
 	});
 
-	test("formats patient.dob and appointments using config.format.date, otherwise copying patient fields unchanged", () => {
+	test("formats patient.dob using config.format.date, otherwise copying patient fields unchanged", () => {
 		const data = convertData(validPlan);
 
 		expect(data.patient).toEqual({ ...PATIENT, dob: "01/01/1990" });
-		expect(data.appointments).toBe("07/01/2026, 08/01/2026");
+	});
+
+	test("orders objective.visits oldest to newest, formatting and joining using config.format.date/visits", () => {
+		const data = convertData({
+			...validPlan,
+			objective: {
+				...validPlan.objective,
+				visits: [
+					{ date: "2026-08-01", vitals: "BP 120/80" },
+					{ date: "2026-07-01", vitals: "BP 118/76" },
+				],
+			},
+		});
+
+		expect(data.visits).toBe("07/01/2026, 08/01/2026");
+	});
+
+	test("leaves visits undefined when objective.visits is missing or empty", () => {
+		expect(convertData(validPlan).visits).toBeUndefined();
+		expect(
+			convertData({ ...validPlan, objective: { ...validPlan.objective, visits: [] } }).visits,
+		).toBeUndefined();
+	});
+
+	test("orders objective.medical.vitals oldest to newest, formatting each using config.format.vitals", () => {
+		const data = convertData({
+			...validPlan,
+			objective: {
+				...validPlan.objective,
+				visits: [
+					{ date: "2026-08-01", vitals: "BP 120/80" },
+					{ date: "2026-07-01", vitals: "BP 118/76" },
+				],
+			},
+		});
+
+		expect(data.objective.medical?.vitals).toEqual([
+			"Appointment 07/01/2026: BP 118/76",
+			"Appointment 08/01/2026: BP 120/80",
+		]);
+	});
+
+	test("skips a visit's vitals when absent, without disturbing date order", () => {
+		const data = convertData({
+			...validPlan,
+			objective: {
+				...validPlan.objective,
+				visits: [{ date: "2026-08-01", vitals: "BP 120/80" }, { date: "2026-07-01" }],
+			},
+		});
+
+		expect(data.objective.medical?.vitals).toEqual(["Appointment 08/01/2026: BP 120/80"]);
+	});
+
+	test("uses a custom config.format.vitals pattern", () => {
+		const data = convertData(
+			{
+				...validPlan,
+				objective: {
+					...validPlan.objective,
+					visits: [{ date: "2026-08-01", vitals: "BP 120/80" }],
+				},
+			},
+			{
+				...DEFAULT_CONFIG,
+				format: { ...DEFAULT_CONFIG.format, vitals: "{date} — {vitals}" },
+			},
+		);
+
+		expect(data.objective.medical?.vitals).toEqual(["08/01/2026 — BP 120/80"]);
+	});
+
+	test("leaves objective.medical.vitals undefined when objective.visits is missing or empty", () => {
+		expect(convertData(validPlan).objective.medical?.vitals).toBeUndefined();
+		expect(
+			convertData({ ...validPlan, objective: { ...validPlan.objective, visits: [] } }).objective
+				.medical?.vitals,
+		).toBeUndefined();
 	});
 
 	test("renders missing patient fields as empty text", () => {
@@ -281,7 +350,6 @@ describe("convertData", () => {
 		const data = convertData(DEFAULT_PLAN);
 
 		expect(data.patient).toEqual({ initials: "", dob: "", chartId: "" });
-		expect(data.appointments).toBe("");
 		expect(data.assessments).toHaveLength(Need.shape.type.options.length);
 		expect(data.assessments.every((assessment) => assessment.isMet === false)).toBe(true);
 		expect(data.statements).toEqual([]);
@@ -294,28 +362,11 @@ describe("convertData", () => {
 		});
 
 		expect(data.patient.dob).toBe("01.01.1990");
-		expect(data.appointments).toBe("01.07.2026, 01.08.2026");
-	});
-
-	test("joins appointment dates using a custom config.format.appointment separator", () => {
-		const data = convertData(validPlan, {
-			...DEFAULT_CONFIG,
-			format: { ...DEFAULT_CONFIG.format, appointment: " / " },
-		});
-
-		expect(data.appointments).toBe("07/01/2026 / 08/01/2026");
-	});
-
-	test("joins an empty appointments list into an empty string", () => {
-		const data = convertData({ ...validPlan, appointments: [] });
-
-		expect(data.appointments).toBe("");
 	});
 
 	function goalWithDoneBy(doneBy: { date?: string; relative?: string } | undefined) {
 		return convertData({
 			patient: PATIENT,
-			appointments: APPOINTMENTS,
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
 				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
@@ -361,7 +412,6 @@ describe("convertData", () => {
 		const data = convertData(
 			{
 				patient: PATIENT,
-				appointments: APPOINTMENTS,
 				subjective: { complaint: "sensitive teeth" },
 				objective: {
 					medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
@@ -399,7 +449,6 @@ describe("convertData", () => {
 
 		const dataWithoutInterventions = convertData({
 			patient: PATIENT,
-			appointments: APPOINTMENTS,
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
 				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
@@ -421,7 +470,6 @@ describe("convertData", () => {
 	test("maps outcome status to a display label, one case per status", () => {
 		const met = convertData({
 			patient: PATIENT,
-			appointments: APPOINTMENTS,
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
 				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
@@ -441,7 +489,6 @@ describe("convertData", () => {
 
 		const partial = convertData({
 			patient: PATIENT,
-			appointments: APPOINTMENTS,
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
 				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
@@ -464,7 +511,6 @@ describe("convertData", () => {
 
 		const unmet = convertData({
 			patient: PATIENT,
-			appointments: APPOINTMENTS,
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
 				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
@@ -486,7 +532,6 @@ describe("convertData", () => {
 	test("labels a goal's outcome as undefined when no outcome is given", () => {
 		const data = convertData({
 			patient: PATIENT,
-			appointments: APPOINTMENTS,
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
 				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
@@ -517,7 +562,6 @@ describe("convertData", () => {
 		const data = convertData(
 			{
 				patient: PATIENT,
-				appointments: APPOINTMENTS,
 				subjective: { complaint: "sensitive teeth" },
 				objective: {
 					medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
@@ -545,7 +589,6 @@ describe("convertData", () => {
 	test("two goals on the same statement carry independent interventions and outcomes", () => {
 		const data = convertData({
 			patient: PATIENT,
-			appointments: APPOINTMENTS,
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
 				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },

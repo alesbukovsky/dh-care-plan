@@ -56,6 +56,12 @@ const Periodontal = z.object({
 });
 registry.add(Periodontal, { id: "Periodontal" });
 
+const Visit = z.object({
+	date: z.iso.date().optional(),
+	vitals: z.string().optional(),
+});
+registry.add(Visit, { id: "Visit" });
+
 const Objective = z.object({
 	medical: Medical.optional(),
 	exams: Exams.optional(),
@@ -63,6 +69,7 @@ const Objective = z.object({
 	periodontal: Periodontal.optional(),
 	radiographic: z.string().optional(),
 	diagnostic: z.string().optional(),
+	visits: z.array(Visit).optional(),
 });
 registry.add(Objective, { id: "Objective" });
 
@@ -112,7 +119,6 @@ export const NEED_TYPES = Need.shape.type.options;
 export const Plan = z.object({
 	study: z.string().optional(),
 	patient: Patient,
-	appointments: z.array(z.iso.date()),
 	subjective: Subjective,
 	objective: Objective,
 	needs: z.array(Need),
@@ -130,7 +136,6 @@ export function getPlanSchema(): object {
 
 export const DEFAULT_PLAN: Plan = {
 	patient: {},
-	appointments: [],
 	subjective: {},
 	objective: {},
 	needs: NEED_TYPES.map((type) => ({ type })),

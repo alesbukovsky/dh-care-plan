@@ -1,9 +1,10 @@
 import type { Plan } from "@dh-care-plan/core";
-import { type FieldDefinition, FieldGroup } from "./fields";
+import { Field, type FieldDefinition, FieldGroup } from "./fields";
 import { PlusIcon, TrashIcon } from "./icons";
 import Section from "./Section";
 
-type Appointment = NonNullable<Plan["appointments"]>[number];
+type Appointments = Plan["appointments"];
+type Appointment = NonNullable<NonNullable<Appointments>["planned"]>[number];
 
 const APPOINTMENT_FIELDS: FieldDefinition<Appointment>[] = [
 	{ key: "length", label: "Estimated Length", placeholder: "e.g. 60 minutes" },
@@ -29,28 +30,38 @@ const APPOINTMENT_FIELDS: FieldDefinition<Appointment>[] = [
 ];
 
 interface AppointmentsSectionProps {
-	appointments: Plan["appointments"];
-	onChange: (next: Plan["appointments"]) => void;
+	appointments: Appointments;
+	onChange: (next: Appointments) => void;
 }
 
 export default function AppointmentsSection({ appointments, onChange }: AppointmentsSectionProps) {
-	const items = appointments ?? [];
+	const interval = appointments?.interval;
+	const items = appointments?.planned ?? [];
 
 	function updateAppointment(index: number, next: Appointment) {
-		onChange(items.map((appointment, i) => (i === index ? next : appointment)));
+		onChange({
+			...appointments,
+			planned: items.map((appointment, i) => (i === index ? next : appointment)),
+		});
 	}
 
 	function addAppointment() {
-		onChange([...items, {}]);
+		onChange({ ...appointments, planned: [...items, {}] });
 	}
 
 	function removeAppointment(index: number) {
 		const next = items.filter((_, i) => i !== index);
-		onChange(next.length > 0 ? next : undefined);
+		onChange({ ...appointments, planned: next.length > 0 ? next : undefined });
 	}
 
 	return (
 		<Section title="Appointments" hint="Planned future appointments" badge={String(items.length)}>
+			<Field
+				label="Recommended interval of care"
+				placeholder="e.g. 3 months"
+				value={interval}
+				onChange={(next) => onChange({ ...appointments, interval: next })}
+			/>
 			<div className="space-y-3">
 				{items.map((appointment, index) => (
 					<div

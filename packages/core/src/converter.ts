@@ -97,9 +97,12 @@ export function convertData(plan: Plan, config: Config = DEFAULT_CONFIG): Templa
 		},
 		assessments,
 		statements,
-		appointments: (plan.appointments ?? []).map((appointment, index) => ({
-			...appointment,
-			label: String(index + 1),
-		})),
+		appointments: {
+			interval: plan.appointments?.interval,
+			planned: (plan.appointments?.planned ?? []).map((appointment, index) => ({
+				...appointment,
+				label: String(index + 1),
+			})),
+		},
 	};
 }

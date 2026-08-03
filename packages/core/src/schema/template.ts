@@ -108,6 +108,12 @@ export const Appointment = z.object({
 });
 registry.add(Appointment, { id: "Appointment" });
 
+const Appointments = z.object({
+	interval: z.string().optional(),
+	planned: z.array(Appointment),
+});
+registry.add(Appointments, { id: "Appointments" });
+
 export const Template = z.object({
 	patient: Patient,
 	visits: z.string().optional(),
@@ -115,7 +121,7 @@ export const Template = z.object({
 	objective: Objective,
 	assessments: z.array(Assessment),
 	statements: z.array(Statement),
-	appointments: z.array(Appointment),
+	appointments: Appointments,
 });
 
 export type Template = z.infer<typeof Template>;

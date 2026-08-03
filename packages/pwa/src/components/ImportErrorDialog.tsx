@@ -5,12 +5,18 @@ import type { ImportIssue } from "../import";
 const MAX_SHOWN_ISSUES = 12;
 
 interface ImportErrorDialogProps {
+	title?: string;
 	summary: string;
 	issues: ImportIssue[];
 	onClose: () => void;
 }
 
-export default function ImportErrorDialog({ summary, issues, onClose }: ImportErrorDialogProps) {
+export default function ImportErrorDialog({
+	title = "Cannot import this file",
+	summary,
+	issues,
+	onClose,
+}: ImportErrorDialogProps) {
 	const closeRef = useRef<HTMLButtonElement>(null);
 
 	useEffect(() => {
@@ -35,7 +41,7 @@ export default function ImportErrorDialog({ summary, issues, onClose }: ImportEr
 			>
 				<div className="rounded-t-[10px] border-b border-[#D8DED9] bg-[#E7EDE8] px-4 py-3">
 					<h2 id="import-error-title" className="font-serif font-medium text-[#1E2B27]">
-						Cannot import this file
+						{title}
 					</h2>
 					<p className="mt-1 text-sm leading-snug text-[#4B5B55]">{summary}</p>
 				</div>

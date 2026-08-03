@@ -22,7 +22,7 @@ const ACTIONS: CommandAction[] = [
 	{ key: "new", label: "New plan", Icon: NewDocumentIcon },
 	{ key: "import", label: "Import data", Icon: UploadIcon },
 	{ key: "export", label: "Export data", Icon: DownloadIcon },
-	{ key: "generate", label: "Generate plan", Icon: DocumentIcon, disabled: true },
+	{ key: "generate", label: "Generate plan", Icon: DocumentIcon },
 	{ key: "configure", label: "Configure", Icon: SettingsIcon, disabled: true },
 ];
 
@@ -32,6 +32,7 @@ interface CommandBarProps {
 	onNewPlan: () => void;
 	onImport: () => void;
 	onExport: () => void;
+	onGenerate: () => void;
 }
 
 export default function CommandBar({
@@ -40,11 +41,13 @@ export default function CommandBar({
 	onNewPlan,
 	onImport,
 	onExport,
+	onGenerate,
 }: CommandBarProps) {
 	const handlers: Record<string, () => void> = {
 		new: onNewPlan,
 		import: onImport,
 		export: onExport,
+		generate: onGenerate,
 	};
 
 	return (

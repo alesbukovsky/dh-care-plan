@@ -1,10 +1,16 @@
-import { DEFAULT_PLAN } from "@dh-care-plan/core";
+import { checkTemplate, render as coreRender, DEFAULT_PLAN } from "@dh-care-plan/core";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, expect, test, vi } from "vitest";
 import App from "../src/App";
 
+vi.mock("@dh-care-plan/core", async () => {
+	const actual = await vi.importActual<typeof import("@dh-care-plan/core")>("@dh-care-plan/core");
+	return { ...actual, checkTemplate: vi.fn(), render: vi.fn() };
+});
+
 afterEach(() => {
 	vi.unstubAllGlobals();
+	vi.clearAllMocks();
 });
 
 test("renders the heading", () => {
@@ -46,10 +52,10 @@ test("exporting asks for a destination and writes the plan there", async () => {
 test("the unimplemented actions are disabled", () => {
 	render(<App />);
 
-	expect(screen.getByRole("button", { name: /Generate plan/ })).toBeDisabled();
 	expect(screen.getByRole("button", { name: /Configure/ })).toBeDisabled();
 	expect(screen.getByRole("button", { name: "Export data" })).toBeEnabled();
 	expect(screen.getByRole("button", { name: "Import data" })).toBeEnabled();
+	expect(screen.getByRole("button", { name: /Generate plan/ })).toBeEnabled();
 });
 
 function planFile(plan: unknown, name = "plan.json"): File {
@@ -238,6 +244,128 @@ test("cancelling or dismissing the new plan prompt keeps the current plan", asyn
 
 	expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 	expect(screen.getByText("J.D.")).toBeInTheDocument();
+});
+
+function templateFile(name = "template.docx"): File {
+	return new File([new Uint8Array([1, 2, 3])], name, {
+		type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+	});
+}
+
+function pickTemplateFile(file: File) {
+	const input = screen.getByLabelText("Care plan template file");
+	fireEvent.change(input, { target: { files: [file] } });
+	return input as HTMLInputElement;
+}
+
+function stubDownload() {
+	const click = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
+	vi.stubGlobal(
+		"URL",
+		Object.assign(URL, { createObjectURL: () => "blob:plan", revokeObjectURL() {} }),
+	);
+	return click;
+}
+
+test("the generate button opens a dialog to pick a template, with the output name already shown", async () => {
+	render(<App />);
+
+	fireEvent.click(screen.getByRole("button", { name: "Generate plan" }));
+
+	const dialog = await screen.findByRole("dialog");
+	expect(dialog).toHaveAccessibleName("Generate a plan");
+	expect(within(dialog).getByText(/\.docx$/)).toBeInTheDocument();
+	expect(screen.getByRole("button", { name: "Generate" })).toBeDisabled();
+});
+
+test("the Generate button becomes actionable as soon as a template is picked", async () => {
+	vi.mocked(checkTemplate).mockReturnValue({ ok: true });
+	render(<App />);
+
+	fireEvent.click(screen.getByRole("button", { name: "Generate plan" }));
+	await screen.findByRole("dialog");
+	expect(screen.getByRole("button", { name: "Generate" })).toBeDisabled();
+
+	pickTemplateFile(templateFile("my-template.docx"));
+	await screen.findByText("my-template.docx");
+
+	expect(screen.getByRole("button", { name: "Generate" })).toBeEnabled();
+});
+
+test("generating downloads the rendered docx under its generated name and closes the dialog", async () => {
+	vi.mocked(checkTemplate).mockReturnValue({ ok: true });
+	vi.mocked(coreRender).mockReturnValue({ ok: true, output: new Uint8Array([9, 9, 9]) });
+	const click = stubDownload();
+	render(<App />);
+
+	fireEvent.click(screen.getByRole("button", { name: "Generate plan" }));
+	await screen.findByRole("dialog");
+	pickTemplateFile(templateFile());
+	await waitFor(() => expect(screen.getByRole("button", { name: "Generate" })).toBeEnabled());
+
+	fireEvent.click(screen.getByRole("button", { name: "Generate" }));
+
+	expect(click).toHaveBeenCalled();
+	expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+});
+
+test("cancelling the generate dialog discards the picked template", async () => {
+	vi.mocked(checkTemplate).mockReturnValue({ ok: true });
+	render(<App />);
+
+	fireEvent.click(screen.getByRole("button", { name: "Generate plan" }));
+	await screen.findByRole("dialog");
+	pickTemplateFile(templateFile());
+	await screen.findByText("template.docx");
+
+	fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+
+	expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+
+	// Reopening starts clean rather than resuming the discarded pick.
+	fireEvent.click(screen.getByRole("button", { name: "Generate plan" }));
+	await screen.findByRole("dialog");
+	expect(screen.getByText("No template selected")).toBeInTheDocument();
+});
+
+test("an invalid template reports the tag issues and keeps the generate dialog open", async () => {
+	vi.mocked(checkTemplate).mockReturnValue({
+		ok: false,
+		issues: [{ path: "unknownTag", message: "not defined in Template" }],
+	});
+	render(<App />);
+
+	fireEvent.click(screen.getByRole("button", { name: "Generate plan" }));
+	await screen.findByRole("dialog");
+	pickTemplateFile(templateFile("bad.docx"));
+
+	const errorDialog = await screen.findByRole("dialog", { name: "Cannot generate plan" });
+	expect(within(errorDialog).getByText(/“bad.docx” is not a valid template/)).toBeInTheDocument();
+	expect(within(errorDialog).getByText("unknownTag")).toBeInTheDocument();
+
+	fireEvent.click(screen.getByRole("button", { name: "Close" }));
+
+	// The generate dialog is still there so the user can pick a different template.
+	expect(screen.getByRole("dialog", { name: "Generate a plan" })).toBeInTheDocument();
+});
+
+test("a render failure is reported without downloading anything", async () => {
+	vi.mocked(checkTemplate).mockReturnValue({ ok: true });
+	vi.mocked(coreRender).mockReturnValue({ ok: false, message: "boom" });
+	const click = stubDownload();
+	render(<App />);
+
+	fireEvent.click(screen.getByRole("button", { name: "Generate plan" }));
+	await screen.findByRole("dialog");
+	pickTemplateFile(templateFile());
+	await waitFor(() => expect(screen.getByRole("button", { name: "Generate" })).toBeEnabled());
+
+	fireEvent.click(screen.getByRole("button", { name: "Generate" }));
+
+	const errorDialog = await screen.findByRole("dialog", { name: "Cannot generate plan" });
+	expect(within(errorDialog).getByText("Could not generate the plan.")).toBeInTheDocument();
+	expect(within(errorDialog).getByText("boom")).toBeInTheDocument();
+	expect(click).not.toHaveBeenCalled();
 });
 
 test("case study text is editable", () => {

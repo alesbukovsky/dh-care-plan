@@ -32,11 +32,11 @@ function goalDoneBy(
 }
 
 export function convertData(plan: Plan, config: Config = DEFAULT_CONFIG) {
-	// An unassessed need still lists in the assessment table, where nothing worse
-	// than "not met" can be said about it, but it carries no diagnosis statement.
+	// An unassessed need still lists in the assessment table, undecided, and
+	// carries no diagnosis statement (that requires isMet to be explicitly false).
 	const assessments = plan.needs.map((need) => ({
 		need: config.mapping.need[need.type],
-		isMet: need.isMet ?? false,
+		isMet: need.isMet,
 		relatedTo: need.relatedTo,
 		evidencedBy: need.evidencedBy,
 	}));

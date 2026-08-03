@@ -362,13 +362,13 @@ describe("convertData", () => {
 		expect(data.patient).toEqual({ initials: "", dob: "", chartId: "" });
 	});
 
-	test("lists an unassessed need as not met, without a diagnosis statement", () => {
+	test("lists an unassessed need as undecided, without a diagnosis statement", () => {
 		const data = convertData({ ...validPlan, needs: [{ type: "health" }] });
 
 		expect(data.assessments).toEqual([
 			{
 				need: DEFAULT_CONFIG.mapping.need.health,
-				isMet: false,
+				isMet: undefined,
 				relatedTo: undefined,
 				evidencedBy: undefined,
 			},
@@ -381,7 +381,7 @@ describe("convertData", () => {
 
 		expect(data.patient).toEqual({ initials: "", dob: "", chartId: "" });
 		expect(data.assessments).toHaveLength(Need.shape.type.options.length);
-		expect(data.assessments.every((assessment) => assessment.isMet === false)).toBe(true);
+		expect(data.assessments.every((assessment) => assessment.isMet === undefined)).toBe(true);
 		expect(data.statements).toEqual([]);
 	});
 

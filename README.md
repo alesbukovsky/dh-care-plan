@@ -60,7 +60,6 @@ Vitest is used for all unit tests, Vite for the PWA and `tsdown` for the core an
 # To do 
 
 - Should "export / import" be renamed to "download / upload"?
-- The plan data JSON needs to carry test of the case study to be fully importable back.
 
 ## Ideas
 

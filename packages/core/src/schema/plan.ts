@@ -110,6 +110,7 @@ export type Need = z.infer<typeof Need>;
 export const NEED_TYPES = Need.shape.type.options;
 
 export const Plan = z.object({
+	study: z.string().optional(),
 	patient: Patient,
 	appointments: z.array(z.iso.date()),
 	subjective: Subjective,

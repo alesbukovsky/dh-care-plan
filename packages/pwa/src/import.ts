@@ -59,6 +59,7 @@ const FIELD_LABELS: Record<string, string> = {
 	significance: "Significance",
 	social: "Social history",
 	status: "Status",
+	study: "Case study",
 	subjective: "Subjective data",
 	task: "Task",
 	type: "Need type",

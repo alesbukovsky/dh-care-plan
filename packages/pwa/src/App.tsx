@@ -11,7 +11,6 @@ import { type ImportFailure, readPlanFile } from "./import";
 export default function App() {
 	// Cloned so editing this session never mutates the shared default.
 	const [plan, setPlan] = useState(() => structuredClone(DEFAULT_PLAN));
-	const [caseText, setCaseText] = useState("");
 	const [commandBarCollapsed, setCommandBarCollapsed] = useState(false);
 	const [importFailure, setImportFailure] = useState<ImportFailure | null>(null);
 	const [confirmingNewPlan, setConfirmingNewPlan] = useState(false);
@@ -49,7 +48,7 @@ export default function App() {
 				onImport={() => fileInputRef.current?.click()}
 				onExport={() => void exportPlan(plan)}
 			/>
-			<CaseStudyPane value={caseText} onChange={setCaseText} />
+			<CaseStudyPane value={plan.study ?? ""} onChange={(study) => setPlan({ ...plan, study })} />
 			<PlanEditor key={planGeneration} plan={plan} onChange={setPlan} />
 
 			<input

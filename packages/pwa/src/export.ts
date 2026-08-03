@@ -48,7 +48,8 @@ function download(json: string, fileName: string): void {
  * without writing anything when the user cancels the picker.
  */
 export async function exportPlan(plan: Plan, today = new Date()): Promise<void> {
-	const json = `${JSON.stringify(plan, null, 2)}\n`;
+	const { study, ...rest } = plan;
+	const json = `${JSON.stringify({ study, ...rest }, null, 2)}\n`;
 	const fileName = planFileName(plan, today);
 	const picker = (window as FilePickerWindow).showSaveFilePicker;
 

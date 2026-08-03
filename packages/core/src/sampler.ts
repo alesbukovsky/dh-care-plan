@@ -6,6 +6,7 @@ import type { Template } from "./schema/template";
 
 export function getPlanSample(): Plan {
 	return {
+		study: "case study text",
 		patient: { initials: "J.D.", dob: "1990-01-01", chartId: "12345" },
 		appointments: ["2026-07-01", "2026-08-01"],
 		subjective: {

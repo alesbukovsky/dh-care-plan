@@ -98,6 +98,16 @@ const Statement = z.object({
 });
 registry.add(Statement, { id: "Statement" });
 
+export const Appointment = z.object({
+	label: z.string().optional(),
+	length: z.string().optional(),
+	prophylaxis: z.string().optional(),
+	instruction: z.string().optional(),
+	recommendation: z.string().optional(),
+	referral: z.string().optional(),
+});
+registry.add(Appointment, { id: "Appointment" });
+
 export const Template = z.object({
 	patient: Patient,
 	visits: z.string().optional(),
@@ -105,6 +115,7 @@ export const Template = z.object({
 	objective: Objective,
 	assessments: z.array(Assessment),
 	statements: z.array(Statement),
+	appointments: z.array(Appointment),
 });
 
 export type Template = z.infer<typeof Template>;

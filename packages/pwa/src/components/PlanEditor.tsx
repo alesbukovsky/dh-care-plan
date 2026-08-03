@@ -1,5 +1,6 @@
 import type { Need, Plan } from "@dh-care-plan/core";
 import { NEEDS } from "../needs";
+import AppointmentsSection from "./AppointmentsSection";
 import NeedCard from "./NeedCard";
 import ObjectiveSection from "./ObjectiveSection";
 import PatientSection from "./PatientSection";
@@ -60,6 +61,10 @@ export default function PlanEditor({ plan, onChange }: PlanEditorProps) {
 						))}
 					</div>
 				</Section>
+				<AppointmentsSection
+					appointments={plan.appointments}
+					onChange={(appointments) => onChange({ ...plan, appointments })}
+				/>
 			</div>
 		</section>
 	);

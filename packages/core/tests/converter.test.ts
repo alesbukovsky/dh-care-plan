@@ -270,6 +270,30 @@ describe("convertData", () => {
 		).toBeUndefined();
 	});
 
+	test("maps appointments onto the template 1:1, labelling each with its position", () => {
+		const appointments = [
+			{
+				length: "60 minutes",
+				prophylaxis: "full mouth debridement",
+				instruction: "flossing technique",
+				recommendation: "return in 3 months",
+				referral: "none",
+			},
+			{ length: "30 minutes" },
+		];
+
+		const data = convertData({ ...validPlan, appointments });
+
+		expect(data.appointments).toEqual([
+			{ ...appointments[0], label: "1" },
+			{ ...appointments[1], label: "2" },
+		]);
+	});
+
+	test("defaults appointments to an empty array when the plan has none", () => {
+		expect(convertData(validPlan).appointments).toEqual([]);
+	});
+
 	test("orders objective.medical.vitals oldest to newest, formatting each using config.format.vitals", () => {
 		const data = convertData({
 			...validPlan,

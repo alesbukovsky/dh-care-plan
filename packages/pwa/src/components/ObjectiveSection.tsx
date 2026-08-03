@@ -143,7 +143,7 @@ export default function ObjectiveSection({ objective, onChange }: ObjectiveSecti
 				/>
 			</Subsection>
 
-			<Subsection title="Visits">
+			<Subsection title="Visits" badge={String(objective.visits?.length ?? 0)}>
 				<VisitsEditor objective={objective} onChange={onChange} />
 			</Subsection>
 		</Section>

@@ -2,11 +2,17 @@ import { type ReactNode, useState } from "react";
 
 interface SubsectionProps {
 	title: string;
+	badge?: string;
 	defaultExpanded?: boolean;
 	children: ReactNode;
 }
 
-export default function Subsection({ title, defaultExpanded = false, children }: SubsectionProps) {
+export default function Subsection({
+	title,
+	badge,
+	defaultExpanded = false,
+	children,
+}: SubsectionProps) {
 	const [expanded, setExpanded] = useState(defaultExpanded);
 
 	return (
@@ -19,6 +25,11 @@ export default function Subsection({ title, defaultExpanded = false, children }:
 				onClick={() => setExpanded((prev) => !prev)}
 			>
 				<h4 className="min-w-0 flex-1 font-serif text-sm font-medium text-[#1E2B27]">{title}</h4>
+				{badge && (
+					<span className="shrink-0 rounded-full bg-[#EEEEEC] px-2 py-0.5 font-mono text-xs uppercase tracking-wide text-[#7C8B86]">
+						{badge}
+					</span>
+				)}
 				<span className="shrink-0 text-xs text-[#7C8B86]">{expanded ? "▾" : "▸"}</span>
 			</button>
 

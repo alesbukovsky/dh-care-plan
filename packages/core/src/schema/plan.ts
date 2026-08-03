@@ -116,12 +116,22 @@ export type Need = z.infer<typeof Need>;
 
 export const NEED_TYPES = Need.shape.type.options;
 
+export const Appointment = z.object({
+	length: z.string().optional(),
+	prophylaxis: z.string().optional(),
+	instruction: z.string().optional(),
+	recommendation: z.string().optional(),
+	referral: z.string().optional(),
+});
+registry.add(Appointment, { id: "Appointment" });
+
 export const Plan = z.object({
 	study: z.string().optional(),
 	patient: Patient,
 	subjective: Subjective,
 	objective: Objective,
 	needs: z.array(Need),
+	appointments: z.array(Appointment).optional(),
 });
 
 export type Plan = z.infer<typeof Plan>;

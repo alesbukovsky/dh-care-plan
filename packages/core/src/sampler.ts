@@ -70,6 +70,15 @@ export function getPlanSample(): Plan {
 				],
 			},
 		],
+		appointments: [
+			{
+				length: "60 minutes",
+				prophylaxis: "full mouth debridement",
+				instruction: "flossing technique",
+				recommendation: "return in 3 months",
+				referral: "none",
+			},
+		],
 	};
 }
 

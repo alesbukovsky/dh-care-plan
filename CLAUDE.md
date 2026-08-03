@@ -18,3 +18,4 @@
 - `pnpm typecheck`: only type-checks everything
 - `pnpm lint` / `pnpm lint:fix`: lints Typescript code, the latter with auto-fix enabled
 - `pnpm dev`: start Vite development server for the PWA
+- If you launch Vite locally, make sure to shut it down after the fact.

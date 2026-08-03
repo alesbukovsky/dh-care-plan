@@ -201,6 +201,41 @@ test("assessing a need adds it to the plan and counts it in the badge", () => {
 	expect(screen.getByText("2 assessed / 0 unmet")).toBeInTheDocument();
 });
 
+test("appointments are added, edited, and removed", () => {
+	render(<Harness />);
+	expand("Appointments");
+
+	fireEvent.click(screen.getByRole("button", { name: "Add appointment" }));
+	fireEvent.change(screen.getByLabelText("Estimated Length"), {
+		target: { value: "60 minutes" },
+	});
+	fireEvent.change(screen.getByLabelText("Prophylaxis (TX)"), {
+		target: { value: "full mouth debridement" },
+	});
+
+	expect(latest.appointments).toEqual([
+		{ length: "60 minutes", prophylaxis: "full mouth debridement" },
+	]);
+
+	fireEvent.click(screen.getByRole("button", { name: "Add appointment" }));
+	fireEvent.change(required(screen.getAllByLabelText("Estimated Length")[1]), {
+		target: { value: "30 minutes" },
+	});
+
+	expect(latest.appointments).toEqual([
+		{ length: "60 minutes", prophylaxis: "full mouth debridement" },
+		{ length: "30 minutes" },
+	]);
+
+	fireEvent.click(required(screen.getAllByRole("button", { name: "Remove appointment" })[0]));
+
+	expect(latest.appointments).toEqual([{ length: "30 minutes" }]);
+
+	fireEvent.click(screen.getByRole("button", { name: "Remove appointment" }));
+
+	expect(latest.appointments).toBeUndefined();
+});
+
 test("clearing a field drops it from the plan", () => {
 	render(<Harness />);
 	expand("Subjective data");

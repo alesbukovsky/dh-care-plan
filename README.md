@@ -1,12 +1,17 @@
 # Dental Hygiene Care Plan Builder
 
-The project consists of teh following parts:
+Progressive web app ([PWA](https://en.wikipedia.org/wiki/Progressive_web_app)) available here: 
+https://dhplan.alesb.workers.dev/
+
+## Development
+
+The project consists of the following parts:
 
 - `packages/core`: shared library with common logic
 - `packages/cli`: command-line interface (CLI) 
 - `packages/pwa`: progressive web application (PWA)
 
-## Getting started
+### Getting started
 
 From a fresh clone, install dependencies, verify everything and start development PWA server:
 
@@ -25,7 +30,7 @@ pnpm setup
 pnpm link:cli
 ```
 
-## PWA Deployment
+### PWA Deployment
 
 Uses Cloudflare Worker with static assets. Create `.cf` file in the project root and export your `CLOUDFLARE_API_TOKEN` 
 within.
@@ -39,13 +44,13 @@ version installed as a PWA dependency is executed, using the associated `wrangle
 - `wrangler.sh versions deploy`: promotes staged version to receive live traffic.
 - `wrangler.sh rollback`: rollbacks to previous live version.
 
-## Toolchain
+### Toolchain
 
 Prerequisites: Node 24+, `pnpm` 11+
 
 Vitest is used for all unit tests, Vite for the PWA and `tsdown` for the core and CLI publishable packages.
 
-## Gotchas
+### Gotchas
 
 - `pnpm-workspace.yaml` has to list `esbuild` and `workerd` under `allowBuilds`, because the tool blocks dependency 
   lifecycle scripts by default (needed here to install platform-specific binary). Without it Vite and `wrangler` 
@@ -57,7 +62,7 @@ Vitest is used for all unit tests, Vite for the PWA and `tsdown` for the core an
   This is a style preference, not a constraint. For example, `./converter.js` resolves in both a bundler and Node, 
   so the explicit form is a strict superset. It is kept because `.js` inside a `.ts` file reads wrong.
 
-# To do 
+## To do 
 
 - Maintenance need is only allowed when ALL other needs are met. This may also need to change how undefined `isMet` 
   flag is shown in final docx file.

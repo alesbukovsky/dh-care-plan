@@ -1,7 +1,7 @@
 import type { Plan } from "@dh-care-plan/core";
 import { checkTemplate, render } from "@dh-care-plan/core";
 import { afterEach, expect, test, vi } from "vitest";
-import { downloadFile } from "../src/files";
+import { saveFile } from "../src/files";
 import {
 	downloadGeneratedPlan,
 	generatedPlanFileName,
@@ -14,7 +14,7 @@ vi.mock("@dh-care-plan/core", async () => {
 	return { ...actual, checkTemplate: vi.fn(), render: vi.fn() };
 });
 
-vi.mock("../src/files", () => ({ downloadFile: vi.fn() }));
+vi.mock("../src/files", () => ({ saveFile: vi.fn() }));
 
 afterEach(() => {
 	vi.clearAllMocks();
@@ -81,7 +81,7 @@ test("a successful render is returned without downloading anything", () => {
 	const result = renderPlan(PLAN, new Uint8Array([1]));
 
 	expect(result).toEqual({ ok: true, output: new Uint8Array([9, 9, 9]) });
-	expect(downloadFile).not.toHaveBeenCalled();
+	expect(saveFile).not.toHaveBeenCalled();
 });
 
 test("a render failure is reported and nothing is downloaded", () => {
@@ -94,19 +94,20 @@ test("a render failure is reported and nothing is downloaded", () => {
 		summary: "Could not generate the plan.",
 		issues: [{ field: "Template", message: "unclosed tag" }],
 	});
-	expect(downloadFile).not.toHaveBeenCalled();
+	expect(saveFile).not.toHaveBeenCalled();
 });
 
 test("the generated plan's file name ends in .docx", () => {
 	expect(generatedPlanFileName(PLAN)).toMatch(/\.docx$/);
 });
 
-test("downloading a generated plan writes it as a .docx under that name", () => {
-	downloadGeneratedPlan(PLAN, new Uint8Array([9, 9, 9]));
+test("downloading a generated plan writes it as a .docx under that name", async () => {
+	await downloadGeneratedPlan(PLAN, new Uint8Array([9, 9, 9]));
 
-	expect(downloadFile).toHaveBeenCalledWith(
+	expect(saveFile).toHaveBeenCalledWith(
 		new Uint8Array([9, 9, 9]),
 		expect.stringMatching(/\.docx$/),
 		"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+		expect.any(Array),
 	);
 });

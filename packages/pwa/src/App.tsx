@@ -1,7 +1,8 @@
-import { DEFAULT_PLAN } from "@dh-care-plan/core";
+import { DEFAULT_CONFIG, DEFAULT_PLAN } from "@dh-care-plan/core";
 import { type ChangeEvent, useRef, useState } from "react";
 import CaseStudyPane from "./components/CaseStudyPane";
 import CommandBar from "./components/CommandBar";
+import ConfigDialog, { type ConfigImportFailure } from "./components/ConfigDialog";
 import ConfirmDialog from "./components/ConfirmDialog";
 import GenerateDialog from "./components/GenerateDialog";
 import ImportErrorDialog from "./components/ImportErrorDialog";
@@ -24,11 +25,14 @@ interface TemplateSelection {
 export default function App() {
 	// Cloned so editing this session never mutates the shared default.
 	const [plan, setPlan] = useState(() => structuredClone(DEFAULT_PLAN));
+	const [config, setConfig] = useState(() => structuredClone(DEFAULT_CONFIG));
 	const [commandBarCollapsed, setCommandBarCollapsed] = useState(false);
 	const [importFailure, setImportFailure] = useState<ImportFailure | null>(null);
+	const [configImportFailure, setConfigImportFailure] = useState<ConfigImportFailure | null>(null);
 	const [generateFailure, setGenerateFailure] = useState<GenerateFailure | null>(null);
 	const [confirmingNewPlan, setConfirmingNewPlan] = useState(false);
 	const [generating, setGenerating] = useState(false);
+	const [configuring, setConfiguring] = useState(false);
 	const [templateSelection, setTemplateSelection] = useState<TemplateSelection | null>(null);
 	// Bumped to remount the editor, so a new plan also resets which sections are expanded.
 	const [planGeneration, setPlanGeneration] = useState(0);
@@ -84,7 +88,7 @@ export default function App() {
 	async function handleGenerate() {
 		if (!templateSelection) return;
 
-		const rendered = renderPlan(plan, templateSelection.template);
+		const rendered = renderPlan(plan, templateSelection.template, config);
 		if (!rendered.ok) {
 			setGenerateFailure(rendered);
 			return;
@@ -103,6 +107,7 @@ export default function App() {
 				onImport={() => fileInputRef.current?.click()}
 				onExport={() => void exportPlan(plan)}
 				onGenerate={openGenerateDialog}
+				onConfigure={() => setConfiguring(true)}
 			/>
 			<CaseStudyPane value={plan.study ?? ""} onChange={(study) => setPlan({ ...plan, study })} />
 			<PlanEditor key={planGeneration} plan={plan} onChange={setPlan} />
@@ -143,6 +148,14 @@ export default function App() {
 				/>
 			)}
 
+			{configImportFailure && (
+				<ImportErrorDialog
+					summary={configImportFailure.summary}
+					issues={configImportFailure.issues}
+					onClose={() => setConfigImportFailure(null)}
+				/>
+			)}
+
 			{generateFailure && (
 				<ImportErrorDialog
 					title="Cannot generate plan"
@@ -159,6 +172,18 @@ export default function App() {
 					onChooseTemplate={() => templateInputRef.current?.click()}
 					onGenerate={handleGenerate}
 					onCancel={closeGenerateDialog}
+				/>
+			)}
+
+			{configuring && (
+				<ConfigDialog
+					config={config}
+					onImportFailure={setConfigImportFailure}
+					onSave={(next) => {
+						setConfig(next);
+						setConfiguring(false);
+					}}
+					onCancel={() => setConfiguring(false)}
 				/>
 			)}
 		</main>

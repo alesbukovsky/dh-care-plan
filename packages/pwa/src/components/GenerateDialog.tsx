@@ -43,7 +43,7 @@ export default function GenerateDialog({
 						Generate a plan
 					</h2>
 					<p className="mt-1 text-sm leading-snug text-[#4B5B55]">
-						Pick a template to fill in with this plan.
+						Pick a template to fill in with this plan
 					</p>
 				</div>
 

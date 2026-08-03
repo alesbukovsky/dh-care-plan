@@ -1,4 +1,9 @@
-import { checkTemplate, render as coreRender, DEFAULT_PLAN } from "@dh-care-plan/core";
+import {
+	checkTemplate,
+	render as coreRender,
+	DEFAULT_CONFIG,
+	DEFAULT_PLAN,
+} from "@dh-care-plan/core";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, expect, test, vi } from "vitest";
 import App from "../src/App";
@@ -49,10 +54,10 @@ test("exporting asks for a destination and writes the plan there", async () => {
 	expect(JSON.parse(write.mock.calls[0]?.[0] as string)).toEqual(DEFAULT_PLAN);
 });
 
-test("the unimplemented actions are disabled", () => {
+test("every command bar action is enabled", () => {
 	render(<App />);
 
-	expect(screen.getByRole("button", { name: /Configure/ })).toBeDisabled();
+	expect(screen.getByRole("button", { name: "Configure" })).toBeEnabled();
 	expect(screen.getByRole("button", { name: "Export data" })).toBeEnabled();
 	expect(screen.getByRole("button", { name: "Import data" })).toBeEnabled();
 	expect(screen.getByRole("button", { name: /Generate plan/ })).toBeEnabled();
@@ -305,7 +310,7 @@ test("generating downloads the rendered docx under its generated name and closes
 
 	fireEvent.click(screen.getByRole("button", { name: "Generate" }));
 
-	expect(click).toHaveBeenCalled();
+	await waitFor(() => expect(click).toHaveBeenCalled());
 	expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 });
 
@@ -366,6 +371,56 @@ test("a render failure is reported without downloading anything", async () => {
 	expect(within(errorDialog).getByText("Could not generate the plan.")).toBeInTheDocument();
 	expect(within(errorDialog).getByText("boom")).toBeInTheDocument();
 	expect(click).not.toHaveBeenCalled();
+});
+
+test("configuring updates the config passed when generating a plan", async () => {
+	vi.mocked(checkTemplate).mockReturnValue({ ok: true });
+	vi.mocked(coreRender).mockReturnValue({ ok: true, output: new Uint8Array([9, 9, 9]) });
+	stubDownload();
+	render(<App />);
+
+	fireEvent.click(screen.getByRole("button", { name: "Configure" }));
+	const configDialog = await screen.findByRole("dialog");
+	fireEvent.change(within(configDialog).getByLabelText("Date"), {
+		target: { value: "DD/MM/YYYY" },
+	});
+	fireEvent.click(within(configDialog).getByRole("button", { name: "Save" }));
+
+	expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+
+	fireEvent.click(screen.getByRole("button", { name: "Generate plan" }));
+	await screen.findByRole("dialog");
+	pickTemplateFile(templateFile());
+	await waitFor(() => expect(screen.getByRole("button", { name: "Generate" })).toBeEnabled());
+	fireEvent.click(screen.getByRole("button", { name: "Generate" }));
+
+	expect(coreRender).toHaveBeenCalledWith(
+		DEFAULT_PLAN,
+		expect.anything(),
+		expect.objectContaining({ format: expect.objectContaining({ date: "DD/MM/YYYY" }) }),
+	);
+});
+
+test("cancelling the config dialog discards the edited config", async () => {
+	vi.mocked(checkTemplate).mockReturnValue({ ok: true });
+	vi.mocked(coreRender).mockReturnValue({ ok: true, output: new Uint8Array([9, 9, 9]) });
+	stubDownload();
+	render(<App />);
+
+	fireEvent.click(screen.getByRole("button", { name: "Configure" }));
+	const configDialog = await screen.findByRole("dialog");
+	fireEvent.change(within(configDialog).getByLabelText("Date"), {
+		target: { value: "DD/MM/YYYY" },
+	});
+	fireEvent.click(within(configDialog).getByRole("button", { name: "Cancel" }));
+
+	fireEvent.click(screen.getByRole("button", { name: "Generate plan" }));
+	await screen.findByRole("dialog");
+	pickTemplateFile(templateFile());
+	await waitFor(() => expect(screen.getByRole("button", { name: "Generate" })).toBeEnabled());
+	fireEvent.click(screen.getByRole("button", { name: "Generate" }));
+
+	expect(coreRender).toHaveBeenCalledWith(DEFAULT_PLAN, expect.anything(), DEFAULT_CONFIG);
 });
 
 test("case study text is editable", () => {

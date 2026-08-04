@@ -45,8 +45,8 @@ pnpm link:cli
 
 ### Icons
 
-Source images are kept in `src/pwa/assets` folder in SVG format. These are used to generate the following PWA icons 
-in the `/src/pwa/public` folder:
+Source images are kept in `packages/pwa/src/assets` folder in SVG format. These are used to generate the following PWA 
+icons in the `packages/pwa/src/public` folder:
 
 - `favicon.ico` (contains 16x16, 32x32 and 48x48)
 - `icon-192.png` and `icon-maskable-192.png`

@@ -3,6 +3,19 @@
 Progressive web app ([PWA](https://en.wikipedia.org/wiki/Progressive_web_app)) available here: 
 https://dhplan.alesb.workers.dev/
 
+This app runs entirely locally in the browser, no data is ever sent anywhere. That said, it is not technically HIPAA 
+compliant, so it is intended primarily for student practice rather than real patient data.
+
+## Browser Support
+
+The app strives to be browser-agnostic, but a few quirks depend on your browser and its settings:
+
+- **File exports**: you may be prompted to choose a save location, or the file may go straight to a configured downloads 
+  folder.
+- **PWA installation**: support varies by browser. For example, Brave may not show an install icon in the address bar (
+  there is a toggle for this in the toolbar's appearance configuration), but the app can still be installed via the 
+  browser's "_Save and Share_" menu.
+
 ## Development
 
 The project consists of the following parts:
@@ -29,6 +42,16 @@ If you want the `dhplan` CLI command sim-linked on your PATH:
 pnpm setup
 pnpm link:cli
 ```
+
+### Icons
+
+Source images are kept in `src/pwa/assets` folder in SVG format. These are used to generate the following PWA icons 
+in the `/src/pwa/public` folder:
+
+- `favicon.ico` (contains 16x16, 32x32 and 48x48)
+- `icon-192.png` and `icon-maskable-192.png`
+- `icon-512.png` and `icon-maskable-512.png`
+
 
 ### PWA Deployment
 

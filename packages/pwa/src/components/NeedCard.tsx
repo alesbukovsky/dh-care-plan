@@ -147,7 +147,7 @@ export default function NeedCard({ definition, index, need, onChange }: NeedCard
 									id={`priority-${definition.type}`}
 									type="text"
 									className={`w-32 ${inputClass}`}
-									placeholder=""
+									placeholder="e.g. 1"
 									value={need.priority ?? ""}
 									onChange={(e) => onChange({ ...need, priority: e.target.value || undefined })}
 								/>

@@ -65,9 +65,8 @@ export default function GenerateDialog({
 					</div>
 
 					<div>
-						<p className="truncate text-sm text-[#4B5B55]">
-							Downloads as <span className="font-mono font-medium text-[#1E2B27]">{fileName}</span>
-						</p>
+						<p className="text-sm font-medium text-[#1E2B27]">Downloads as</p>
+						<p className="truncate font-mono text-sm text-[#4B5B55]">{fileName}</p>
 						<p className="mt-0.5 text-xs leading-snug text-[#7C8B86]">
 							Depending on you browser you may be able to select location later.
 						</p>

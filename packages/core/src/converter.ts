@@ -37,6 +37,8 @@ export function convertData(plan: Plan, config: Config = DEFAULT_CONFIG) {
 	const assessments = plan.needs.map((need) => ({
 		need: config.mapping.need[need.type],
 		isMet: need.isMet,
+		priority: need.priority,
+		rationale: need.rationale,
 		relatedTo: need.relatedTo,
 		evidencedBy: need.evidencedBy,
 	}));

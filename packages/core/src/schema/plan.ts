@@ -107,6 +107,8 @@ export const Need = z.object({
 	isMet: z.boolean().optional(),
 	relatedTo: z.string().optional(),
 	evidencedBy: z.string().optional(),
+	priority: z.string().optional(),
+	rationale: z.string().optional(),
 	goals: z.array(Goal).optional(),
 });
 registry.add(Need, { id: "Need" });

@@ -71,6 +71,8 @@ const Assessment = z.object({
 	isMet: z.boolean().optional(),
 	relatedTo: z.string().optional(),
 	evidencedBy: z.string().optional(),
+	priority: z.string().optional(),
+	rationale: z.string().optional(),
 });
 registry.add(Assessment, { id: "Assessment" });
 

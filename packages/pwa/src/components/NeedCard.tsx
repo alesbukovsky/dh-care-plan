@@ -56,6 +56,8 @@ export default function NeedCard({ definition, index, need, onChange }: NeedCard
 			isMet: status === "met",
 			relatedTo: need?.relatedTo,
 			evidencedBy: need?.evidencedBy,
+			priority: need?.priority,
+			rationale: need?.rationale,
 			goals: need?.goals,
 		});
 		setExpanded(true);
@@ -132,6 +134,40 @@ export default function NeedCard({ definition, index, need, onChange }: NeedCard
 										onChange={(e) => onChange({ ...need, evidencedBy: e.target.value })}
 									/>
 								</div>
+							</div>
+
+							<div className="flex items-center gap-2">
+								<label
+									htmlFor={`priority-${definition.type}`}
+									className="font-mono text-xs uppercase tracking-wide text-[#7C8B86]"
+								>
+									Priority
+								</label>
+								<input
+									id={`priority-${definition.type}`}
+									type="text"
+									className={`w-32 ${inputClass}`}
+									placeholder=""
+									value={need.priority ?? ""}
+									onChange={(e) => onChange({ ...need, priority: e.target.value || undefined })}
+								/>
+							</div>
+
+							<div>
+								<label
+									htmlFor={`rationale-${definition.type}`}
+									className="mb-1 block font-mono text-xs uppercase tracking-wide text-[#7C8B86]"
+								>
+									Rationale
+								</label>
+								<textarea
+									id={`rationale-${definition.type}`}
+									className={`w-full resize-none ${inputClass}`}
+									rows={2}
+									placeholder="why this priority"
+									value={need.rationale ?? ""}
+									onChange={(e) => onChange({ ...need, rationale: e.target.value })}
+								/>
 							</div>
 
 							<GoalsEditor need={need} onChange={onChange} />

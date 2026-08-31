@@ -66,6 +66,14 @@ describe("checkTemplate", () => {
 		expect(checkTemplate(docx)).toEqual({ ok: true });
 	});
 
+	test("accepts an inline expression tag referencing $index and an array field", () => {
+		const docx = buildDocx(
+			"<w:p><w:r><w:t>{#assessments}{need}{^$index + 1 === assessments.length}, {/$index + 1 === assessments.length}{/assessments}</w:t></w:r></w:p>",
+		);
+
+		expect(checkTemplate(docx)).toEqual({ ok: true });
+	});
+
 	test("reports a read failure for a non-.docx file", () => {
 		const notADocx = new TextEncoder().encode("not a zip file");
 

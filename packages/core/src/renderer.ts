@@ -101,6 +101,18 @@ function stripFilters(tag: string): string {
 	return (tag.split("|")[0] ?? tag).trim();
 }
 
+const FIELD_PATH = /^[$A-Za-z_][$A-Za-z0-9_]*(\.[$A-Za-z_][$A-Za-z0-9_]*)*$/;
+
+/**
+ * A tag can be a plain field path (checkable against the schema) or an inline
+ * expression, e.g. `{^$index + 1 === assessments.length}` for a last-item
+ * condition. Expressions aren't schema fields, so they're exempt from the
+ * "not defined in Template" check.
+ */
+function isFieldPath(tag: string): boolean {
+	return FIELD_PATH.test(tag);
+}
+
 function collectUndefinedTags(
 	tagTree: Record<string, unknown>,
 	shape: Record<string, z.ZodType>,
@@ -112,7 +124,7 @@ function collectUndefinedTags(
 		if (baseTag === ".") continue;
 
 		const { field, nestedShape } = resolveTagShape(shape, baseTag);
-		if (!field) {
+		if (!field && isFieldPath(baseTag)) {
 			issues.push({
 				path: [...path, baseTag].join("."),
 				message: "not defined in Template",

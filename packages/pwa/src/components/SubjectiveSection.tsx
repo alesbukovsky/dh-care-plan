@@ -36,12 +36,6 @@ const FIELDS: FieldDefinition<Subjective>[] = [
 		multiline: true,
 	},
 	{
-		key: "significance",
-		label: "Significance to care",
-		placeholder: "how the history affects this plan",
-		multiline: true,
-	},
-	{
 		key: "other",
 		label: "Other",
 		placeholder: "anything else the patient reported",

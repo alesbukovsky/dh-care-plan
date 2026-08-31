@@ -14,7 +14,6 @@ export function getPlanSample(): Plan {
 			medical: "no relevant medical history",
 			dental: "brushes twice daily, does not floss",
 			social: "no relevant social history",
-			significance: "would benefit from flossing instruction",
 			other: "tolerated all procedures well",
 		},
 		objective: {

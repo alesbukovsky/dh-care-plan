@@ -80,7 +80,7 @@ Vitest is used for all unit tests, Vite for the PWA and `tsdown` for the core an
   fail at run time, not at install time. Rolldown ships its binary as an optional platform dependency and needs no 
   entry here.
 
-- Extensionl-ess relative imports work because a bundler-style resolver always sits in front of the source, `tsdown` 
+- Extensionless relative imports work because a bundler-style resolver always sits in front of the source, `tsdown` 
   for core and CLI, Vite for the PWA and for Vitest, so no hand-written specifier ever reaches Node's ESM resolver. 
   This is a style preference, not a constraint. For example, `./converter.js` resolves in both a bundler and Node, 
   so the explicit form is a strict superset. It is kept because `.js` inside a `.ts` file reads wrong.

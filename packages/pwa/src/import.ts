@@ -59,7 +59,6 @@ const FIELD_LABELS: Record<string, string> = {
 	restorations: "Restorations",
 	restorative: "Restorative",
 	risk: "Caries risk",
-	significance: "Significance",
 	social: "Social history",
 	status: "Status",
 	study: "Case study",

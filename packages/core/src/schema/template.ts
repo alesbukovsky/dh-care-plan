@@ -16,7 +16,6 @@ const Subjective = z.object({
 	medical: z.string().optional(),
 	dental: z.string().optional(),
 	social: z.string().optional(),
-	significance: z.string().optional(),
 	other: z.string().optional(),
 });
 registry.add(Subjective, { id: "Subjective" });

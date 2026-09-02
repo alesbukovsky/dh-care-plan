@@ -14,6 +14,10 @@ function goalLabel(number: number, index: number): string {
 	return `${number}${String.fromCharCode(97 + index)}`;
 }
 
+function metLabel(isMet: boolean | undefined, config: Config): string {
+	return config.mapping.met[String(isMet) as "true" | "false" | "undefined"];
+}
+
 function goalDoneBy(
 	doneBy: { date?: string; relative?: string } | undefined,
 	config: Config,
@@ -36,11 +40,9 @@ export function convertData(plan: Plan, config: Config = DEFAULT_CONFIG) {
 	// carries no diagnosis statement (that requires isMet to be explicitly false).
 	const assessments = plan.needs.map((need) => ({
 		need: config.mapping.need[need.type],
-		isMet: need.isMet,
+		met: metLabel(need.isMet, config),
 		priority: need.priority,
 		rationale: need.rationale,
-		relatedTo: need.relatedTo,
-		evidencedBy: need.evidencedBy,
 	}));
 
 	const unmetNeeds = plan.needs.filter((need) => need.isMet === false);

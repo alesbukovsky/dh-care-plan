@@ -70,13 +70,11 @@ describe("dhplan inspect", () => {
 			assessments: [
 				{
 					need: DEFAULT_CONFIG.mapping.need.maintenance,
-					isMet: true,
+					met: DEFAULT_CONFIG.mapping.met.true,
 				},
 				{
 					need: DEFAULT_CONFIG.mapping.need.integrity,
-					isMet: false,
-					relatedTo: "gum disease",
-					evidencedBy: "x-ray",
+					met: DEFAULT_CONFIG.mapping.met.false,
 				},
 			],
 			statements: [

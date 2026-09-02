@@ -22,6 +22,12 @@ const Outcome = z.object({
 	undefined: z.string(),
 });
 
+const Met = z.object({
+	true: z.string(),
+	false: z.string(),
+	undefined: z.string(),
+});
+
 const Goal = z.object({
 	doneBy: z.string(),
 });
@@ -36,6 +42,7 @@ const Format = z.object({
 const Mapping = z.object({
 	need: Need,
 	outcome: Outcome,
+	met: Met,
 });
 
 export const Config = z.object({
@@ -79,6 +86,11 @@ export const DEFAULT_CONFIG: Config = {
 			partial: "Partially met",
 			unmet: "Not met",
 			undefined: "TBD",
+		},
+		met: {
+			true: "Yes",
+			false: "No",
+			undefined: "",
 		},
 	},
 };

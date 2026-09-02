@@ -68,9 +68,7 @@ registry.add(Objective, { id: "Objective" });
 
 const Assessment = z.object({
 	need: z.string().optional(),
-	isMet: z.boolean().optional(),
-	relatedTo: z.string().optional(),
-	evidencedBy: z.string().optional(),
+	met: z.string().optional(),
 	priority: z.string().optional(),
 	rationale: z.string().optional(),
 });

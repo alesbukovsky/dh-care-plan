@@ -58,15 +58,13 @@ describe("convertData", () => {
 		expect(data.assessments).toEqual([
 			{
 				need: DEFAULT_CONFIG.mapping.need.maintenance,
-				isMet: true,
-				relatedTo: undefined,
-				evidencedBy: undefined,
+				met: DEFAULT_CONFIG.mapping.met.true,
+				priority: undefined,
+				rationale: undefined,
 			},
 			{
 				need: DEFAULT_CONFIG.mapping.need.integrity,
-				isMet: false,
-				relatedTo: "gum disease",
-				evidencedBy: "x-ray",
+				met: DEFAULT_CONFIG.mapping.met.false,
 			},
 		]);
 	});
@@ -102,21 +100,6 @@ describe("convertData", () => {
 
 		expect(data.assessments[0]?.need).toBe(DEFAULT_CONFIG.mapping.need.comfort);
 		expect(data.statements[0]?.need).toBe(DEFAULT_CONFIG.mapping.need.comfort);
-	});
-
-	test("leaves an assessment's relatedTo/evidencedBy undefined when the need has neither", () => {
-		const data = convertData({
-			patient: PATIENT,
-			subjective: { complaint: "sensitive teeth" },
-			objective: {
-				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
-				exams: { findings: ["no visible caries"], referrals: "none" },
-			},
-			needs: [{ type: "maintenance", isMet: true }],
-		});
-
-		expect(data.assessments[0]?.relatedTo).toBeUndefined();
-		expect(data.assessments[0]?.evidencedBy).toBeUndefined();
 	});
 
 	test("gives an unmet need without goals an empty goals array", () => {
@@ -368,9 +351,7 @@ describe("convertData", () => {
 		expect(data.assessments).toEqual([
 			{
 				need: DEFAULT_CONFIG.mapping.need.health,
-				isMet: undefined,
-				relatedTo: undefined,
-				evidencedBy: undefined,
+				met: DEFAULT_CONFIG.mapping.met.undefined,
 			},
 		]);
 		expect(data.statements).toEqual([]);
@@ -381,7 +362,9 @@ describe("convertData", () => {
 
 		expect(data.patient).toEqual({ initials: "", dob: "", chartId: "" });
 		expect(data.assessments).toHaveLength(Need.shape.type.options.length);
-		expect(data.assessments.every((assessment) => assessment.isMet === undefined)).toBe(true);
+		expect(
+			data.assessments.every((assessment) => assessment.met === DEFAULT_CONFIG.mapping.met.undefined),
+		).toBe(true);
 		expect(data.statements).toEqual([]);
 	});
 

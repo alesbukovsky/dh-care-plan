@@ -107,6 +107,32 @@ function OutcomeSection({ value, onChange }: OutcomeSectionProps) {
 	);
 }
 
+interface MetSectionProps {
+	value: Config["mapping"]["met"];
+	onChange: (next: Config["mapping"]["met"]) => void;
+}
+
+const MET_LABELS: { key: keyof Config["mapping"]["met"]; label: string }[] = [
+	{ key: "true", label: "Met" },
+	{ key: "false", label: "Not met" },
+	{ key: "undefined", label: "Undefined" },
+];
+
+function MetSection({ value, onChange }: MetSectionProps) {
+	return (
+		<div className="grid grid-cols-2 gap-3">
+			{MET_LABELS.map(({ key, label }) => (
+				<Field
+					key={key}
+					label={label}
+					value={value[key]}
+					onChange={(next) => onChange({ ...value, [key]: next ?? "" })}
+				/>
+			))}
+		</div>
+	);
+}
+
 export default function ConfigDialog({
 	config,
 	onImportFailure,
@@ -199,6 +225,16 @@ export default function ConfigDialog({
 							onChange={(outcome) =>
 								setDraft({ ...draft, mapping: { ...draft.mapping, outcome } })
 							}
+						/>
+					</section>
+
+					<section className="rounded-md border border-[#D8DED9] bg-white p-3">
+						<h3 className="mb-2 font-mono text-xs font-bold uppercase tracking-wide text-[#4B5B55]">
+							Met Labels
+						</h3>
+						<MetSection
+							value={draft.mapping.met}
+							onChange={(met) => setDraft({ ...draft, mapping: { ...draft.mapping, met } })}
 						/>
 					</section>
 				</div>

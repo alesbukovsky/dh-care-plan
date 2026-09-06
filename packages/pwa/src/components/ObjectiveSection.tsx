@@ -1,4 +1,5 @@
 import type { Plan } from "@dh-care-plan/core";
+import BmiCalculatorButton from "./BmiCalculatorButton";
 import { Field, type FieldDefinition, FieldGroup, inputClass, StringListField } from "./fields";
 import { PlusIcon, TrashIcon } from "./icons";
 import Section from "./Section";
@@ -12,7 +13,13 @@ type Vitals = NonNullable<Objective["vitals"]>;
 type Visit = NonNullable<Vitals["visits"]>[number];
 
 const MEDICAL_FIELDS: FieldDefinition<Medical>[] = [
-	{ key: "bmi", label: "BMI", placeholder: "e.g. 22.4", width: "half" },
+	{
+		key: "bmi",
+		label: "BMI",
+		placeholder: "e.g. 22.4",
+		width: "half",
+		renderExtra: (_value, onChange) => <BmiCalculatorButton onAccept={onChange} />,
+	},
 	{ key: "asa", label: "ASA class", placeholder: "e.g. II", width: "half" },
 	{
 		key: "medications",

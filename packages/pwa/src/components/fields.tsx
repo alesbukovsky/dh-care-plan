@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { useId } from "react";
 import { PlusIcon, TrashIcon } from "./icons";
 
@@ -13,6 +14,8 @@ export interface FieldDefinition<T> {
 	multiline?: boolean;
 	/** Render narrower so two ("half") or three ("third") such fields share one line. */
 	width?: "half" | "third";
+	/** Render a small action (e.g. a button opening a helper dialog) next to the field. */
+	renderExtra?: (value: string | undefined, onChange: (next: string | undefined) => void) => ReactNode;
 }
 
 interface FieldProps {
@@ -23,6 +26,7 @@ interface FieldProps {
 	multiline?: boolean;
 	type?: "text" | "date";
 	className?: string;
+	extra?: ReactNode;
 }
 
 export function Field({
@@ -33,6 +37,7 @@ export function Field({
 	multiline,
 	type = "text",
 	className,
+	extra,
 }: FieldProps) {
 	const id = useId();
 
@@ -41,25 +46,30 @@ export function Field({
 			<label htmlFor={id} className={labelClass}>
 				{label}
 			</label>
-			{multiline ? (
-				<textarea
-					id={id}
-					rows={2}
-					className={`w-full resize-y ${inputClass}`}
-					placeholder={placeholder}
-					value={value ?? ""}
-					onChange={(event) => onChange(event.target.value || undefined)}
-				/>
-			) : (
-				<input
-					id={id}
-					type={type}
-					className={`w-full ${inputClass}`}
-					placeholder={placeholder}
-					value={value ?? ""}
-					onChange={(event) => onChange(event.target.value || undefined)}
-				/>
-			)}
+			<div className="relative">
+				{multiline ? (
+					<textarea
+						id={id}
+						rows={2}
+						className={`w-full resize-y ${inputClass}`}
+						placeholder={placeholder}
+						value={value ?? ""}
+						onChange={(event) => onChange(event.target.value || undefined)}
+					/>
+				) : (
+					<input
+						id={id}
+						type={type}
+						className={`w-full ${extra ? "pr-8" : ""} ${inputClass}`}
+						placeholder={placeholder}
+						value={value ?? ""}
+						onChange={(event) => onChange(event.target.value || undefined)}
+					/>
+				)}
+				{extra && (
+					<div className="absolute inset-y-0 right-1 flex items-center">{extra}</div>
+				)}
+			</div>
 		</div>
 	);
 }
@@ -165,17 +175,23 @@ interface FieldGroupProps<T extends object> {
 export function FieldGroup<T extends object>({ fields, value, onChange }: FieldGroupProps<T>) {
 	return (
 		<div className="grid grid-cols-6 gap-3">
-			{fields.map((field) => (
-				<Field
-					key={field.key}
-					label={field.label}
-					placeholder={field.placeholder}
-					multiline={field.multiline}
-					className={FIELD_SPAN[field.width ?? "full"]}
-					value={value?.[field.key] as string | undefined}
-					onChange={(next) => onChange({ ...value, [field.key]: next } as T)}
-				/>
-			))}
+			{fields.map((field) => {
+				const fieldValue = value?.[field.key] as string | undefined;
+				const fieldOnChange = (next: string | undefined) =>
+					onChange({ ...value, [field.key]: next } as T);
+				return (
+					<Field
+						key={field.key}
+						label={field.label}
+						placeholder={field.placeholder}
+						multiline={field.multiline}
+						className={FIELD_SPAN[field.width ?? "full"]}
+						value={fieldValue}
+						onChange={fieldOnChange}
+						extra={field.renderExtra?.(fieldValue, fieldOnChange)}
+					/>
+				);
+			})}
 		</div>
 	);
 }

@@ -50,6 +50,16 @@ export function getPlanSample(): Plan {
 				],
 			},
 		},
+		conditions: [
+			{
+				description: "Type 2 diabetes",
+				medications: "Metformin 500mg BID",
+				adverse: "none reported",
+				interactions: "none noted",
+				modifications: "morning appointments preferred",
+				recommendations: "monitor for delayed healing",
+			},
+		],
 		needs: [
 			{
 				type: "maintenance",

@@ -94,6 +94,7 @@ export function convertData(plan: Plan, config: Config = DEFAULT_CONFIG) {
 		},
 		visits: visits || undefined,
 		subjective: plan.subjective,
+		conditions: plan.conditions,
 		objective: {
 			medical:
 				plan.objective.medical || hasVitals

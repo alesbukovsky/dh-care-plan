@@ -19,6 +19,7 @@ const validPlan: Plan = {
 		medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
 		exams: { findings: ["no visible caries"], referrals: "none" },
 	},
+	conditions: [],
 	needs: [
 		{
 			type: "maintenance",

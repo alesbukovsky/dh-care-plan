@@ -67,6 +67,7 @@ describe("dhplan inspect", () => {
 				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
 				exams: { findings: ["no visible caries"], referrals: "none" },
 			},
+			conditions: [],
 			assessments: [
 				{
 					need: DEFAULT_CONFIG.mapping.need.maintenance,

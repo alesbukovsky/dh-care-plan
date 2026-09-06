@@ -45,6 +45,7 @@ describe("Template", () => {
 			patient: {},
 			subjective: {},
 			objective: {},
+			conditions: [],
 			assessments: [],
 			statements: [],
 			appointments: {},

@@ -19,6 +19,7 @@ function Harness() {
 		patient: { initials: "", dob: "", chartId: "" },
 		subjective: {},
 		objective: {},
+		conditions: [],
 		needs: [],
 	});
 	latest = plan;

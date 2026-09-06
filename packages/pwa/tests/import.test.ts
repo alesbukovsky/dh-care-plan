@@ -6,6 +6,7 @@ const VALID_PLAN: Plan = {
 	patient: { initials: "J.D.", dob: "2001-04-17", chartId: "A1234" },
 	subjective: { complaint: "Sensitivity on the lower left" },
 	objective: { medical: { bmi: "22.4" } },
+	conditions: [],
 	needs: [{ type: "health", isMet: false, goals: [{ task: "Reduce plaque score" }] }],
 };
 
@@ -61,6 +62,7 @@ test("an empty plan is accepted so an unfilled DOCX can still be rendered", asyn
 			patient: {},
 			subjective: {},
 			objective: {},
+			conditions: [],
 			needs: NEED_TYPES.map((type) => ({ type })),
 		},
 	});
@@ -75,6 +77,7 @@ test("missing top-level sections are filled in rather than rejected", async () =
 			patient: { initials: "JD" },
 			subjective: {},
 			objective: {},
+			conditions: [],
 			needs: NEED_TYPES.map((type) => ({ type })),
 		},
 	});

@@ -7,6 +7,7 @@ const PLAN: Plan = {
 	patient: { initials: "J.D.", dob: "2001-04-17", chartId: "A1234" },
 	subjective: { complaint: "Sensitivity" },
 	objective: {},
+	conditions: [],
 	needs: [{ type: "health", isMet: false }],
 };
 
@@ -55,6 +56,7 @@ describe("parsePlan", () => {
 				patient: {},
 				subjective: {},
 				objective: {},
+				conditions: [],
 				needs: NEED_TYPES.map((type) => ({ type })),
 			},
 		});

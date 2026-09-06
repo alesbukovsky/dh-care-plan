@@ -12,6 +12,7 @@ const validPlan = {
 		medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
 		exams: { findings: ["no visible caries"], referrals: "none" },
 	},
+	conditions: [],
 	needs: [
 		{
 			type: "maintenance" as const,
@@ -88,6 +89,7 @@ describe("convertData", () => {
 				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
 				exams: { findings: ["no visible caries"], referrals: "none" },
 			},
+			conditions: [],
 			needs: [
 				{
 					type: "comfort",
@@ -110,6 +112,7 @@ describe("convertData", () => {
 				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
 				exams: { findings: ["no visible caries"], referrals: "none" },
 			},
+			conditions: [],
 			needs: [
 				{
 					type: "integrity",
@@ -131,6 +134,7 @@ describe("convertData", () => {
 				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
 				exams: { findings: ["no visible caries"], referrals: "none" },
 			},
+			conditions: [],
 			needs: [
 				{ type: "maintenance", isMet: true },
 				{
@@ -194,6 +198,7 @@ describe("convertData", () => {
 				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
 				exams: { findings: ["no visible caries"], referrals: "none" },
 			},
+			conditions: [],
 			needs: [
 				{
 					type: "integrity",
@@ -211,6 +216,7 @@ describe("convertData", () => {
 				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
 				exams: { findings: ["no visible caries"], referrals: "none" },
 			},
+			conditions: [],
 			needs: [
 				{
 					type: "integrity",
@@ -254,6 +260,27 @@ describe("convertData", () => {
 			convertData({ ...validPlan, objective: { ...validPlan.objective, vitals: { visits: [] } } })
 				.visits,
 		).toBeUndefined();
+	});
+
+	test("maps conditions onto the template 1:1", () => {
+		const conditions = [
+			{
+				description: "Type 2 diabetes",
+				medications: "Metformin 500mg BID",
+				adverse: "none reported",
+				interactions: "none noted",
+				modifications: "morning appointments preferred",
+				recommendations: "monitor for delayed healing",
+			},
+		];
+
+		const data = convertData({ ...validPlan, conditions });
+
+		expect(data.conditions).toEqual(conditions);
+	});
+
+	test("defaults conditions to an empty list when the plan has none", () => {
+		expect(convertData(validPlan).conditions).toEqual([]);
 	});
 
 	test("maps appointments onto the template 1:1, labelling each with its position", () => {
@@ -398,6 +425,7 @@ describe("convertData", () => {
 				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
 				exams: { findings: ["no visible caries"], referrals: "none" },
 			},
+			conditions: [],
 			needs: [
 				{
 					type: "integrity",
@@ -443,6 +471,7 @@ describe("convertData", () => {
 					medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
 					exams: { findings: ["no visible caries"], referrals: "none" },
 				},
+				conditions: [],
 				needs: [
 					{
 						type: "integrity",
@@ -480,6 +509,7 @@ describe("convertData", () => {
 				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
 				exams: { findings: ["no visible caries"], referrals: "none" },
 			},
+			conditions: [],
 			needs: [
 				{
 					type: "integrity",
@@ -501,6 +531,7 @@ describe("convertData", () => {
 				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
 				exams: { findings: ["no visible caries"], referrals: "none" },
 			},
+			conditions: [],
 			needs: [
 				{
 					type: "integrity",
@@ -520,6 +551,7 @@ describe("convertData", () => {
 				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
 				exams: { findings: ["no visible caries"], referrals: "none" },
 			},
+			conditions: [],
 			needs: [
 				{
 					type: "integrity",
@@ -542,6 +574,7 @@ describe("convertData", () => {
 				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
 				exams: { findings: ["no visible caries"], referrals: "none" },
 			},
+			conditions: [],
 			needs: [
 				{
 					type: "integrity",
@@ -563,6 +596,7 @@ describe("convertData", () => {
 				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
 				exams: { findings: ["no visible caries"], referrals: "none" },
 			},
+			conditions: [],
 			needs: [
 				{
 					type: "integrity",
@@ -593,6 +627,7 @@ describe("convertData", () => {
 					medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
 					exams: { findings: ["no visible caries"], referrals: "none" },
 				},
+				conditions: [],
 				needs: [
 					{
 						type: "integrity",
@@ -620,6 +655,7 @@ describe("convertData", () => {
 				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
 				exams: { findings: ["no visible caries"], referrals: "none" },
 			},
+			conditions: [],
 			needs: [
 				{
 					type: "integrity",

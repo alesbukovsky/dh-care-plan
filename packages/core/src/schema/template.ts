@@ -72,6 +72,16 @@ const Objective = z.object({
 });
 registry.add(Objective, { id: "Objective" });
 
+const Condition = z.object({
+	description: z.string().optional(),
+	medications: z.string().optional(),
+	adverse: z.string().optional(),
+	interactions: z.string().optional(),
+	modifications: z.string().optional(),
+	recommendations: z.string().optional(),
+});
+registry.add(Condition, { id: "Condition" });
+
 const Assessment = z.object({
 	need: z.string().optional(),
 	met: z.string().optional(),
@@ -118,6 +128,7 @@ export const Template = z.object({
 	visits: z.string().optional(),
 	subjective: Subjective.default(() => ({})),
 	objective: Objective.default(() => ({})),
+	conditions: z.array(Condition).default(() => []),
 	assessments: z.array(Assessment).default(() => []),
 	statements: z.array(Statement).default(() => []),
 	appointments: z

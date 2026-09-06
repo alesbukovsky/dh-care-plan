@@ -43,10 +43,12 @@ export function getPlanSample(): Plan {
 			},
 			radiographic: "none needed",
 			diagnostic: "none needed",
-			visits: [
-				{ date: "2026-08-01", vitals: "BP 120/80, pulse 72" },
-				{ date: "2026-07-01", vitals: "BP 118/76, pulse 70" },
-			],
+			vitals: {
+				visits: [
+					{ date: "2026-08-01", vitals: "BP 120/80, pulse 72" },
+					{ date: "2026-07-01", vitals: "BP 118/76, pulse 70" },
+				],
+			},
 		},
 		needs: [
 			{

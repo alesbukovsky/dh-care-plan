@@ -61,14 +61,20 @@ const Visit = z.object({
 });
 registry.add(Visit, { id: "Visit" });
 
+const Vitals = z.object({
+	undated: z.string().optional(),
+	visits: z.array(Visit).optional(),
+});
+registry.add(Vitals, { id: "Vitals" });
+
 const Objective = z.object({
+	vitals: Vitals.optional(),
 	medical: Medical.optional(),
 	exams: Exams.optional(),
 	restorative: Restorative.optional(),
 	periodontal: Periodontal.optional(),
 	radiographic: z.string().optional(),
 	diagnostic: z.string().optional(),
-	visits: z.array(Visit).optional(),
 });
 registry.add(Objective, { id: "Objective" });
 

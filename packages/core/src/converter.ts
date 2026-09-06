@@ -67,7 +67,7 @@ export function convertData(plan: Plan, config: Config = DEFAULT_CONFIG) {
 		};
 	});
 
-	const sortedVisits = (plan.objective.visits ?? [])
+	const sortedVisits = (plan.objective.vitals?.visits ?? [])
 		.filter((visit): visit is { date: string; vitals?: string } => visit.date !== undefined)
 		.toSorted((a, b) => a.date.localeCompare(b.date));
 
@@ -75,13 +75,16 @@ export function convertData(plan: Plan, config: Config = DEFAULT_CONFIG) {
 		.map((visit) => dateStr(visit.date, config.format.date))
 		.join(config.format.visits);
 
-	const vitals = sortedVisits
+	const dated = sortedVisits
 		.filter((visit): visit is { date: string; vitals: string } => visit.vitals !== undefined)
 		.map((visit) =>
 			config.format.vitals
 				.replace("{date}", dateStr(visit.date, config.format.date))
 				.replace("{vitals}", visit.vitals),
 		);
+
+	const undated = plan.objective.vitals?.undated;
+	const hasVitals = dated.length > 0 || undated !== undefined;
 
 	return {
 		patient: {
@@ -92,11 +95,18 @@ export function convertData(plan: Plan, config: Config = DEFAULT_CONFIG) {
 		visits: visits || undefined,
 		subjective: plan.subjective,
 		objective: {
-			...plan.objective,
 			medical:
-				plan.objective.medical || vitals.length
-					? { ...plan.objective.medical, vitals: vitals.length ? vitals : undefined }
+				plan.objective.medical || hasVitals
+					? {
+							...plan.objective.medical,
+							vitals: hasVitals ? { dated: dated.length ? dated : undefined, undated } : undefined,
+						}
 					: plan.objective.medical,
+			exams: plan.objective.exams,
+			restorative: plan.objective.restorative,
+			periodontal: plan.objective.periodontal,
+			radiographic: plan.objective.radiographic,
+			diagnostic: plan.objective.diagnostic,
 		},
 		assessments,
 		statements,

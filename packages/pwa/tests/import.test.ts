@@ -126,7 +126,7 @@ test("bad dates spell out the expected format", async () => {
 		planFile({
 			...VALID_PLAN,
 			patient: { ...VALID_PLAN.patient, dob: "17/04/2001" },
-			objective: { ...VALID_PLAN.objective, visits: [{ date: "2026-13-01" }] },
+			objective: { ...VALID_PLAN.objective, vitals: { visits: [{ date: "2026-13-01" }] } },
 		}),
 	);
 
@@ -137,7 +137,7 @@ test("bad dates spell out the expected format", async () => {
 			message: 'Must be a date written as YYYY-MM-DD, but the file has text ("17/04/2001").',
 		},
 		{
-			field: "Objective data → Visits #1 → Date",
+			field: "Objective data → Vitals → Visits #1 → Date",
 			message: 'Must be a date written as YYYY-MM-DD, but the file has text ("2026-13-01").',
 		},
 	]);

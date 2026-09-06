@@ -236,10 +236,12 @@ describe("convertData", () => {
 			...validPlan,
 			objective: {
 				...validPlan.objective,
-				visits: [
-					{ date: "2026-08-01", vitals: "BP 120/80" },
-					{ date: "2026-07-01", vitals: "BP 118/76" },
-				],
+				vitals: {
+					visits: [
+						{ date: "2026-08-01", vitals: "BP 120/80" },
+						{ date: "2026-07-01", vitals: "BP 118/76" },
+					],
+				},
 			},
 		});
 
@@ -249,7 +251,8 @@ describe("convertData", () => {
 	test("leaves visits undefined when objective.visits is missing or empty", () => {
 		expect(convertData(validPlan).visits).toBeUndefined();
 		expect(
-			convertData({ ...validPlan, objective: { ...validPlan.objective, visits: [] } }).visits,
+			convertData({ ...validPlan, objective: { ...validPlan.objective, vitals: { visits: [] } } })
+				.visits,
 		).toBeUndefined();
 	});
 
@@ -288,17 +291,18 @@ describe("convertData", () => {
 			...validPlan,
 			objective: {
 				...validPlan.objective,
-				visits: [
-					{ date: "2026-08-01", vitals: "BP 120/80" },
-					{ date: "2026-07-01", vitals: "BP 118/76" },
-				],
+				vitals: {
+					visits: [
+						{ date: "2026-08-01", vitals: "BP 120/80" },
+						{ date: "2026-07-01", vitals: "BP 118/76" },
+					],
+				},
 			},
 		});
 
-		expect(data.objective.medical?.vitals).toEqual([
-			"Appointment 07/01/2026: BP 118/76",
-			"Appointment 08/01/2026: BP 120/80",
-		]);
+		expect(data.objective.medical?.vitals).toEqual({
+			dated: ["Appointment 07/01/2026: BP 118/76", "Appointment 08/01/2026: BP 120/80"],
+		});
 	});
 
 	test("skips a visit's vitals when absent, without disturbing date order", () => {
@@ -306,11 +310,11 @@ describe("convertData", () => {
 			...validPlan,
 			objective: {
 				...validPlan.objective,
-				visits: [{ date: "2026-08-01", vitals: "BP 120/80" }, { date: "2026-07-01" }],
+				vitals: { visits: [{ date: "2026-08-01", vitals: "BP 120/80" }, { date: "2026-07-01" }] },
 			},
 		});
 
-		expect(data.objective.medical?.vitals).toEqual(["Appointment 08/01/2026: BP 120/80"]);
+		expect(data.objective.medical?.vitals).toEqual({ dated: ["Appointment 08/01/2026: BP 120/80"] });
 	});
 
 	test("uses a custom config.format.vitals pattern", () => {
@@ -319,7 +323,7 @@ describe("convertData", () => {
 				...validPlan,
 				objective: {
 					...validPlan.objective,
-					visits: [{ date: "2026-08-01", vitals: "BP 120/80" }],
+					vitals: { visits: [{ date: "2026-08-01", vitals: "BP 120/80" }] },
 				},
 			},
 			{
@@ -328,15 +332,24 @@ describe("convertData", () => {
 			},
 		);
 
-		expect(data.objective.medical?.vitals).toEqual(["08/01/2026 — BP 120/80"]);
+		expect(data.objective.medical?.vitals).toEqual({ dated: ["08/01/2026 — BP 120/80"] });
 	});
 
 	test("leaves objective.medical.vitals undefined when objective.visits is missing or empty", () => {
 		expect(convertData(validPlan).objective.medical?.vitals).toBeUndefined();
 		expect(
-			convertData({ ...validPlan, objective: { ...validPlan.objective, visits: [] } }).objective
-				.medical?.vitals,
+			convertData({ ...validPlan, objective: { ...validPlan.objective, vitals: { visits: [] } } })
+				.objective.medical?.vitals,
 		).toBeUndefined();
+	});
+
+	test("captures undated vitals even without any dated visits", () => {
+		const data = convertData({
+			...validPlan,
+			objective: { ...validPlan.objective, vitals: { undated: "BP 120/80, pulse 72" } },
+		});
+
+		expect(data.objective.medical?.vitals).toEqual({ undated: "BP 120/80, pulse 72" });
 	});
 
 	test("renders missing patient fields as empty text", () => {

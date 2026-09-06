@@ -8,7 +8,8 @@ type Objective = Plan["objective"];
 type Medical = NonNullable<Objective["medical"]>;
 type Restorative = NonNullable<Objective["restorative"]>;
 type Periodontal = NonNullable<Objective["periodontal"]>;
-type Visit = NonNullable<Objective["visits"]>[number];
+type Vitals = NonNullable<Objective["vitals"]>;
+type Visit = NonNullable<Vitals["visits"]>[number];
 
 const MEDICAL_FIELDS: FieldDefinition<Medical>[] = [
 	{ key: "bmi", label: "BMI", placeholder: "e.g. 22.4", width: "half" },
@@ -81,6 +82,10 @@ export default function ObjectiveSection({ objective, onChange }: ObjectiveSecti
 
 	return (
 		<Section title="Objective data" hint="Clinical findings from assessment">
+			<Subsection title="Vitals">
+				<VisitsEditor objective={objective} onChange={onChange} />
+			</Subsection>
+
 			<Subsection title="Medical history">
 				<FieldGroup
 					fields={MEDICAL_FIELDS}
@@ -142,10 +147,6 @@ export default function ObjectiveSection({ objective, onChange }: ObjectiveSecti
 					onChange={(diagnostic) => onChange({ ...objective, diagnostic })}
 				/>
 			</Subsection>
-
-			<Subsection title="Visits" badge={String(objective.visits?.length ?? 0)}>
-				<VisitsEditor objective={objective} onChange={onChange} />
-			</Subsection>
 		</Section>
 	);
 }
@@ -156,27 +157,37 @@ interface VisitsEditorProps {
 }
 
 function VisitsEditor({ objective, onChange }: VisitsEditorProps) {
-	const visits = objective.visits ?? [];
+	const vitals = objective.vitals ?? {};
+	const visits = vitals.visits ?? [];
 
 	function updateVisit(index: number, patch: Partial<Visit>) {
 		onChange({
 			...objective,
-			visits: visits.map((visit, i) => (i === index ? { ...visit, ...patch } : visit)),
+			vitals: {
+				...vitals,
+				visits: visits.map((visit, i) => (i === index ? { ...visit, ...patch } : visit)),
+			},
 		});
 	}
 
 	function addVisit() {
-		onChange({ ...objective, visits: [...visits, {}] });
+		onChange({ ...objective, vitals: { ...vitals, visits: [...visits, {}] } });
 	}
 
 	function removeVisit(index: number) {
 		const next = visits.filter((_, i) => i !== index);
-		onChange({ ...objective, visits: next.length > 0 ? next : undefined });
+		onChange({ ...objective, vitals: { ...vitals, visits: next.length > 0 ? next : undefined } });
 	}
 
 	return (
 		<div>
-			<div className="space-y-2">
+			<Field
+				label="Undated"
+				placeholder="vitals with no visit on record, e.g. BP 120/80, pulse 72"
+				value={vitals.undated}
+				onChange={(undated) => onChange({ ...objective, vitals: { ...vitals, undated } })}
+			/>
+			<div className="mt-3 space-y-2">
 				{visits.map((visit, index) => (
 					<div
 						// biome-ignore lint/suspicious/noArrayIndexKey: visits have no stable id in the schema

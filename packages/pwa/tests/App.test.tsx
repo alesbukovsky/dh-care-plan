@@ -432,10 +432,11 @@ test("cancelling the config dialog discards the edited config", async () => {
 test("case study text is editable", () => {
 	render(<App />);
 
-	const caseText = screen.getByPlaceholderText("Paste patient case text here…");
-	fireEvent.change(caseText, { target: { value: "42 y/o patient, no relevant history" } });
+	const caseText = screen.getByRole("textbox", { name: "Case study" });
+	caseText.textContent = "42 y/o patient, no relevant history";
+	fireEvent.input(caseText);
 
-	expect(caseText).toHaveValue("42 y/o patient, no relevant history");
+	expect(caseText).toHaveTextContent("42 y/o patient, no relevant history");
 });
 
 test("a previously saved draft is restored when the app loads", () => {

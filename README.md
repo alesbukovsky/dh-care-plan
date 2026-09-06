@@ -85,13 +85,7 @@ Vitest is used for all unit tests, Vite for the PWA and `tsdown` for the core an
   This is a style preference, not a constraint. For example, `./converter.js` resolves in both a bundler and Node, 
   so the explicit form is a strict superset. It is kept because `.js` inside a `.ts` file reads wrong.
 
-## To do 
+## Notes
 
-- Maintenance need is only allowed when ALL other needs are met. This may also need to change how undefined `isMet` 
-  flag is shown in final docx file.
-- Should "export / import" be renamed to "download / upload"?
-
-## Ideas
-
-- Add BMI calculator next to BMI field.
-- Add slash shortcuts, e.g. `/i` for patient initials or `/n` for "Not needed".
+- Age is not an editable field because it isn't actually used as a variable anywhere in the template. It's shown as 
+  a reference to help when writing the plan.

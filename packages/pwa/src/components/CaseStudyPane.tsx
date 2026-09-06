@@ -10,7 +10,7 @@ export default function CaseStudyPane({ value, onChange }: CaseStudyPaneProps) {
 				Case study
 			</h2>
 			<textarea
-				className="flex-1 resize-none rounded-lg border border-[#B9C3BD] bg-white p-3 text-sm text-[#1E2B27] outline-none focus:border-[#7C8B86]"
+				className="flex-1 resize-y rounded-lg border border-[#B9C3BD] bg-white p-3 text-sm text-[#1E2B27] outline-none focus:border-[#7C8B86]"
 				placeholder="Paste patient case text here…"
 				value={value}
 				onChange={(event) => onChange(event.target.value)}

@@ -45,7 +45,7 @@ export function Field({
 				<textarea
 					id={id}
 					rows={2}
-					className={`w-full resize-none ${inputClass}`}
+					className={`w-full resize-y ${inputClass}`}
 					placeholder={placeholder}
 					value={value ?? ""}
 					onChange={(event) => onChange(event.target.value || undefined)}

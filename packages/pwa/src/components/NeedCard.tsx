@@ -117,7 +117,7 @@ export default function NeedCard({ definition, index, need, onChange }: NeedCard
 										Unmet human need for {definition.name.toLowerCase()}, related to
 									</p>
 									<textarea
-										className={`w-full resize-none ${inputClass}`}
+										className={`w-full resize-y ${inputClass}`}
 										rows={2}
 										placeholder="etiology / risk factor"
 										value={need.relatedTo ?? ""}
@@ -127,7 +127,7 @@ export default function NeedCard({ definition, index, need, onChange }: NeedCard
 								<div>
 									<p className="mb-1 font-serif italic text-[#4B5B55]">as evidenced by</p>
 									<textarea
-										className={`w-full resize-none ${inputClass}`}
+										className={`w-full resize-y ${inputClass}`}
 										rows={2}
 										placeholder="clinical signs / patient report"
 										value={need.evidencedBy ?? ""}
@@ -162,7 +162,7 @@ export default function NeedCard({ definition, index, need, onChange }: NeedCard
 								</label>
 								<textarea
 									id={`rationale-${definition.type}`}
-									className={`w-full resize-none ${inputClass}`}
+									className={`w-full resize-y ${inputClass}`}
 									rows={2}
 									placeholder="why this priority"
 									value={need.rationale ?? ""}
@@ -342,7 +342,7 @@ function GoalsEditor({ need, onChange }: GoalsEditorProps) {
 									Outcome evaluation
 								</p>
 								<textarea
-									className={`w-full resize-none ${inputClass} disabled:cursor-not-allowed disabled:opacity-60`}
+									className={`w-full resize-y ${inputClass} disabled:cursor-not-allowed disabled:opacity-60`}
 									rows={2}
 									disabled={!outcome}
 									placeholder={

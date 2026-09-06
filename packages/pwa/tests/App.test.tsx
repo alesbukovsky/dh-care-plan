@@ -5,17 +5,23 @@ import {
 	DEFAULT_PLAN,
 } from "@dh-care-plan/core";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { afterEach, expect, test, vi } from "vitest";
+import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import App from "../src/App";
+import { loadDraft, saveDraft } from "../src/persistence";
 
 vi.mock("@dh-care-plan/core", async () => {
 	const actual = await vi.importActual<typeof import("@dh-care-plan/core")>("@dh-care-plan/core");
 	return { ...actual, checkTemplate: vi.fn(), render: vi.fn() };
 });
 
+beforeEach(() => {
+	localStorage.clear();
+});
+
 afterEach(() => {
 	vi.unstubAllGlobals();
 	vi.clearAllMocks();
+	vi.useRealTimers();
 });
 
 test("renders the heading", () => {
@@ -430,4 +436,55 @@ test("case study text is editable", () => {
 	fireEvent.change(caseText, { target: { value: "42 y/o patient, no relevant history" } });
 
 	expect(caseText).toHaveValue("42 y/o patient, no relevant history");
+});
+
+test("a previously saved draft is restored when the app loads", () => {
+	saveDraft({ ...DEFAULT_PLAN, patient: { initials: "J.D." } }, DEFAULT_CONFIG);
+
+	render(<App />);
+
+	expect(screen.getByText("J.D.")).toBeInTheDocument();
+});
+
+test("edits are autosaved to the draft a short pause after the last change", () => {
+	vi.useFakeTimers();
+	render(<App />);
+
+	fireEvent.click(screen.getByRole("button", { name: /Patient/ }));
+	fireEvent.change(screen.getByLabelText("Initials"), { target: { value: "J.D." } });
+
+	// Not yet — still within the debounce window.
+	expect(loadDraft()).toBeNull();
+
+	vi.advanceTimersByTime(1000);
+
+	expect(loadDraft()?.plan.patient?.initials).toBe("J.D.");
+});
+
+test("starting a new plan clears the saved draft, not just the editor", async () => {
+	render(<App />);
+	await importNamedPatient();
+	saveDraft({ ...DEFAULT_PLAN, patient: { initials: "J.D." } }, DEFAULT_CONFIG);
+
+	fireEvent.click(screen.getByRole("button", { name: "New plan" }));
+	await screen.findByRole("dialog");
+	fireEvent.click(screen.getByRole("button", { name: "Start new plan" }));
+
+	expect(loadDraft()).toBeNull();
+});
+
+test("the autosave icon shows enabled when storage works", () => {
+	render(<App />);
+	expect(screen.getByTitle(/Autosave is on/)).toBeInTheDocument();
+	expect(screen.queryByTitle(/Autosave is off/)).not.toBeInTheDocument();
+});
+
+test("the autosave icon shows disabled when storage is unavailable", () => {
+	vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+		throw new Error("SecurityError");
+	});
+
+	render(<App />);
+
+	expect(screen.getByTitle(/Autosave is off/)).toBeInTheDocument();
 });

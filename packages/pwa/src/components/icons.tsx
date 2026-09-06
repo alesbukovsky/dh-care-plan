@@ -90,6 +90,23 @@ export function PlusIcon(props: SVGProps<SVGSVGElement>) {
 	);
 }
 
+export function CloudIcon(props: SVGProps<SVGSVGElement>) {
+	return (
+		<Icon {...props}>
+			<path d="M7 18.5a4 4 0 0 1-.5-7.97 5 5 0 0 1 9.71-1.79A4.5 4.5 0 0 1 17.5 18.5H7Z" />
+		</Icon>
+	);
+}
+
+export function CloudOffIcon(props: SVGProps<SVGSVGElement>) {
+	return (
+		<Icon {...props}>
+			<path d="M7 18.5a4 4 0 0 1-.5-7.97 5 5 0 0 1 9.71-1.79A4.5 4.5 0 0 1 17.5 18.5H7Z" />
+			<path d="M4 4l16 16" />
+		</Icon>
+	);
+}
+
 export function TrashIcon(props: SVGProps<SVGSVGElement>) {
 	return (
 		<Icon {...props}>

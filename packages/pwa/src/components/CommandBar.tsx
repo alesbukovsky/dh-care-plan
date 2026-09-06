@@ -2,6 +2,8 @@ import type { ComponentType, SVGProps } from "react";
 import {
 	ChevronLeftIcon,
 	ChevronRightIcon,
+	CloudIcon,
+	CloudOffIcon,
 	DocumentIcon,
 	DownloadIcon,
 	NewDocumentIcon,
@@ -34,6 +36,7 @@ interface CommandBarProps {
 	onExport: () => void;
 	onGenerate: () => void;
 	onConfigure: () => void;
+	autosaveAvailable: boolean;
 }
 
 export default function CommandBar({
@@ -44,6 +47,7 @@ export default function CommandBar({
 	onExport,
 	onGenerate,
 	onConfigure,
+	autosaveAvailable,
 }: CommandBarProps) {
 	const handlers: Record<string, () => void> = {
 		new: onNewPlan,
@@ -96,8 +100,21 @@ export default function CommandBar({
 			</div>
 
 			{!collapsed && (
-				<div className="border-t border-white/10 p-3 font-mono text-xs text-[#9FC3B7]">
+				<div className="flex items-center justify-between border-t border-white/10 p-3 font-mono text-xs text-[#9FC3B7]">
 					<span>Version {APP_VERSION}</span>
+					<span
+						title={
+							autosaveAvailable
+								? "Autosave is on — your work is saved in this browser as you type"
+								: "Autosave is off — this browser's storage is unavailable"
+						}
+					>
+						{autosaveAvailable ? (
+							<CloudIcon className="h-4 w-4" />
+						) : (
+							<CloudOffIcon className="h-4 w-4 text-amber-400" />
+						)}
+					</span>
 				</div>
 			)}
 		</nav>

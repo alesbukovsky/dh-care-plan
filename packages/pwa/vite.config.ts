@@ -57,6 +57,9 @@ export default defineConfig({
 		environment: "jsdom",
 		include: ["tests/**/*.test.{ts,tsx}"],
 		setupFiles: ["./tests/test-setup.ts"],
+		// Node's own experimental `localStorage` global shadows jsdom's working
+		// implementation unless disabled — see https://github.com/nodejs/node/issues/57837.
+		execArgv: ["--no-experimental-webstorage"],
 		coverage: {
 			provider: "v8",
 			reporter: ["text", "lcov", "html"],

@@ -1,5 +1,5 @@
 import { DEFAULT_CONFIG, DEFAULT_PLAN } from "@dh-care-plan/core";
-import { type ChangeEvent, useRef, useState } from "react";
+import { type ChangeEvent, useEffect, useRef, useState } from "react";
 import CaseStudyPane from "./components/CaseStudyPane";
 import CommandBar from "./components/CommandBar";
 import ConfigDialog, { type ConfigImportFailure } from "./components/ConfigDialog";
@@ -16,16 +16,21 @@ import {
 	renderPlan,
 } from "./generate";
 import { type ImportFailure, readPlanFile } from "./import";
+import { clearDraft, isStorageAvailable, loadDraft, saveDraft } from "./persistence";
 
 interface TemplateSelection {
 	name: string;
 	template: Uint8Array;
 }
 
+// How long to wait after the last edit before autosaving the draft.
+const AUTOSAVE_DEBOUNCE_MS = 1000;
+
 export default function App() {
 	// Cloned so editing this session never mutates the shared default.
-	const [plan, setPlan] = useState(() => structuredClone(DEFAULT_PLAN));
-	const [config, setConfig] = useState(() => structuredClone(DEFAULT_CONFIG));
+	const [plan, setPlan] = useState(() => loadDraft()?.plan ?? structuredClone(DEFAULT_PLAN));
+	const [config, setConfig] = useState(() => loadDraft()?.config ?? structuredClone(DEFAULT_CONFIG));
+	const [autosaveAvailable, setAutosaveAvailable] = useState(() => isStorageAvailable());
 	const [commandBarCollapsed, setCommandBarCollapsed] = useState(false);
 	const [importFailure, setImportFailure] = useState<ImportFailure | null>(null);
 	const [configImportFailure, setConfigImportFailure] = useState<ConfigImportFailure | null>(null);
@@ -39,10 +44,20 @@ export default function App() {
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const templateInputRef = useRef<HTMLInputElement>(null);
 
+	// Autosaves the draft ~1s after the last edit, so typing never triggers a write per keystroke.
+	useEffect(() => {
+		const timeout = setTimeout(() => {
+			if (!saveDraft(plan, config)) setAutosaveAvailable(false);
+		}, AUTOSAVE_DEBOUNCE_MS);
+		return () => clearTimeout(timeout);
+	}, [plan, config]);
+
 	function startNewPlan() {
 		setPlan(structuredClone(DEFAULT_PLAN));
+		setConfig(structuredClone(DEFAULT_CONFIG));
 		setPlanGeneration((prev) => prev + 1);
 		setConfirmingNewPlan(false);
+		clearDraft();
 	}
 
 	async function handleImportFile(event: ChangeEvent<HTMLInputElement>) {
@@ -108,6 +123,7 @@ export default function App() {
 				onExport={() => void exportPlan(plan)}
 				onGenerate={openGenerateDialog}
 				onConfigure={() => setConfiguring(true)}
+				autosaveAvailable={autosaveAvailable}
 			/>
 			<CaseStudyPane value={plan.study ?? ""} onChange={(study) => setPlan({ ...plan, study })} />
 			<PlanEditor key={planGeneration} plan={plan} onChange={setPlan} />

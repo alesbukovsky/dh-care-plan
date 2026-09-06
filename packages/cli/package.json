@@ -1,6 +1,6 @@
 {
 	"name": "@dh-care-plan/cli",
-	"version": "0.2.1",
+	"version": "0.3.0",
 	"type": "module",
 	"bin": {
 		"dhplan": "./dist/dhplan.js"
@@ -20,7 +20,7 @@
 		"test": "pnpm run build && pnpm run typecheck && vitest run --coverage"
 	},
 	"dependencies": {
-		"@dh-care-plan/core": "workspace:0.2.1",
+		"@dh-care-plan/core": "workspace:0.3.0",
 		"commander": "15.0.0"
 	},
 	"devDependencies": {

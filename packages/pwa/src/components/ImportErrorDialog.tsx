@@ -32,18 +32,18 @@ export default function ImportErrorDialog({
 	const hidden = issues.length - shown.length;
 
 	return (
-		<div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1E2B27]/40 p-4">
+		<div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#1E2B27]/40 p-4">
 			<div
 				role="dialog"
 				aria-modal="true"
 				aria-labelledby="import-error-title"
-				className="flex max-h-[80vh] w-full max-w-lg flex-col rounded-[10px] border border-[#D8DED9] bg-[#FBFCFA] shadow-xl"
+				className="flex max-h-[80vh] w-full max-w-lg flex-col rounded-[10px] border border-[#D9B8B4] bg-[#FBFCFA] shadow-xl"
 			>
-				<div className="rounded-t-[10px] border-b border-[#D8DED9] bg-[#E7EDE8] px-4 py-3">
-					<h2 id="import-error-title" className="font-serif font-medium text-[#1E2B27]">
+				<div className="rounded-t-[10px] border-b border-[#D9B8B4] bg-[#F3E3E1] px-4 py-3">
+					<h2 id="import-error-title" className="font-serif font-medium text-[#7A3B34]">
 						{title}
 					</h2>
-					<p className="mt-1 text-sm leading-snug text-[#4B5B55]">{summary}</p>
+					<p className="mt-1 text-sm leading-snug text-[#8A5C55]">{summary}</p>
 				</div>
 
 				{shown.length > 0 && (

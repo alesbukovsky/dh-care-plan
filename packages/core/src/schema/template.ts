@@ -20,14 +20,8 @@ const Subjective = z.object({
 });
 registry.add(Subjective, { id: "Subjective" });
 
-const Vitals = z.object({
-	undated: z.string().optional(),
-	dated: z.array(z.string()).optional(),
-})
-registry.add(Vitals, { id: "Vitals" });
-
 const Medical = z.object({
-	vitals: Vitals.optional(),
+	vitals: z.array(z.string()).optional(),
 	bmi: z.string().optional(),
 	medications: z.string().optional(),
 	allergies: z.string().optional(),

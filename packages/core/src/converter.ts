@@ -92,7 +92,8 @@ export function convertData(plan: Plan, config: Config = DEFAULT_CONFIG) {
 		);
 
 	const undated = plan.objective.vitals?.undated;
-	const hasVitals = dated.length > 0 || undated !== undefined;
+	const vitals = undated !== undefined ? [undated, ...dated] : dated;
+	const hasVitals = vitals.length > 0;
 
 	return {
 		patient: {
@@ -108,7 +109,7 @@ export function convertData(plan: Plan, config: Config = DEFAULT_CONFIG) {
 				plan.objective.medical || hasVitals
 					? {
 							...plan.objective.medical,
-							vitals: hasVitals ? { dated: dated.length ? dated : undefined, undated } : undefined,
+							vitals: hasVitals ? vitals : undefined,
 						}
 					: plan.objective.medical,
 			exams: plan.objective.exams,

@@ -10,8 +10,8 @@
 		"test": "pnpm run typecheck && vitest run --coverage",
 		"dev": "vite",
 		"serve": "pnpm run build && vite preview",
-		"deploy": "source ../../.cf && wrangler deploy",
-		"deploy:stage": "source ../../.cf && wrangler versions upload"
+		"flare": "source ../../.cf && wrangler deploy",
+		"flare:stage": "source ../../.cf && wrangler versions upload"
 	},
 	"devDependencies": {
 		"@tailwindcss/vite": "4.3.3",

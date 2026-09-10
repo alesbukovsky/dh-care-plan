@@ -12,8 +12,8 @@
 		"dev": "pnpm --filter @dh-care-plan/pwa run dev",
 		"serve": "pnpm --filter @dh-care-plan/pwa run serve",
 		"link:cli": "pnpm run build:cli && ln -sf \"$PWD/packages/cli/dist/dhplan.js\" \"$PNPM_HOME/bin/dhplan\" && echo \"Linked dhplan -> $PNPM_HOME/bin/dhplan\"",
-		"deploy": "pnpm run test && pnpm run build:pwa && pnpm --filter @dh-care-plan/pwa run deploy",
-		"deploy:stage": "pnpm run test && pnpm run build:pwa && pnpm --filter @dh-care-plan/pwa run deploy:stage"
+		"flare": "pnpm run test && pnpm run build:pwa && pnpm --filter @dh-care-plan/pwa run flare",
+		"flare:stage": "pnpm run test && pnpm run build:pwa && pnpm --filter @dh-care-plan/pwa run flare:stage"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.5.5"
@@ -22,7 +22,13 @@
 		"typescript": "^5"
 	},
 	"engines": {
-		"node": ">=24",
-		"pnpm": ">=11"
-	}
+		"node": ">=24"
+	},
+	"devEngines": {
+    	"packageManager": {
+      		"name": "pnpm",
+      		"version": ">=12.0.0",
+      		"onFail": "warn"
+    	}
+  	}
 }

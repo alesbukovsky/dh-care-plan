@@ -58,8 +58,8 @@ icons in the `packages/pwa/src/public` folder:
 Uses Cloudflare Worker with static assets. Create `.cf` file in the project root and export your `CLOUDFLARE_API_TOKEN` 
 within.
 
-- `pnpm deploy`: uploads to live URL, and immediately routes traffic.
-- `pnpm deploy:stage`: stages a version for preview, no traffic yet.
+- `pnpm flare`: uploads to live URL, and immediately routes traffic.
+- `pnpm flare:stage`: stages a version for preview, no traffic yet.
 
 The `wrangler.sh` script is a wrapper around the Cloudflare CLI tool. It sources the `.cf` file and ensures that the 
 version installed as a PWA dependency is executed, using the associated `wrangler.jsonc` configuration. For example:
@@ -69,7 +69,7 @@ version installed as a PWA dependency is executed, using the associated `wrangle
 
 ### Toolchain
 
-Prerequisites: Node 24+, `pnpm` 11+
+Prerequisites: Node 24+, `pnpm` 12+
 
 Vitest is used for all unit tests, Vite for the PWA and `tsdown` for the core and CLI publishable packages.
 
@@ -84,6 +84,11 @@ Vitest is used for all unit tests, Vite for the PWA and `tsdown` for the core an
   for core and CLI, Vite for the PWA and for Vitest, so no hand-written specifier ever reaches Node's ESM resolver. 
   This is a style preference, not a constraint. For example, `./converter.js` resolves in both a bundler and Node, 
   so the explicit form is a strict superset. It is kept because `.js` inside a `.ts` file reads wrong.
+
+- Despite the documentation stating the [opposite](https://pnpm.io/scripts#built-in-command-and-script-name-conflicts),
+  `pnpm 12.3.4` ignores custom `deploy` script, runs built-in instead and fails with `ERR_PNPM_CANNOT_DEPLOY_MANY`
+  error. Note that `pnpm run deploy` invokes the custom script. It could be a regression on the `pnpm` side as this 
+  used to work. The Cloudflare deployment scripts are named `flare` to avoid this issue.
 
 ## Notes
 

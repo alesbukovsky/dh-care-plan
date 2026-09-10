@@ -36,13 +36,20 @@ function goalDoneBy(
 }
 
 export function convertData(plan: Plan, config: Config = DEFAULT_CONFIG) {
-	// An unassessed need still lists in the assessment table, undecided, and
+	// An unassessed need still lists in the justification/assessment tables, undecided, and
 	// carries no diagnosis statement (that requires isMet to be explicitly false).
-	const assessments = plan.needs.map((need) => ({
+	const justifications = plan.needs.map((need) => ({
 		need: config.mapping.need[need.type],
 		met: metLabel(need.isMet, config),
 		priority: need.priority,
 		rationale: need.rationale,
+	}));
+
+	const assessments = plan.needs.map((need) => ({
+		need: config.mapping.need[need.type],
+		met: metLabel(need.isMet, config),
+		relatedTo: orEmpty(need.relatedTo),
+		evidencedBy: orEmpty(need.evidencedBy),
 	}));
 
 	const unmetNeeds = plan.needs.filter((need) => need.isMet === false);
@@ -52,6 +59,7 @@ export function convertData(plan: Plan, config: Config = DEFAULT_CONFIG) {
 		return {
 			label: String(statementNo),
 			need: config.mapping.need[need.type],
+			met: metLabel(need.isMet, config),
 			relatedTo: orEmpty(need.relatedTo),
 			evidencedBy: orEmpty(need.evidencedBy),
 			goals: (need.goals ?? []).map((goal, goalInx) => ({
@@ -109,6 +117,7 @@ export function convertData(plan: Plan, config: Config = DEFAULT_CONFIG) {
 			radiographic: plan.objective.radiographic,
 			diagnostic: plan.objective.diagnostic,
 		},
+		justifications,
 		assessments,
 		statements,
 		appointments: {

@@ -68,7 +68,7 @@ describe("dhplan inspect", () => {
 				exams: { findings: ["no visible caries"], referrals: "none" },
 			},
 			conditions: [],
-			assessments: [
+			justifications: [
 				{
 					need: DEFAULT_CONFIG.mapping.need.maintenance,
 					met: DEFAULT_CONFIG.mapping.met.true,
@@ -78,10 +78,25 @@ describe("dhplan inspect", () => {
 					met: DEFAULT_CONFIG.mapping.met.false,
 				},
 			],
+			assessments: [
+				{
+					need: DEFAULT_CONFIG.mapping.need.maintenance,
+					met: DEFAULT_CONFIG.mapping.met.true,
+					relatedTo: "",
+					evidencedBy: "",
+				},
+				{
+					need: DEFAULT_CONFIG.mapping.need.integrity,
+					met: DEFAULT_CONFIG.mapping.met.false,
+					relatedTo: "gum disease",
+					evidencedBy: "x-ray",
+				},
+			],
 			statements: [
 				{
 					label: "1",
 					need: DEFAULT_CONFIG.mapping.need.integrity,
+					met: DEFAULT_CONFIG.mapping.met.false,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
 					goals: [

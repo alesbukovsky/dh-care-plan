@@ -53,10 +53,10 @@ describe("dateStr", () => {
 });
 
 describe("convertData", () => {
-	test("maps every need to an assessment, preserving order", () => {
+	test("maps every need to a justification, preserving order", () => {
 		const data = convertData(validPlan);
 
-		expect(data.assessments).toEqual([
+		expect(data.justifications).toEqual([
 			{
 				need: DEFAULT_CONFIG.mapping.need.maintenance,
 				met: DEFAULT_CONFIG.mapping.met.true,
@@ -81,7 +81,7 @@ describe("convertData", () => {
 		});
 	});
 
-	test("derives both assessment.need and statement.need from config.mapping.need for the same need", () => {
+	test("derives both justification.need and statement.need from config.mapping.need for the same need", () => {
 		const data = convertData({
 			patient: PATIENT,
 			subjective: { complaint: "sensitive teeth" },
@@ -100,7 +100,7 @@ describe("convertData", () => {
 			],
 		});
 
-		expect(data.assessments[0]?.need).toBe(DEFAULT_CONFIG.mapping.need.comfort);
+		expect(data.justifications[0]?.need).toBe(DEFAULT_CONFIG.mapping.need.comfort);
 		expect(data.statements[0]?.need).toBe(DEFAULT_CONFIG.mapping.need.comfort);
 	});
 
@@ -388,7 +388,7 @@ describe("convertData", () => {
 	test("lists an unassessed need as undecided, without a diagnosis statement", () => {
 		const data = convertData({ ...validPlan, needs: [{ type: "health" }] });
 
-		expect(data.assessments).toEqual([
+		expect(data.justifications).toEqual([
 			{
 				need: DEFAULT_CONFIG.mapping.need.health,
 				met: DEFAULT_CONFIG.mapping.met.undefined,
@@ -401,9 +401,11 @@ describe("convertData", () => {
 		const data = convertData(DEFAULT_PLAN);
 
 		expect(data.patient).toEqual({ initials: "", dob: "", chartId: "" });
-		expect(data.assessments).toHaveLength(Need.shape.type.options.length);
+		expect(data.justifications).toHaveLength(Need.shape.type.options.length);
 		expect(
-			data.assessments.every((assessment) => assessment.met === DEFAULT_CONFIG.mapping.met.undefined),
+			data.justifications.every(
+				(justification) => justification.met === DEFAULT_CONFIG.mapping.met.undefined,
+			),
 		).toBe(true);
 		expect(data.statements).toEqual([]);
 	});

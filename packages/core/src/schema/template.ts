@@ -82,11 +82,26 @@ const Condition = z.object({
 });
 registry.add(Condition, { id: "Condition" });
 
-const Assessment = z.object({
+const _Need = z.object({
 	need: z.string().optional(),
 	met: z.string().optional(),
+});
+
+const _Evidence = z.object({
+	relatedTo: z.string().optional(),
+	evidencedBy: z.string().optional(),
+});
+
+const Justification = z.object({
+	..._Need.shape,
 	priority: z.string().optional(),
 	rationale: z.string().optional(),
+});
+registry.add(Justification, { id: "Justification" });
+
+const Assessment = z.object({
+	..._Need.shape,
+	..._Evidence.shape,
 });
 registry.add(Assessment, { id: "Assessment" });
 
@@ -106,9 +121,8 @@ registry.add(Goal, { id: "Goal" });
 
 const Statement = z.object({
 	label: z.string().optional(),
-	need: z.string().optional(),
-	relatedTo: z.string().optional(),
-	evidencedBy: z.string().optional(),
+	..._Need.shape,
+	..._Evidence.shape,
 	goals: z.array(Goal).optional(),
 });
 registry.add(Statement, { id: "Statement" });
@@ -129,6 +143,7 @@ export const Template = z.object({
 	subjective: Subjective.default(() => ({})),
 	objective: Objective.default(() => ({})),
 	conditions: z.array(Condition).default(() => []),
+	justifications: z.array(Justification).default(() => []),
 	assessments: z.array(Assessment).default(() => []),
 	statements: z.array(Statement).default(() => []),
 	appointments: z

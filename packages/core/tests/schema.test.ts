@@ -46,6 +46,7 @@ describe("Template", () => {
 			subjective: {},
 			objective: {},
 			conditions: [],
+			justifications: [],
 			assessments: [],
 			statements: [],
 			appointments: {},

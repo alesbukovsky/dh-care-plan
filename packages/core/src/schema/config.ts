@@ -22,7 +22,7 @@ const Outcome = z.object({
 	undefined: z.string(),
 });
 
-const Met = z.object({
+const Exists = z.object({
 	true: z.string(),
 	false: z.string(),
 	undefined: z.string(),
@@ -42,7 +42,7 @@ const Format = z.object({
 const Mapping = z.object({
 	need: Need,
 	outcome: Outcome,
-	met: Met,
+	exists: Exists,
 });
 
 export const Config = z.object({
@@ -87,7 +87,7 @@ export const DEFAULT_CONFIG: Config = {
 			unmet: "Not met",
 			undefined: "TBD",
 		},
-		met: {
+		exists: {
 			true: "Yes",
 			false: "No",
 			undefined: "",

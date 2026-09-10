@@ -21,10 +21,10 @@ beforeAll(async () => {
 				exams: { findings: ["no visible caries"], referrals: "none" },
 			},
 			needs: [
-				{ type: "maintenance", isMet: true },
+				{ type: "maintenance", exists: false },
 				{
 					type: "integrity",
-					isMet: false,
+					exists: true,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
 					goals: [{ task: "floss daily", outcome: { status: "unmet" } }],
@@ -71,23 +71,23 @@ describe("dhplan inspect", () => {
 			justifications: [
 				{
 					need: DEFAULT_CONFIG.mapping.need.maintenance,
-					met: DEFAULT_CONFIG.mapping.met.true,
+					exists: DEFAULT_CONFIG.mapping.exists.false,
 				},
 				{
 					need: DEFAULT_CONFIG.mapping.need.integrity,
-					met: DEFAULT_CONFIG.mapping.met.false,
+					exists: DEFAULT_CONFIG.mapping.exists.true,
 				},
 			],
 			assessments: [
 				{
 					need: DEFAULT_CONFIG.mapping.need.maintenance,
-					met: DEFAULT_CONFIG.mapping.met.true,
+					exists: DEFAULT_CONFIG.mapping.exists.false,
 					relatedTo: "",
 					evidencedBy: "",
 				},
 				{
 					need: DEFAULT_CONFIG.mapping.need.integrity,
-					met: DEFAULT_CONFIG.mapping.met.false,
+					exists: DEFAULT_CONFIG.mapping.exists.true,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
 				},
@@ -96,7 +96,7 @@ describe("dhplan inspect", () => {
 				{
 					label: "1",
 					need: DEFAULT_CONFIG.mapping.need.integrity,
-					met: DEFAULT_CONFIG.mapping.met.false,
+					exists: DEFAULT_CONFIG.mapping.exists.true,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
 					goals: [

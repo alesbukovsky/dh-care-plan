@@ -78,7 +78,7 @@ registry.add(Condition, { id: "Condition" });
 
 const _Need = z.object({
 	need: z.string().optional(),
-	met: z.string().optional(),
+	exists: z.string().optional(),
 });
 
 const _Evidence = z.object({

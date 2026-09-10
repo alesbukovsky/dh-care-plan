@@ -16,11 +16,11 @@ const validPlan = {
 	needs: [
 		{
 			type: "maintenance" as const,
-			isMet: true,
+			exists: false,
 		},
 		{
 			type: "integrity" as const,
-			isMet: false,
+			exists: true,
 			relatedTo: "gum disease",
 			evidencedBy: "x-ray",
 			goals: [
@@ -59,13 +59,13 @@ describe("convertData", () => {
 		expect(data.justifications).toEqual([
 			{
 				need: DEFAULT_CONFIG.mapping.need.maintenance,
-				met: DEFAULT_CONFIG.mapping.met.true,
+				exists: DEFAULT_CONFIG.mapping.exists.false,
 				priority: undefined,
 				rationale: undefined,
 			},
 			{
 				need: DEFAULT_CONFIG.mapping.need.integrity,
-				met: DEFAULT_CONFIG.mapping.met.false,
+				exists: DEFAULT_CONFIG.mapping.exists.true,
 			},
 		]);
 	});
@@ -93,7 +93,7 @@ describe("convertData", () => {
 			needs: [
 				{
 					type: "comfort",
-					isMet: false,
+					exists: true,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
 				},
@@ -116,7 +116,7 @@ describe("convertData", () => {
 			needs: [
 				{
 					type: "integrity",
-					isMet: false,
+					exists: true,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
 				},
@@ -136,10 +136,10 @@ describe("convertData", () => {
 			},
 			conditions: [],
 			needs: [
-				{ type: "maintenance", isMet: true },
+				{ type: "maintenance", exists: false },
 				{
 					type: "integrity",
-					isMet: false,
+					exists: true,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
 					goals: [
@@ -149,7 +149,7 @@ describe("convertData", () => {
 				},
 				{
 					type: "health",
-					isMet: false,
+					exists: true,
 					relatedTo: "sugar intake",
 					evidencedBy: "diary",
 					goals: [
@@ -202,7 +202,7 @@ describe("convertData", () => {
 			needs: [
 				{
 					type: "integrity",
-					isMet: false,
+					exists: true,
 					evidencedBy: "x-ray",
 				},
 			],
@@ -220,7 +220,7 @@ describe("convertData", () => {
 			needs: [
 				{
 					type: "integrity",
-					isMet: false,
+					exists: true,
 					relatedTo: "gum disease",
 				},
 			],
@@ -410,7 +410,7 @@ describe("convertData", () => {
 		expect(data.justifications).toEqual([
 			{
 				need: DEFAULT_CONFIG.mapping.need.health,
-				met: DEFAULT_CONFIG.mapping.met.undefined,
+				exists: DEFAULT_CONFIG.mapping.exists.undefined,
 			},
 		]);
 		expect(data.statements).toEqual([]);
@@ -423,7 +423,7 @@ describe("convertData", () => {
 		expect(data.justifications).toHaveLength(Need.shape.type.options.length);
 		expect(
 			data.justifications.every(
-				(justification) => justification.met === DEFAULT_CONFIG.mapping.met.undefined,
+				(justification) => justification.exists === DEFAULT_CONFIG.mapping.exists.undefined,
 			),
 		).toBe(true);
 		expect(data.statements).toEqual([]);
@@ -450,7 +450,7 @@ describe("convertData", () => {
 			needs: [
 				{
 					type: "integrity",
-					isMet: false,
+					exists: true,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
 					goals: [
@@ -496,7 +496,7 @@ describe("convertData", () => {
 				needs: [
 					{
 						type: "integrity",
-						isMet: false,
+						exists: true,
 						relatedTo: "gum disease",
 						evidencedBy: "x-ray",
 						goals: [
@@ -534,7 +534,7 @@ describe("convertData", () => {
 			needs: [
 				{
 					type: "integrity",
-					isMet: false,
+					exists: true,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
 					goals: [{ task: "floss daily", outcome: { status: "unmet" } }],
@@ -556,7 +556,7 @@ describe("convertData", () => {
 			needs: [
 				{
 					type: "integrity",
-					isMet: false,
+					exists: true,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
 					goals: [{ task: "floss daily", outcome: { status: "met", note: "resolved" } }],
@@ -576,7 +576,7 @@ describe("convertData", () => {
 			needs: [
 				{
 					type: "integrity",
-					isMet: false,
+					exists: true,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
 					goals: [{ task: "floss daily", outcome: { status: "partial" } }],
@@ -599,7 +599,7 @@ describe("convertData", () => {
 			needs: [
 				{
 					type: "integrity",
-					isMet: false,
+					exists: true,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
 					goals: [{ task: "floss daily", outcome: { status: "unmet" } }],
@@ -621,7 +621,7 @@ describe("convertData", () => {
 			needs: [
 				{
 					type: "integrity",
-					isMet: false,
+					exists: true,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
 					goals: [{ task: "floss daily" }],
@@ -652,7 +652,7 @@ describe("convertData", () => {
 				needs: [
 					{
 						type: "integrity",
-						isMet: false,
+						exists: true,
 						relatedTo: "gum disease",
 						evidencedBy: "x-ray",
 						goals: [{ task: "floss daily", outcome: { status: "partial" } }],
@@ -680,7 +680,7 @@ describe("convertData", () => {
 			needs: [
 				{
 					type: "integrity",
-					isMet: false,
+					exists: true,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
 					goals: [

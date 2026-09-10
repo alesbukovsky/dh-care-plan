@@ -21,7 +21,7 @@ beforeAll(async () => {
 				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
 				exams: { findings: ["no visible caries"], referrals: "none" },
 			},
-			needs: [{ type: "maintenance", isMet: true }],
+			needs: [{ type: "maintenance", exists: false }],
 		}),
 	);
 	await writeFixture(join(dir, "malformed-plan.json"), "{ not json");

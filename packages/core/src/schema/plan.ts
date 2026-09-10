@@ -85,7 +85,7 @@ const Condition = z.object({
 	interactions: z.string().optional(),
 	modifications: z.string().optional(),
 	recommendations: z.string().optional(),
-})
+});
 registry.add(Condition, { id: "Condition" });
 
 const Outcome = z.object({
@@ -120,7 +120,7 @@ export const Need = z.object({
 		"responsibility",
 		"maintenance",
 	]),
-	isMet: z.boolean().optional(),
+	exists: z.boolean().optional(),
 	relatedTo: z.string().optional(),
 	evidencedBy: z.string().optional(),
 	priority: z.string().optional(),

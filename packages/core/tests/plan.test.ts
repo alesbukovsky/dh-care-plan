@@ -8,7 +8,7 @@ const PATIENT = { initials: "J.D.", dob: "1990-01-01", chartId: "12345" };
 function needWithGoal(doneBy?: unknown) {
 	return {
 		type: "integrity" as const,
-		isMet: false,
+		exists: true,
 		relatedTo: "gum disease",
 		evidencedBy: "x-ray",
 		goals: [doneBy === undefined ? baseGoal : { ...baseGoal, doneBy }],

@@ -16,7 +16,7 @@ let latest: Need | undefined;
 function Harness() {
 	const [need, setNeed] = useState<Need | undefined>({
 		type: "health",
-		isMet: false,
+		exists: true,
 		goals: [{ task: "" }, { task: "", outcome: { status: "unmet" } }],
 	});
 	latest = need;
@@ -37,6 +37,10 @@ function expand() {
 
 function values(elements: HTMLElement[]) {
 	return elements.map((element) => (element as HTMLInputElement).value);
+}
+
+function pillText(container: HTMLElement): string | null {
+	return container.querySelector(".rounded-full")?.textContent ?? null;
 }
 
 test("each goal's outcome, interventions, and note are edited independently", () => {
@@ -97,7 +101,7 @@ test("clearing a goal's outcome back to TBD drops the outcome and its note", () 
 });
 
 test("an unassessed need stays not started until a status is picked", () => {
-	render(<UnassessedHarness />);
+	const { container } = render(<UnassessedHarness />);
 
 	expect(screen.getByText("Not started")).toBeInTheDocument();
 
@@ -105,17 +109,17 @@ test("an unassessed need stays not started until a status is picked", () => {
 
 	expect(screen.queryByPlaceholderText("etiology / risk factor")).not.toBeInTheDocument();
 
-	fireEvent.click(screen.getByRole("button", { name: "Need is unmet" }));
+	fireEvent.click(screen.getByRole("button", { name: "Yes" }));
 
-	expect(latest).toEqual({ type: "health", isMet: false });
-	expect(screen.getByText("Unmet")).toBeInTheDocument();
+	expect(latest).toEqual({ type: "health", exists: true });
+	expect(pillText(container)).toBe("Yes");
 });
 
 test("the diagnosis statement and goals survive a change of status", () => {
-	render(<UnassessedHarness />);
+	const { container } = render(<UnassessedHarness />);
 	expand();
 
-	fireEvent.click(screen.getByRole("button", { name: "Need is unmet" }));
+	fireEvent.click(screen.getByRole("button", { name: "Yes" }));
 	fireEvent.change(screen.getByPlaceholderText("etiology / risk factor"), {
 		target: { value: "poor plaque control" },
 	});
@@ -127,14 +131,14 @@ test("the diagnosis statement and goals survive a change of status", () => {
 		target: { value: "Floss daily" },
 	});
 
-	fireEvent.click(screen.getByRole("button", { name: "Need is met" }));
+	fireEvent.click(screen.getByRole("button", { name: "No" }));
 
-	expect(screen.getByText("Met")).toBeInTheDocument();
-	// a met need shows neither the diagnosis statement nor the goals
+	expect(pillText(container)).toBe("No");
+	// a need the client doesn't have shows neither the diagnosis statement nor the goals
 	expect(screen.queryByPlaceholderText("etiology / risk factor")).not.toBeInTheDocument();
 	expect(screen.queryByPlaceholderText("e.g. floss daily")).not.toBeInTheDocument();
 
-	fireEvent.click(screen.getByRole("button", { name: "Need is unmet" }));
+	fireEvent.click(screen.getByRole("button", { name: "Yes" }));
 
 	expect(screen.getByPlaceholderText("etiology / risk factor")).toHaveValue("poor plaque control");
 	expect(screen.getByPlaceholderText("clinical signs / patient report")).toHaveValue(

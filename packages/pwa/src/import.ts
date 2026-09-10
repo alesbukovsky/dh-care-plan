@@ -40,7 +40,7 @@ const FIELD_LABELS: Record<string, string> = {
 	interactions: "Drug interactions",
 	interval: "Recommended interval of care",
 	interventions: "Interventions",
-	isMet: "Need met",
+	exists: "Has the need",
 	length: "Length",
 	medical: "Medical history",
 	medications: "Medications",

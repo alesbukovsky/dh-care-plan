@@ -14,11 +14,15 @@ interface NeedCardProps {
 type Goal = NonNullable<Need["goals"]>[number];
 
 const TOGGLE_STATUSES = [
-	{ value: "met", label: "Need is met", activeClass: "border-[#2F6F62] bg-[#2F6F62] text-white" },
 	{
-		value: "unmet",
-		label: "Need is unmet",
+		value: "exists",
+		label: "Yes",
 		activeClass: "border-[#B85C2E] bg-[#B85C2E] text-white",
+	},
+	{
+		value: "absent",
+		label: "No",
+		activeClass: "border-[#2F6F62] bg-[#2F6F62] text-white",
 	},
 ] as const;
 
@@ -41,19 +45,19 @@ const GOAL_OUTCOME_STATUSES = [
 	},
 ] as const;
 
-const STATUS_PILL: Record<"met" | "unmet", { label: string; className: string }> = {
-	met: { label: "Met", className: "bg-[#E4EFEA] text-[#1F4D43]" },
-	unmet: { label: "Unmet", className: "bg-[#F3E1D3] text-[#B85C2E]" },
+const STATUS_PILL: Record<"exists" | "absent", { label: string; className: string }> = {
+	exists: { label: "Yes", className: "bg-[#F3E1D3] text-[#B85C2E]" },
+	absent: { label: "No", className: "bg-[#E4EFEA] text-[#1F4D43]" },
 };
 const NOT_STARTED_PILL = { label: "Not started", className: "bg-[#EEEEEC] text-[#7C8B86]" };
 
 export default function NeedCard({ definition, index, need, onChange }: NeedCardProps) {
 	const [expanded, setExpanded] = useState(false);
 
-	function setStatus(status: "met" | "unmet") {
+	function setStatus(status: "exists" | "absent") {
 		onChange({
 			type: definition.type,
-			isMet: status === "met",
+			exists: status === "exists",
 			relatedTo: need?.relatedTo,
 			evidencedBy: need?.evidencedBy,
 			priority: need?.priority,
@@ -64,7 +68,7 @@ export default function NeedCard({ definition, index, need, onChange }: NeedCard
 	}
 
 	const pill =
-		need?.isMet === undefined ? NOT_STARTED_PILL : STATUS_PILL[need.isMet ? "met" : "unmet"];
+		need?.exists === undefined ? NOT_STARTED_PILL : STATUS_PILL[need.exists ? "exists" : "absent"];
 
 	return (
 		<div className="rounded-[10px] border border-[#D8DED9] bg-[#FBFCFA]">
@@ -99,7 +103,7 @@ export default function NeedCard({ definition, index, need, onChange }: NeedCard
 								type="button"
 								onClick={() => setStatus(status.value)}
 								className={`flex-1 rounded-md border px-2 py-2 text-xs font-semibold ${
-									need?.isMet === (status.value === "met")
+									need?.exists === (status.value === "exists")
 										? status.activeClass
 										: "border-[#B9C3BD] bg-white text-[#4B5B55]"
 								}`}
@@ -109,12 +113,12 @@ export default function NeedCard({ definition, index, need, onChange }: NeedCard
 						))}
 					</div>
 
-					{need?.isMet === false && (
+					{need?.exists === true && (
 						<>
 							<div className="space-y-1 rounded-lg border border-[#B9C3BD] bg-[#EDEBE1] px-3 pb-2 pt-3">
 								<div>
 									<p className="mb-1 font-serif italic text-[#4B5B55]">
-										Unmet human need for {definition.name.toLowerCase()}, related to
+										Client has the need for {definition.name.toLowerCase()}, related to
 									</p>
 									<textarea
 										className={`w-full resize-y ${inputClass}`}

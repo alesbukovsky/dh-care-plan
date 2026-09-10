@@ -22,10 +22,10 @@ beforeAll(async () => {
 				exams: { findings: ["no visible caries"], referrals: "none" },
 			},
 			needs: [
-				{ type: "maintenance", isMet: true },
+				{ type: "maintenance", exists: false },
 				{
 					type: "integrity",
-					isMet: false,
+					exists: true,
 					relatedTo: "gum disease",
 					evidencedBy: "x-ray",
 					goals: [{ task: "floss daily", outcome: { status: "unmet" } }],

@@ -107,21 +107,21 @@ function OutcomeSection({ value, onChange }: OutcomeSectionProps) {
 	);
 }
 
-interface MetSectionProps {
-	value: Config["mapping"]["met"];
-	onChange: (next: Config["mapping"]["met"]) => void;
+interface ExistsSectionProps {
+	value: Config["mapping"]["exists"];
+	onChange: (next: Config["mapping"]["exists"]) => void;
 }
 
-const MET_LABELS: { key: keyof Config["mapping"]["met"]; label: string }[] = [
-	{ key: "true", label: "Met" },
-	{ key: "false", label: "Not met" },
+const EXISTS_LABELS: { key: keyof Config["mapping"]["exists"]; label: string }[] = [
+	{ key: "true", label: "Has the need" },
+	{ key: "false", label: "Doesn't have the need" },
 	{ key: "undefined", label: "Undefined" },
 ];
 
-function MetSection({ value, onChange }: MetSectionProps) {
+function ExistsSection({ value, onChange }: ExistsSectionProps) {
 	return (
 		<div className="grid grid-cols-2 gap-3">
-			{MET_LABELS.map(({ key, label }) => (
+			{EXISTS_LABELS.map(({ key, label }) => (
 				<Field
 					key={key}
 					label={label}
@@ -230,11 +230,11 @@ export default function ConfigDialog({
 
 					<section className="rounded-md border border-[#D8DED9] bg-white p-3">
 						<h3 className="mb-2 font-mono text-xs font-bold uppercase tracking-wide text-[#4B5B55]">
-							Met Labels
+							Has-the-Need Labels
 						</h3>
-						<MetSection
-							value={draft.mapping.met}
-							onChange={(met) => setDraft({ ...draft, mapping: { ...draft.mapping, met } })}
+						<ExistsSection
+							value={draft.mapping.exists}
+							onChange={(exists) => setDraft({ ...draft, mapping: { ...draft.mapping, exists } })}
 						/>
 					</section>
 				</div>

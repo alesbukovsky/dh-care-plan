@@ -23,9 +23,9 @@ export default function PlanEditor({ plan, onChange }: PlanEditorProps) {
 		onChange({ ...plan, needs });
 	}
 
-	// A need only counts as assessed once it has been marked met or unmet.
-	const assessedCount = plan.needs.filter((need) => need.isMet !== undefined).length;
-	const unmetCount = plan.needs.filter((need) => need.isMet === false).length;
+	// A need only counts as assessed once it has been marked as existing or not.
+	const assessedCount = plan.needs.filter((need) => need.exists !== undefined).length;
+	const yesCount = plan.needs.filter((need) => need.exists === true).length;
 
 	return (
 		<section className="flex min-w-0 flex-[3] flex-col overflow-y-auto p-4">
@@ -52,7 +52,7 @@ export default function PlanEditor({ plan, onChange }: PlanEditorProps) {
 				<Section
 					title="Human needs"
 					hint="Assessment, diagnoses, goals, and interventions"
-					badge={`${assessedCount} assessed / ${unmetCount} unmet`}
+					badge={`${assessedCount} assessed / ${yesCount} yes`}
 				>
 					<div className="space-y-3">
 						{NEEDS.map((definition, index) => (

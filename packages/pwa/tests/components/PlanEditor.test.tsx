@@ -168,38 +168,38 @@ test("exam referrals and diagnostic needs are stored under their own keys", () =
 test("assessing a need adds it to the plan and counts it in the badge", () => {
 	render(<Harness />);
 
-	expect(screen.getByText("0 assessed / 0 unmet")).toBeInTheDocument();
+	expect(screen.getByText("0 assessed / 0 yes")).toBeInTheDocument();
 
 	expand("Human needs");
 	expand("Wholesome facial image");
-	fireEvent.click(screen.getByRole("button", { name: "Need is unmet" }));
+	fireEvent.click(screen.getByRole("button", { name: "Yes" }));
 
-	expect(latest.needs).toEqual([{ type: "image", isMet: false }]);
-	expect(screen.getByText("1 assessed / 1 unmet")).toBeInTheDocument();
+	expect(latest.needs).toEqual([{ type: "image", exists: true }]);
+	expect(screen.getByText("1 assessed / 1 yes")).toBeInTheDocument();
 
 	// changing the status of an assessed need replaces it rather than appending
-	fireEvent.click(screen.getByRole("button", { name: "Need is met" }));
+	fireEvent.click(screen.getByRole("button", { name: "No" }));
 
-	expect(latest.needs).toEqual([{ type: "image", isMet: true }]);
-	expect(screen.getByText("1 assessed / 0 unmet")).toBeInTheDocument();
+	expect(latest.needs).toEqual([{ type: "image", exists: false }]);
+	expect(screen.getByText("1 assessed / 0 yes")).toBeInTheDocument();
 
 	expand("Freedom from anxiety / stress");
-	fireEvent.click(required(screen.getAllByRole("button", { name: "Need is unmet" })[1]));
+	fireEvent.click(required(screen.getAllByRole("button", { name: "Yes" })[1]));
 
 	expect(latest.needs).toEqual([
-		{ type: "image", isMet: true },
-		{ type: "peace", isMet: false },
+		{ type: "image", exists: false },
+		{ type: "peace", exists: true },
 	]);
-	expect(screen.getByText("2 assessed / 1 unmet")).toBeInTheDocument();
+	expect(screen.getByText("2 assessed / 1 yes")).toBeInTheDocument();
 
 	// updating a need other than the first leaves the earlier ones alone
-	fireEvent.click(required(screen.getAllByRole("button", { name: "Need is met" })[1]));
+	fireEvent.click(required(screen.getAllByRole("button", { name: "No" })[1]));
 
 	expect(latest.needs).toEqual([
-		{ type: "image", isMet: true },
-		{ type: "peace", isMet: true },
+		{ type: "image", exists: false },
+		{ type: "peace", exists: false },
 	]);
-	expect(screen.getByText("2 assessed / 0 unmet")).toBeInTheDocument();
+	expect(screen.getByText("2 assessed / 0 yes")).toBeInTheDocument();
 });
 
 test("the recommended interval of care is stored separately from the appointment plan", () => {

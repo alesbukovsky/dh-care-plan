@@ -8,7 +8,7 @@ const PLAN: Plan = {
 	subjective: { complaint: "Sensitivity" },
 	objective: {},
 	conditions: [],
-	needs: [{ type: "health", isMet: false }],
+	needs: [{ type: "health", exists: true }],
 };
 
 function encode(value: unknown): Uint8Array {
@@ -70,7 +70,7 @@ describe("parsePlan", () => {
 	});
 
 	test("hands back the whole zod issue and the data it came from", () => {
-		const data = { ...PLAN, needs: [{ type: "health", isMet: "yes" }] };
+		const data = { ...PLAN, needs: [{ type: "health", exists: "yes" }] };
 		const result = parsePlan(JSON.stringify(data));
 
 		if (result.ok || result.reason !== "schema") throw new Error("expected a schema mismatch");
@@ -79,12 +79,12 @@ describe("parsePlan", () => {
 		expect(result.issues[0]).toMatchObject({
 			code: "invalid_type",
 			expected: "boolean",
-			path: ["needs", 0, "isMet"],
+			path: ["needs", 0, "exists"],
 		});
 	});
 
 	test("keeps the path structured, so callers can label each segment themselves", () => {
-		const result = parsePlan(JSON.stringify({ ...PLAN, needs: [{ isMet: false }] }));
+		const result = parsePlan(JSON.stringify({ ...PLAN, needs: [{ exists: true }] }));
 
 		if (result.ok || result.reason !== "schema") throw new Error("expected a schema mismatch");
 		expect(result.issues[0]?.path).toEqual(["needs", 0, "type"]);

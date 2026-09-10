@@ -1,4 +1,4 @@
-import { DEFAULT_CONFIG, DEFAULT_PLAN, type Config, type Plan } from "@dh-care-plan/core";
+import { type Config, DEFAULT_CONFIG, DEFAULT_PLAN, type Plan } from "@dh-care-plan/core";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import { clearDraft, isStorageAvailable, loadDraft, saveDraft } from "../src/persistence";
 

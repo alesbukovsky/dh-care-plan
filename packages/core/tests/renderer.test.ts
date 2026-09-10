@@ -23,11 +23,11 @@ const validPlan: Plan = {
 	needs: [
 		{
 			type: "maintenance",
-			isMet: true,
+			exists: false,
 		},
 		{
 			type: "integrity",
-			isMet: false,
+			exists: true,
 			relatedTo: "gum disease",
 			evidencedBy: "x-ray",
 			goals: [

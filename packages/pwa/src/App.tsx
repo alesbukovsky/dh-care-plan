@@ -29,7 +29,9 @@ const AUTOSAVE_DEBOUNCE_MS = 1000;
 export default function App() {
 	// Cloned so editing this session never mutates the shared default.
 	const [plan, setPlan] = useState(() => loadDraft()?.plan ?? structuredClone(DEFAULT_PLAN));
-	const [config, setConfig] = useState(() => loadDraft()?.config ?? structuredClone(DEFAULT_CONFIG));
+	const [config, setConfig] = useState(
+		() => loadDraft()?.config ?? structuredClone(DEFAULT_CONFIG),
+	);
 	const [autosaveAvailable, setAutosaveAvailable] = useState(() => isStorageAvailable());
 	const [commandBarCollapsed, setCommandBarCollapsed] = useState(false);
 	const [importFailure, setImportFailure] = useState<ImportFailure | null>(null);

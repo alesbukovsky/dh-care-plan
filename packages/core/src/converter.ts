@@ -14,8 +14,8 @@ function goalLabel(number: number, index: number): string {
 	return `${number}${String.fromCharCode(97 + index)}`;
 }
 
-function metLabel(isMet: boolean | undefined, config: Config): string {
-	return config.mapping.met[String(isMet) as "true" | "false" | "undefined"];
+function existsLabel(exists: boolean | undefined, config: Config): string {
+	return config.mapping.exists[String(exists) as "true" | "false" | "undefined"];
 }
 
 function goalDoneBy(
@@ -37,29 +37,29 @@ function goalDoneBy(
 
 export function convertData(plan: Plan, config: Config = DEFAULT_CONFIG) {
 	// An unassessed need still lists in the justification/assessment tables, undecided, and
-	// carries no diagnosis statement (that requires isMet to be explicitly false).
+	// carries no diagnosis statement (that requires exists to be explicitly true).
 	const justifications = plan.needs.map((need) => ({
 		need: config.mapping.need[need.type],
-		met: metLabel(need.isMet, config),
+		exists: existsLabel(need.exists, config),
 		priority: need.priority,
 		rationale: need.rationale,
 	}));
 
 	const assessments = plan.needs.map((need) => ({
 		need: config.mapping.need[need.type],
-		met: metLabel(need.isMet, config),
+		exists: existsLabel(need.exists, config),
 		relatedTo: orEmpty(need.relatedTo),
 		evidencedBy: orEmpty(need.evidencedBy),
 	}));
 
-	const unmetNeeds = plan.needs.filter((need) => need.isMet === false);
+	const existingNeeds = plan.needs.filter((need) => need.exists === true);
 
-	const statements = unmetNeeds.map((need, needInx) => {
+	const statements = existingNeeds.map((need, needInx) => {
 		const statementNo = needInx + 1;
 		return {
 			label: String(statementNo),
 			need: config.mapping.need[need.type],
-			met: metLabel(need.isMet, config),
+			exists: existsLabel(need.exists, config),
 			relatedTo: orEmpty(need.relatedTo),
 			evidencedBy: orEmpty(need.evidencedBy),
 			goals: (need.goals ?? []).map((goal, goalInx) => ({

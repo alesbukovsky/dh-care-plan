@@ -35,6 +35,7 @@ const FIELD_LABELS: Record<string, string> = {
 	partial: "Partially met",
 	unmet: "Not met",
 	undefined: "TBD",
+	exists: "Has-the-need labels",
 };
 
 function fail(summary: string, issues: ImportIssue[] = []): ConfigImportFailure {

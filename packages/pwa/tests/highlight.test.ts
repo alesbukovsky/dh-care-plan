@@ -31,9 +31,7 @@ describe("sanitizeHtml", () => {
 	});
 
 	test("flattens a mark carrying extra attributes", () => {
-		expect(sanitizeHtml('<mark class="bg-yellow-200" style="color:red">note</mark>')).toBe(
-			"note",
-		);
+		expect(sanitizeHtml('<mark class="bg-yellow-200" style="color:red">note</mark>')).toBe("note");
 	});
 });
 

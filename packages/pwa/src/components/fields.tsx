@@ -15,7 +15,10 @@ export interface FieldDefinition<T> {
 	/** Render narrower so two ("half") or three ("third") such fields share one line. */
 	width?: "half" | "third";
 	/** Render a small action (e.g. a button opening a helper dialog) next to the field. */
-	renderExtra?: (value: string | undefined, onChange: (next: string | undefined) => void) => ReactNode;
+	renderExtra?: (
+		value: string | undefined,
+		onChange: (next: string | undefined) => void,
+	) => ReactNode;
 }
 
 interface FieldProps {
@@ -66,9 +69,7 @@ export function Field({
 						onChange={(event) => onChange(event.target.value || undefined)}
 					/>
 				)}
-				{extra && (
-					<div className="absolute inset-y-0 right-1 flex items-center">{extra}</div>
-				)}
+				{extra && <div className="absolute inset-y-0 right-1 flex items-center">{extra}</div>}
 			</div>
 		</div>
 	);

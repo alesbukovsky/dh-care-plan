@@ -97,13 +97,13 @@ test("importing a valid plan fills the editor", async () => {
 			patient: { initials: "J.D.", dob: "2001-04-17", chartId: "A1234" },
 			subjective: { complaint: "Sensitivity on the lower left" },
 			objective: {},
-			needs: [{ type: "health", isMet: false }],
+			needs: [{ type: "health", exists: true }],
 		}),
 	);
 
 	// The patient badge carries the initials even while the section is collapsed.
 	await waitFor(() => expect(screen.getByText("J.D.")).toBeInTheDocument());
-	expect(screen.getByText("1 assessed / 1 unmet")).toBeInTheDocument();
+	expect(screen.getByText("1 assessed / 1 yes")).toBeInTheDocument();
 
 	fireEvent.click(screen.getByRole("button", { name: /Patient/ }));
 
@@ -122,7 +122,7 @@ test("dismissing the picker without a file changes nothing", async () => {
 
 	await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
 	// The new plan lists every need, none of them assessed yet.
-	expect(screen.getByText("0 assessed / 0 unmet")).toBeInTheDocument();
+	expect(screen.getByText("0 assessed / 0 yes")).toBeInTheDocument();
 	fireEvent.click(screen.getByRole("button", { name: /Human needs/ }));
 	expect(screen.getAllByText("Not started")).toHaveLength(DEFAULT_PLAN.needs.length);
 });
@@ -158,12 +158,12 @@ test("only the first dozen problems are listed, the rest are counted", async () 
 			patient: { initials: "JD", dob: "2001-04-17", chartId: "A1234" },
 			subjective: {},
 			objective: {},
-			needs: Array.from({ length: 14 }, () => ({ type: "health", isMet: "yes" })),
+			needs: Array.from({ length: 14 }, () => ({ type: "health", exists: "yes" })),
 		}),
 	);
 
 	await screen.findByRole("dialog");
-	expect(screen.getAllByText(/Need met$/)).toHaveLength(12);
+	expect(screen.getAllByText(/Has the need$/)).toHaveLength(12);
 	expect(screen.getByText("…and 2 more problems.")).toBeInTheDocument();
 });
 
@@ -196,7 +196,7 @@ async function importNamedPatient() {
 			patient: { initials: "J.D.", dob: "2001-04-17", chartId: "A1234" },
 			subjective: {},
 			objective: {},
-			needs: [{ type: "health", isMet: false }],
+			needs: [{ type: "health", exists: true }],
 		}),
 	);
 	await waitFor(() => expect(screen.getByText("J.D.")).toBeInTheDocument());

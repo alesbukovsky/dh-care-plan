@@ -1,5 +1,7 @@
 import type { Need, Plan } from "@dh-care-plan/core";
+import { useMemo } from "react";
 import { NEEDS } from "../needs";
+import { computePriorityErrors } from "../priorityValidation";
 import AppointmentsSection from "./AppointmentsSection";
 import ConditionsSection from "./ConditionsSection";
 import NeedCard from "./NeedCard";
@@ -22,6 +24,8 @@ export default function PlanEditor({ plan, onChange }: PlanEditorProps) {
 				: plan.needs.map((need, i) => (i === index ? next : need));
 		onChange({ ...plan, needs });
 	}
+
+	const priorityErrors = useMemo(() => computePriorityErrors(plan.needs), [plan.needs]);
 
 	// A need only counts as assessed once it has been marked as existing or not.
 	const assessedCount = plan.needs.filter((need) => need.exists !== undefined).length;
@@ -62,6 +66,7 @@ export default function PlanEditor({ plan, onChange }: PlanEditorProps) {
 								definition={definition}
 								need={plan.needs.find((need) => need.type === definition.type)}
 								onChange={(next) => updateNeed(definition.type, next)}
+								priorityError={priorityErrors.get(definition.type)}
 							/>
 						))}
 					</div>

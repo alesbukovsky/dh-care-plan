@@ -2,13 +2,14 @@ import type { Need } from "@dh-care-plan/core";
 import { useState } from "react";
 import type { NeedDefinition } from "../needs";
 import { inputClass } from "./fields";
-import { PlusIcon, TrashIcon } from "./icons";
+import { ExclamationIcon, PlusIcon, TrashIcon } from "./icons";
 
 interface NeedCardProps {
 	definition: NeedDefinition;
 	index: number;
 	need: Need | undefined;
 	onChange: (next: Need) => void;
+	priorityError?: string;
 }
 
 type Goal = NonNullable<Need["goals"]>[number];
@@ -51,7 +52,13 @@ const STATUS_PILL: Record<"exists" | "absent", { label: string; className: strin
 };
 const NOT_STARTED_PILL = { label: "Not started", className: "bg-[#EEEEEC] text-[#7C8B86]" };
 
-export default function NeedCard({ definition, index, need, onChange }: NeedCardProps) {
+export default function NeedCard({
+	definition,
+	index,
+	need,
+	onChange,
+	priorityError,
+}: NeedCardProps) {
 	const [expanded, setExpanded] = useState(false);
 
 	function setStatus(status: "exists" | "absent") {
@@ -147,14 +154,26 @@ export default function NeedCard({ definition, index, need, onChange }: NeedCard
 								>
 									Priority
 								</label>
-								<input
-									id={`priority-${definition.type}`}
-									type="text"
-									className={`w-32 ${inputClass}`}
-									placeholder="e.g. 1"
-									value={need.priority ?? ""}
-									onChange={(e) => onChange({ ...need, priority: e.target.value || undefined })}
-								/>
+								<div className="relative w-32">
+									<input
+										id={`priority-${definition.type}`}
+										type="text"
+										className={`w-full ${inputClass} ${
+											priorityError ? "border-[#D9B8B4]! focus:border-[#D9B8B4]! pr-7" : ""
+										}`}
+										placeholder="e.g. 1"
+										value={need.priority ?? ""}
+										onChange={(e) => onChange({ ...need, priority: e.target.value || undefined })}
+									/>
+									{priorityError && (
+										<span
+											className="absolute inset-y-0 right-2 flex items-center text-[#C19C98]"
+											title={priorityError}
+										>
+											<ExclamationIcon className="h-[18px] w-[18px]" strokeWidth={2} />
+										</span>
+									)}
+								</div>
 							</div>
 
 							<div>

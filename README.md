@@ -1,10 +1,20 @@
 # Dental Hygiene Care Plan Builder
 
-Progressive web app ([PWA](https://en.wikipedia.org/wiki/Progressive_web_app)) available here: 
+A set of tools that simplify the creation of a dental hygiene care plan. Users enter data through an intuitive 
+interface, and the tool uses a Word (`.docx`) template to generate the final document.
+
+Progressive web app ([PWA](https://en.wikipedia.org/wiki/Progressive_web_app)) is available here: 
 https://dhplan.alesb.workers.dev/
 
 This app runs entirely locally in the browser, no data is ever sent anywhere. That said, it is not technically HIPAA 
 compliant, so it is intended primarily for student practice rather than real patient data.
+
+## Usage
+
+- [Web application user guide](docs/GUIDE.md)
+- [Template reference](docs/TEMPLATE.md)
+- [Sample Word template](docs/sample-template.docx)
+- [CLI reference](docs/CLI.md)
 
 ## Browser Support
 

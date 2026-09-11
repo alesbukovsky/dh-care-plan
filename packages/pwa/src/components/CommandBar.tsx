@@ -118,7 +118,7 @@ export default function CommandBar({
 			</div>
 
 			{!collapsed && (
-				<div className="flex items-center justify-between border-t border-white/10 p-3 font-mono text-xs text-[#9FC3B7]">
+				<div className="flex items-center justify-between border-t border-white/10 p-3 text-xs text-[#9FC3B7]">
 					<span>Version {APP_VERSION}</span>
 					<span
 						title={

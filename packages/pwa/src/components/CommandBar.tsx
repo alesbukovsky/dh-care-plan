@@ -6,12 +6,15 @@ import {
 	CloudOffIcon,
 	DocumentIcon,
 	DownloadIcon,
+	HelpIcon,
 	NewDocumentIcon,
 	SettingsIcon,
 	UploadIcon,
 } from "./icons";
 
 const APP_VERSION = __APP_VERSION__;
+const GUIDE_URL =
+	"https://github.com/alesbukovsky/dh-care-plan/blob/main/docs/GUIDE.md";
 
 interface CommandAction {
 	key: string;
@@ -97,6 +100,21 @@ export default function CommandBar({
 						{!collapsed && <span>{label}</span>}
 					</button>
 				))}
+			</div>
+
+			<div className="p-2">
+				<a
+					href={GUIDE_URL}
+					target="_blank"
+					rel="noopener noreferrer"
+					title="Help"
+					className={`flex items-center gap-2 rounded px-2 py-2 text-sm text-[#CFE3DC] hover:bg-white/10 hover:text-[#EFEFE9] ${
+						collapsed ? "justify-center" : ""
+					}`}
+				>
+					<HelpIcon />
+					{!collapsed && <span>Help</span>}
+				</a>
 			</div>
 
 			{!collapsed && (

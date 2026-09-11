@@ -136,6 +136,16 @@ export function ExclamationIcon(props: SVGProps<SVGSVGElement>) {
 	);
 }
 
+export function HelpIcon(props: SVGProps<SVGSVGElement>) {
+	return (
+		<Icon {...props}>
+			<circle cx="12" cy="12" r="9" />
+			<path d="M9.5 9a2.5 2.5 0 0 1 4.83.9c0 1.6-2.33 1.9-2.33 3.6" />
+			<path d="M12 17h.01" />
+		</Icon>
+	);
+}
+
 export function TrashIcon(props: SVGProps<SVGSVGElement>) {
 	return (
 		<Icon {...props}>

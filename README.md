@@ -11,7 +11,7 @@ compliant, so it is intended primarily for student practice rather than real pat
 
 ## Usage
 
-- [Web application user guide](docs/GUIDE.md)
+- [Web app user guide](docs/GUIDE.md)
 - [Template reference](docs/TEMPLATE.md)
 - [Sample Word template](docs/sample-template.docx)
 - [CLI reference](docs/CLI.md)

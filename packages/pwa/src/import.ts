@@ -26,7 +26,6 @@ const FIELD_LABELS: Record<string, string> = {
 	description: "Condition",
 	dental: "Dental history",
 	diagnostic: "Diagnostic tests",
-	diseases: "Diseases",
 	dob: "Date of birth",
 	doneBy: "Target date",
 	evidencedBy: "Evidenced by",

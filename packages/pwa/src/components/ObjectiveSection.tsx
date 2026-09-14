@@ -21,19 +21,7 @@ const MEDICAL_FIELDS: FieldDefinition<Medical>[] = [
 		renderExtra: (_value, onChange) => <BmiCalculatorButton onAccept={onChange} />,
 	},
 	{ key: "asa", label: "ASA class", placeholder: "e.g. II", width: "half" },
-	{
-		key: "medications",
-		label: "Medications",
-		placeholder: "drug, dose, oral implications",
-		multiline: true,
-	},
 	{ key: "allergies", label: "Allergies", placeholder: "allergen and reaction", multiline: true },
-	{
-		key: "diseases",
-		label: "Diseases / conditions",
-		placeholder: "systemic findings",
-		multiline: true,
-	},
 	{
 		key: "referrals",
 		label: "Need for referrals",
@@ -94,6 +82,9 @@ export default function ObjectiveSection({ objective, onChange }: ObjectiveSecti
 			</Subsection>
 
 			<Subsection title="Medical history">
+				<p className="text-xs text-[#7C8B86]">
+					Medications and diseases are entered in the "Medical conditions" section below.
+				</p>
 				<FieldGroup
 					fields={MEDICAL_FIELDS}
 					value={objective.medical}

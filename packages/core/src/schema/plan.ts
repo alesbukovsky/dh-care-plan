@@ -22,9 +22,7 @@ registry.add(Subjective, { id: "Subjective" });
 
 const Medical = z.object({
 	bmi: z.string().optional(),
-	medications: z.string().optional(),
 	allergies: z.string().optional(),
-	diseases: z.string().optional(),
 	asa: z.string().optional(),
 	referrals: z.string().optional(),
 });
@@ -78,9 +76,16 @@ const Objective = z.object({
 });
 registry.add(Objective, { id: "Objective" });
 
-const Condition = z.object({
+const Medication = z.object({
+	name: z.string().optional(),
 	description: z.string().optional(),
-	medications: z.string().optional(),
+});
+registry.add(Medication, { id: "Medication" });
+
+const Condition = z.object({
+	name: z.string().optional(),
+	description: z.string().optional(),
+	medications: z.array(Medication).default(() => []),
 	adverse: z.string().optional(),
 	interactions: z.string().optional(),
 	modifications: z.string().optional(),

@@ -5,6 +5,17 @@ function orEmpty(value: string | undefined): string {
 	return value ?? "";
 }
 
+function formatNameDescription(
+	name: string | undefined,
+	description: string | undefined,
+	pattern: string,
+): string | undefined {
+	if (name && description) {
+		return pattern.replace("{name}", name).replace("{description}", description);
+	}
+	return name ?? description;
+}
+
 export function dateStr(iso: string, pattern: string): string {
 	const [year = "", month = "", day = ""] = iso.split("-");
 	return pattern.replaceAll("YYYY", year).replaceAll("MM", month).replaceAll("DD", day);
@@ -81,7 +92,7 @@ export function convertData(plan: Plan, config: Config = DEFAULT_CONFIG) {
 
 	const visits = sortedVisits
 		.map((visit) => dateStr(visit.date, config.format.date))
-		.join(config.format.visits);
+		.join(config.delimiter.visits);
 
 	const dated = sortedVisits
 		.filter((visit): visit is { date: string; vitals: string } => visit.vitals !== undefined)
@@ -95,6 +106,38 @@ export function convertData(plan: Plan, config: Config = DEFAULT_CONFIG) {
 	const vitals = undated !== undefined ? [undated, ...dated] : dated;
 	const hasVitals = vitals.length > 0;
 
+	const conditions = plan.conditions.map((condition) => ({
+		description: formatNameDescription(
+			condition.name,
+			condition.description,
+			config.format.condition.description,
+		),
+		medications: condition.medications
+			.map((medication) =>
+				formatNameDescription(
+					medication.name,
+					medication.description,
+					config.format.condition.medication,
+				),
+			)
+			.filter((medication): medication is string => Boolean(medication))
+			.join(config.delimiter.condition.medications),
+		adverse: condition.adverse,
+		interactions: condition.interactions,
+		modifications: condition.modifications,
+		recommendations: condition.recommendations,
+	}));
+
+	const medications = plan.conditions
+		.flatMap((condition) => condition.medications.map((medication) => medication.name))
+		.filter((name): name is string => Boolean(name))
+		.join(config.delimiter.medical.medications);
+
+	const diseases = plan.conditions
+		.map((condition) => condition.name)
+		.filter((name): name is string => Boolean(name))
+		.join(config.delimiter.medical.diseases);
+
 	return {
 		patient: {
 			initials: orEmpty(plan.patient.initials),
@@ -103,13 +146,15 @@ export function convertData(plan: Plan, config: Config = DEFAULT_CONFIG) {
 		},
 		visits: visits || undefined,
 		subjective: plan.subjective,
-		conditions: plan.conditions,
+		conditions,
 		objective: {
 			medical:
-				plan.objective.medical || hasVitals
+				plan.objective.medical || hasVitals || medications || diseases
 					? {
 							...plan.objective.medical,
 							vitals: hasVitals ? vitals : undefined,
+							medications: medications || undefined,
+							diseases: diseases || undefined,
 						}
 					: plan.objective.medical,
 			exams: plan.objective.exams,

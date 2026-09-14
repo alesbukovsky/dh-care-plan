@@ -35,8 +35,22 @@ const Goal = z.object({
 const Format = z.object({
 	date: z.string(),
 	goal: Goal,
-	visits: z.string(),
 	vitals: z.string(),
+	condition: z.object({
+		medication: z.string(),
+		description: z.string(),
+	}),
+});
+
+const Delimiter = z.object({
+	visits: z.string(),
+	medical: z.object({
+		medications: z.string(),
+		diseases: z.string(),
+	}),
+	condition: z.object({
+		medications: z.string(),
+	}),
 });
 
 const Mapping = z.object({
@@ -47,6 +61,7 @@ const Mapping = z.object({
 
 export const Config = z.object({
 	format: Format,
+	delimiter: Delimiter,
 	mapping: Mapping,
 });
 
@@ -66,8 +81,21 @@ export const DEFAULT_CONFIG: Config = {
 		goal: {
 			doneBy: "{date} / {relative}",
 		},
-		visits: ", ",
 		vitals: "Appointment {date}: {vitals}",
+		condition: {
+			medication: "{name} ({description})",
+			description: "{name} - {description}",
+		},
+	},
+	delimiter: {
+		visits: ", ",
+		medical: {
+			medications: ", ",
+			diseases: ", ",
+		},
+		condition: {
+			medications: ", ",
+		},
 	},
 	mapping: {
 		need: {

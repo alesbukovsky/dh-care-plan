@@ -25,6 +25,7 @@ function Harness() {
 				setValue(next);
 				latest = next;
 			}}
+			width={480}
 		/>
 	);
 }

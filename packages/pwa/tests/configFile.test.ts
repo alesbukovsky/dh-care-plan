@@ -46,14 +46,14 @@ test("an unreadable file is reported instead of thrown", async () => {
 });
 
 test("a missing field is reported with its plain-language label", async () => {
-	const { format, ...rest } = DEFAULT_CONFIG;
-	const { visits, ...formatRest } = format;
-	const result = await readConfigFile(configFile({ ...rest, format: formatRest }));
+	const { delimiter, ...rest } = DEFAULT_CONFIG;
+	const { visits, ...delimiterRest } = delimiter;
+	const result = await readConfigFile(configFile({ ...rest, delimiter: delimiterRest }));
 
 	if (result.ok) throw new Error("expected the import to fail");
 	expect(result.issues).toEqual([
 		{
-			field: "Format → Visits",
+			field: "Delimiter → Visits",
 			message: "This field is required, but the file does not have it.",
 		},
 	]);

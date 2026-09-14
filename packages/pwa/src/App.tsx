@@ -1,5 +1,5 @@
 import { DEFAULT_CONFIG, DEFAULT_PLAN } from "@dh-care-plan/core";
-import { type ChangeEvent, useEffect, useRef, useState } from "react";
+import { type ChangeEvent, type MouseEvent as ReactMouseEvent, useEffect, useRef, useState } from "react";
 import CaseStudyPane from "./components/CaseStudyPane";
 import CommandBar from "./components/CommandBar";
 import ConfigDialog, { type ConfigImportFailure } from "./components/ConfigDialog";
@@ -26,6 +26,10 @@ interface TemplateSelection {
 // How long to wait after the last edit before autosaving the draft.
 const AUTOSAVE_DEBOUNCE_MS = 1000;
 
+const CASE_STUDY_MIN_WIDTH = 280;
+const CASE_STUDY_MAX_WIDTH = 900;
+const CASE_STUDY_DEFAULT_WIDTH = 480;
+
 export default function App() {
 	// Cloned so editing this session never mutates the shared default.
 	const [plan, setPlan] = useState(() => loadDraft()?.plan ?? structuredClone(DEFAULT_PLAN));
@@ -45,6 +49,28 @@ export default function App() {
 	const [planGeneration, setPlanGeneration] = useState(0);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const templateInputRef = useRef<HTMLInputElement>(null);
+	const [caseStudyWidth, setCaseStudyWidth] = useState(CASE_STUDY_DEFAULT_WIDTH);
+
+	function startResizingCaseStudy(event: ReactMouseEvent<HTMLButtonElement>) {
+		event.preventDefault();
+		const startX = event.clientX;
+		const startWidth = caseStudyWidth;
+
+		function handleMouseMove(moveEvent: globalThis.MouseEvent) {
+			const nextWidth = startWidth + (moveEvent.clientX - startX);
+			setCaseStudyWidth(
+				Math.min(CASE_STUDY_MAX_WIDTH, Math.max(CASE_STUDY_MIN_WIDTH, nextWidth)),
+			);
+		}
+
+		function handleMouseUp() {
+			window.removeEventListener("mousemove", handleMouseMove);
+			window.removeEventListener("mouseup", handleMouseUp);
+		}
+
+		window.addEventListener("mousemove", handleMouseMove);
+		window.addEventListener("mouseup", handleMouseUp);
+	}
 
 	// Autosaves the draft ~1s after the last edit, so typing never triggers a write per keystroke.
 	useEffect(() => {
@@ -127,7 +153,18 @@ export default function App() {
 				onConfigure={() => setConfiguring(true)}
 				autosaveAvailable={autosaveAvailable}
 			/>
-			<CaseStudyPane value={plan.study ?? ""} onChange={(study) => setPlan({ ...plan, study })} />
+			<CaseStudyPane
+				value={plan.study ?? ""}
+				onChange={(study) => setPlan({ ...plan, study })}
+				width={caseStudyWidth}
+			/>
+			<button
+				type="button"
+				aria-label="Resize case study panel"
+				title="Drag to resize"
+				onMouseDown={startResizingCaseStudy}
+				className="w-1 shrink-0 cursor-col-resize border-0 bg-[#D8DED9] p-0 hover:bg-[#7C8B86] active:bg-[#7C8B86]"
+			/>
 			<PlanEditor key={planGeneration} plan={plan} onChange={setPlan} />
 
 			<input

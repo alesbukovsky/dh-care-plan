@@ -9,7 +9,7 @@ const validPlan = {
 	patient: PATIENT,
 	subjective: { complaint: "sensitive teeth" },
 	objective: {
-		medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
+		medical: { bmi: "22.4", allergies: "none", asa: "I" },
 		exams: { findings: ["no visible caries"], referrals: "none" },
 	},
 	conditions: [],
@@ -86,7 +86,7 @@ describe("convertData", () => {
 			patient: PATIENT,
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
-				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
+				medical: { bmi: "22.4", allergies: "none", asa: "I" },
 				exams: { findings: ["no visible caries"], referrals: "none" },
 			},
 			conditions: [],
@@ -109,7 +109,7 @@ describe("convertData", () => {
 			patient: PATIENT,
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
-				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
+				medical: { bmi: "22.4", allergies: "none", asa: "I" },
 				exams: { findings: ["no visible caries"], referrals: "none" },
 			},
 			conditions: [],
@@ -131,7 +131,7 @@ describe("convertData", () => {
 			patient: PATIENT,
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
-				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
+				medical: { bmi: "22.4", allergies: "none", asa: "I" },
 				exams: { findings: ["no visible caries"], referrals: "none" },
 			},
 			conditions: [],
@@ -195,7 +195,7 @@ describe("convertData", () => {
 			patient: PATIENT,
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
-				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
+				medical: { bmi: "22.4", allergies: "none", asa: "I" },
 				exams: { findings: ["no visible caries"], referrals: "none" },
 			},
 			conditions: [],
@@ -213,7 +213,7 @@ describe("convertData", () => {
 			patient: PATIENT,
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
-				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
+				medical: { bmi: "22.4", allergies: "none", asa: "I" },
 				exams: { findings: ["no visible caries"], referrals: "none" },
 			},
 			conditions: [],
@@ -237,7 +237,7 @@ describe("convertData", () => {
 		expect(data.patient).toEqual({ ...PATIENT, dob: "01/01/1990" });
 	});
 
-	test("orders objective.visits oldest to newest, formatting and joining using config.format.date/visits", () => {
+	test("orders objective.visits oldest to newest, formatting and joining using config.format.date / config.delimiter.visits", () => {
 		const data = convertData({
 			...validPlan,
 			objective: {
@@ -262,11 +262,12 @@ describe("convertData", () => {
 		).toBeUndefined();
 	});
 
-	test("maps conditions onto the template 1:1", () => {
+	test("maps conditions onto the template 1:1, formatting name/description and flattening medications", () => {
 		const conditions = [
 			{
-				description: "Type 2 diabetes",
-				medications: "Metformin 500mg BID",
+				name: "Type 2 diabetes",
+				description: "diagnosed 2018",
+				medications: [{ name: "Metformin", description: "500mg BID" }],
 				adverse: "none reported",
 				interactions: "none noted",
 				modifications: "morning appointments preferred",
@@ -276,7 +277,46 @@ describe("convertData", () => {
 
 		const data = convertData({ ...validPlan, conditions });
 
-		expect(data.conditions).toEqual(conditions);
+		expect(data.conditions).toEqual([
+			{
+				description: "Type 2 diabetes - diagnosed 2018",
+				medications: "Metformin (500mg BID)",
+				adverse: "none reported",
+				interactions: "none noted",
+				modifications: "morning appointments preferred",
+				recommendations: "monitor for delayed healing",
+			},
+		]);
+	});
+
+	test("uses name or description alone for a condition, without applying the format pattern", () => {
+		const data = convertData({
+			...validPlan,
+			conditions: [
+				{ name: "Type 2 diabetes", medications: [] },
+				{ description: "diagnosed 2018", medications: [{ name: "Metformin" }] },
+			],
+		});
+
+		expect(data.conditions[0]?.description).toBe("Type 2 diabetes");
+		expect(data.conditions[1]?.description).toBe("diagnosed 2018");
+		expect(data.conditions[1]?.medications).toBe("Metformin");
+	});
+
+	test("derives Medical.medications and Medical.diseases from conditions", () => {
+		const data = convertData({
+			...validPlan,
+			conditions: [
+				{
+					name: "Type 2 diabetes",
+					medications: [{ name: "Metformin" }, { name: "Insulin" }],
+				},
+				{ name: "Hypertension", medications: [{ name: "Lisinopril" }] },
+			],
+		});
+
+		expect(data.objective.medical?.medications).toBe("Metformin, Insulin, Lisinopril");
+		expect(data.objective.medical?.diseases).toBe("Type 2 diabetes, Hypertension");
 	});
 
 	test("defaults conditions to an empty list when the plan has none", () => {
@@ -443,7 +483,7 @@ describe("convertData", () => {
 			patient: PATIENT,
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
-				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
+				medical: { bmi: "22.4", allergies: "none", asa: "I" },
 				exams: { findings: ["no visible caries"], referrals: "none" },
 			},
 			conditions: [],
@@ -489,7 +529,7 @@ describe("convertData", () => {
 				patient: PATIENT,
 				subjective: { complaint: "sensitive teeth" },
 				objective: {
-					medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
+					medical: { bmi: "22.4", allergies: "none", asa: "I" },
 					exams: { findings: ["no visible caries"], referrals: "none" },
 				},
 				conditions: [],
@@ -527,7 +567,7 @@ describe("convertData", () => {
 			patient: PATIENT,
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
-				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
+				medical: { bmi: "22.4", allergies: "none", asa: "I" },
 				exams: { findings: ["no visible caries"], referrals: "none" },
 			},
 			conditions: [],
@@ -549,7 +589,7 @@ describe("convertData", () => {
 			patient: PATIENT,
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
-				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
+				medical: { bmi: "22.4", allergies: "none", asa: "I" },
 				exams: { findings: ["no visible caries"], referrals: "none" },
 			},
 			conditions: [],
@@ -569,7 +609,7 @@ describe("convertData", () => {
 			patient: PATIENT,
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
-				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
+				medical: { bmi: "22.4", allergies: "none", asa: "I" },
 				exams: { findings: ["no visible caries"], referrals: "none" },
 			},
 			conditions: [],
@@ -592,7 +632,7 @@ describe("convertData", () => {
 			patient: PATIENT,
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
-				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
+				medical: { bmi: "22.4", allergies: "none", asa: "I" },
 				exams: { findings: ["no visible caries"], referrals: "none" },
 			},
 			conditions: [],
@@ -614,7 +654,7 @@ describe("convertData", () => {
 			patient: PATIENT,
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
-				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
+				medical: { bmi: "22.4", allergies: "none", asa: "I" },
 				exams: { findings: ["no visible caries"], referrals: "none" },
 			},
 			conditions: [],
@@ -631,7 +671,7 @@ describe("convertData", () => {
 		expect(data.statements[0]?.goals[0]?.outcome).toEqual({ label: "TBD", note: undefined });
 	});
 
-	test("uses a custom config's mapping.outcome labels instead of the defaults", () => {
+	test("uses a custom config's outcome labels instead of the defaults", () => {
 		const customConfig = {
 			...DEFAULT_CONFIG,
 			mapping: {
@@ -645,7 +685,7 @@ describe("convertData", () => {
 				patient: PATIENT,
 				subjective: { complaint: "sensitive teeth" },
 				objective: {
-					medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
+					medical: { bmi: "22.4", allergies: "none", asa: "I" },
 					exams: { findings: ["no visible caries"], referrals: "none" },
 				},
 				conditions: [],
@@ -673,7 +713,7 @@ describe("convertData", () => {
 			patient: PATIENT,
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
-				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
+				medical: { bmi: "22.4", allergies: "none", asa: "I" },
 				exams: { findings: ["no visible caries"], referrals: "none" },
 			},
 			conditions: [],

@@ -17,7 +17,7 @@ beforeAll(async () => {
 			patient: { initials: "J.D.", dob: "1990-01-01", chartId: "12345" },
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
-				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
+				medical: { bmi: "22.4", allergies: "none", asa: "I" },
 				exams: { findings: ["no visible caries"], referrals: "none" },
 			},
 			needs: [
@@ -64,7 +64,7 @@ describe("dhplan inspect", () => {
 			appointments: { planned: [] },
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
-				medical: { bmi: "22.4", medications: "none", allergies: "none", asa: "I" },
+				medical: { bmi: "22.4", allergies: "none", asa: "I" },
 				exams: { findings: ["no visible caries"], referrals: "none" },
 			},
 			conditions: [],

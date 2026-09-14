@@ -19,9 +19,7 @@ export function getPlanSample(): Plan {
 		objective: {
 			medical: {
 				bmi: "22.4",
-				medications: "none",
 				allergies: "none",
-				diseases: "none",
 				asa: "I",
 				referrals: "none",
 			},
@@ -52,8 +50,9 @@ export function getPlanSample(): Plan {
 		},
 		conditions: [
 			{
-				description: "Type 2 diabetes",
-				medications: "Metformin 500mg BID",
+				name: "Type 2 diabetes",
+				description: "diagnosed 2018, managed with medication",
+				medications: [{ name: "Metformin", description: "500mg BID" }],
 				adverse: "none reported",
 				interactions: "none noted",
 				modifications: "morning appointments preferred",

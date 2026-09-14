@@ -32,7 +32,7 @@ export default function PlanEditor({ plan, onChange }: PlanEditorProps) {
 	const yesCount = plan.needs.filter((need) => need.exists === true).length;
 
 	return (
-		<section className="flex min-w-0 flex-[3] flex-col overflow-y-auto p-4">
+		<section className="flex min-w-0 flex-1 flex-col overflow-y-auto p-4">
 			<h2 className="mb-3 font-mono text-sm font-semibold uppercase tracking-wide text-[#7C8B86]">
 				Care Plan
 			</h2>

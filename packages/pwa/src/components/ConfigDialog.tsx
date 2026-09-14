@@ -35,14 +35,61 @@ function FormatSection({ value, onChange }: FormatSectionProps) {
 				onChange={(next) => onChange({ ...value, goal: { doneBy: next ?? "" } })}
 			/>
 			<Field
+				label="Vitals"
+				value={value.vitals}
+				onChange={(next) => onChange({ ...value, vitals: next ?? "" })}
+			/>
+			<Field
+				label="Condition medication"
+				value={value.condition.medication}
+				onChange={(next) =>
+					onChange({ ...value, condition: { ...value.condition, medication: next ?? "" } })
+				}
+			/>
+			<Field
+				label="Condition description"
+				value={value.condition.description}
+				onChange={(next) =>
+					onChange({ ...value, condition: { ...value.condition, description: next ?? "" } })
+				}
+			/>
+		</div>
+	);
+}
+
+interface DelimiterSectionProps {
+	value: Config["delimiter"];
+	onChange: (next: Config["delimiter"]) => void;
+}
+
+function DelimiterSection({ value, onChange }: DelimiterSectionProps) {
+	return (
+		<div className="grid grid-cols-2 gap-3">
+			<Field
 				label="Visits"
 				value={value.visits}
 				onChange={(next) => onChange({ ...value, visits: next ?? "" })}
 			/>
 			<Field
-				label="Vitals"
-				value={value.vitals}
-				onChange={(next) => onChange({ ...value, vitals: next ?? "" })}
+				label="Medical medications"
+				value={value.medical.medications}
+				onChange={(next) =>
+					onChange({ ...value, medical: { ...value.medical, medications: next ?? "" } })
+				}
+			/>
+			<Field
+				label="Medical diseases"
+				value={value.medical.diseases}
+				onChange={(next) =>
+					onChange({ ...value, medical: { ...value.medical, diseases: next ?? "" } })
+				}
+			/>
+			<Field
+				label="Condition medications"
+				value={value.condition.medications}
+				onChange={(next) =>
+					onChange({ ...value, condition: { ...value.condition, medications: next ?? "" } })
+				}
 			/>
 		</div>
 	);
@@ -203,6 +250,16 @@ export default function ConfigDialog({
 						<FormatSection
 							value={draft.format}
 							onChange={(format) => setDraft({ ...draft, format })}
+						/>
+					</section>
+
+					<section className="rounded-md border border-[#D8DED9] bg-white p-3">
+						<h3 className="mb-2 font-mono text-xs font-bold uppercase tracking-wide text-[#4B5B55]">
+							Delimiters
+						</h3>
+						<DelimiterSection
+							value={draft.delimiter}
+							onChange={(delimiter) => setDraft({ ...draft, delimiter })}
 						/>
 					</section>
 

@@ -136,7 +136,7 @@ describe("parseConfig", () => {
 
 	test("rejects a config missing format.goal.doneBy", () => {
 		const { goal, ...formatWithoutGoal } = DEFAULT_CONFIG.format;
-		const config = { ...DEFAULT_CONFIG, format: formatWithoutGoal };
+		const config = { ...DEFAULT_CONFIG, format: { ...formatWithoutGoal, goal: {} } };
 
 		expect(parseConfig(JSON.stringify(config))).toMatchObject({ ok: false, reason: "schema" });
 	});

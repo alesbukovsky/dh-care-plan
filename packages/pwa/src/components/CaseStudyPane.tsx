@@ -18,9 +18,10 @@ import { EraserIcon } from "./icons";
 interface CaseStudyPaneProps {
 	value: string;
 	onChange: (value: string) => void;
+	width: number;
 }
 
-export default function CaseStudyPane({ value, onChange }: CaseStudyPaneProps) {
+export default function CaseStudyPane({ value, onChange, width }: CaseStudyPaneProps) {
 	const editorRef = useRef<HTMLDivElement>(null);
 	const lastEmitted = useRef<string | null>(null);
 
@@ -70,7 +71,10 @@ export default function CaseStudyPane({ value, onChange }: CaseStudyPaneProps) {
 	}
 
 	return (
-		<section className="flex min-w-0 flex-[2] flex-col bg-[#F3EFE4] p-4">
+		<section
+			className="flex min-w-0 flex-none flex-col bg-[#F3EFE4] p-4"
+			style={{ width: `${width}px` }}
+		>
 			<h2 className="mb-3 font-mono text-sm font-semibold uppercase tracking-wide text-[#7C8B86]">
 				Case study
 			</h2>

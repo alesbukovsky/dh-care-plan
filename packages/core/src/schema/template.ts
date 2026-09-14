@@ -32,7 +32,7 @@ const Medical = z.object({
 registry.add(Medical, { id: "Medical" });
 
 const Exams = z.object({
-	findings: z.array(z.string()).optional(),
+	findings: z.string().optional(),
 	referrals: z.array(z.string()).optional(),
 });
 registry.add(Exams, { id: "Exams" });
@@ -67,6 +67,7 @@ const Objective = z.object({
 registry.add(Objective, { id: "Objective" });
 
 const Condition = z.object({
+	name: z.string().optional(),
 	description: z.string().optional(),
 	medications: z.string().optional(),
 	adverse: z.string().optional(),

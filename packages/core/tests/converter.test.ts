@@ -10,7 +10,7 @@ const validPlan = {
 	subjective: { complaint: "sensitive teeth" },
 	objective: {
 		medical: { bmi: "22.4", allergies: "none", asa: "I" },
-		exams: { findings: ["no visible caries"], referrals: ["none"] },
+		exams: { findings: "no visible caries", referrals: ["none"] },
 	},
 	conditions: [],
 	needs: [
@@ -87,7 +87,7 @@ describe("convertData", () => {
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
 				medical: { bmi: "22.4", allergies: "none", asa: "I" },
-				exams: { findings: ["no visible caries"], referrals: ["none"] },
+				exams: { findings: "no visible caries", referrals: ["none"] },
 			},
 			conditions: [],
 			needs: [
@@ -110,7 +110,7 @@ describe("convertData", () => {
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
 				medical: { bmi: "22.4", allergies: "none", asa: "I" },
-				exams: { findings: ["no visible caries"], referrals: ["none"] },
+				exams: { findings: "no visible caries", referrals: ["none"] },
 			},
 			conditions: [],
 			needs: [
@@ -132,7 +132,7 @@ describe("convertData", () => {
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
 				medical: { bmi: "22.4", allergies: "none", asa: "I" },
-				exams: { findings: ["no visible caries"], referrals: ["none"] },
+				exams: { findings: "no visible caries", referrals: ["none"] },
 			},
 			conditions: [],
 			needs: [
@@ -196,7 +196,7 @@ describe("convertData", () => {
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
 				medical: { bmi: "22.4", allergies: "none", asa: "I" },
-				exams: { findings: ["no visible caries"], referrals: ["none"] },
+				exams: { findings: "no visible caries", referrals: ["none"] },
 			},
 			conditions: [],
 			needs: [
@@ -214,7 +214,7 @@ describe("convertData", () => {
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
 				medical: { bmi: "22.4", allergies: "none", asa: "I" },
-				exams: { findings: ["no visible caries"], referrals: ["none"] },
+				exams: { findings: "no visible caries", referrals: ["none"] },
 			},
 			conditions: [],
 			needs: [
@@ -262,7 +262,7 @@ describe("convertData", () => {
 		).toBeUndefined();
 	});
 
-	test("maps conditions onto the template 1:1, formatting name/description and flattening medications", () => {
+	test("maps conditions onto the template 1:1, passing name/description through and flattening medications", () => {
 		const conditions = [
 			{
 				name: "Type 2 diabetes",
@@ -279,7 +279,8 @@ describe("convertData", () => {
 
 		expect(data.conditions).toEqual([
 			{
-				description: "Type 2 diabetes - diagnosed 2018",
+				name: "Type 2 diabetes",
+				description: "diagnosed 2018",
 				medications: "Metformin (500mg BID)",
 				adverse: "none reported",
 				interactions: "none noted",
@@ -289,7 +290,7 @@ describe("convertData", () => {
 		]);
 	});
 
-	test("uses name or description alone for a condition, without applying the format pattern", () => {
+	test("passes name and description through independently, even when only one is set", () => {
 		const data = convertData({
 			...validPlan,
 			conditions: [
@@ -298,7 +299,9 @@ describe("convertData", () => {
 			],
 		});
 
-		expect(data.conditions[0]?.description).toBe("Type 2 diabetes");
+		expect(data.conditions[0]?.name).toBe("Type 2 diabetes");
+		expect(data.conditions[0]?.description).toBeUndefined();
+		expect(data.conditions[1]?.name).toBeUndefined();
 		expect(data.conditions[1]?.description).toBe("diagnosed 2018");
 		expect(data.conditions[1]?.medications).toBe("Metformin");
 	});
@@ -493,7 +496,7 @@ describe("convertData", () => {
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
 				medical: { bmi: "22.4", allergies: "none", asa: "I" },
-				exams: { findings: ["no visible caries"], referrals: ["none"] },
+				exams: { findings: "no visible caries", referrals: ["none"] },
 			},
 			conditions: [],
 			needs: [
@@ -539,7 +542,7 @@ describe("convertData", () => {
 				subjective: { complaint: "sensitive teeth" },
 				objective: {
 					medical: { bmi: "22.4", allergies: "none", asa: "I" },
-					exams: { findings: ["no visible caries"], referrals: ["none"] },
+					exams: { findings: "no visible caries", referrals: ["none"] },
 				},
 				conditions: [],
 				needs: [
@@ -577,7 +580,7 @@ describe("convertData", () => {
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
 				medical: { bmi: "22.4", allergies: "none", asa: "I" },
-				exams: { findings: ["no visible caries"], referrals: ["none"] },
+				exams: { findings: "no visible caries", referrals: ["none"] },
 			},
 			conditions: [],
 			needs: [
@@ -599,7 +602,7 @@ describe("convertData", () => {
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
 				medical: { bmi: "22.4", allergies: "none", asa: "I" },
-				exams: { findings: ["no visible caries"], referrals: ["none"] },
+				exams: { findings: "no visible caries", referrals: ["none"] },
 			},
 			conditions: [],
 			needs: [
@@ -619,7 +622,7 @@ describe("convertData", () => {
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
 				medical: { bmi: "22.4", allergies: "none", asa: "I" },
-				exams: { findings: ["no visible caries"], referrals: ["none"] },
+				exams: { findings: "no visible caries", referrals: ["none"] },
 			},
 			conditions: [],
 			needs: [
@@ -642,7 +645,7 @@ describe("convertData", () => {
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
 				medical: { bmi: "22.4", allergies: "none", asa: "I" },
-				exams: { findings: ["no visible caries"], referrals: ["none"] },
+				exams: { findings: "no visible caries", referrals: ["none"] },
 			},
 			conditions: [],
 			needs: [
@@ -664,7 +667,7 @@ describe("convertData", () => {
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
 				medical: { bmi: "22.4", allergies: "none", asa: "I" },
-				exams: { findings: ["no visible caries"], referrals: ["none"] },
+				exams: { findings: "no visible caries", referrals: ["none"] },
 			},
 			conditions: [],
 			needs: [
@@ -695,7 +698,7 @@ describe("convertData", () => {
 				subjective: { complaint: "sensitive teeth" },
 				objective: {
 					medical: { bmi: "22.4", allergies: "none", asa: "I" },
-					exams: { findings: ["no visible caries"], referrals: ["none"] },
+					exams: { findings: "no visible caries", referrals: ["none"] },
 				},
 				conditions: [],
 				needs: [
@@ -723,7 +726,7 @@ describe("convertData", () => {
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
 				medical: { bmi: "22.4", allergies: "none", asa: "I" },
-				exams: { findings: ["no visible caries"], referrals: ["none"] },
+				exams: { findings: "no visible caries", referrals: ["none"] },
 			},
 			conditions: [],
 			needs: [

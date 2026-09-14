@@ -149,7 +149,7 @@ function MedicationsEditor({ medications, onChange }: MedicationsEditorProps) {
 					>
 						<input
 							type="text"
-							className={`w-40 shrink-0 ${inputClass}`}
+							className={`w-56 shrink-0 ${inputClass}`}
 							placeholder="drug name"
 							value={medication.name ?? ""}
 							onChange={(event) =>

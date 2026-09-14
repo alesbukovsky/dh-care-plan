@@ -29,7 +29,7 @@ const Medical = z.object({
 registry.add(Medical, { id: "Medical" });
 
 const Exams = z.object({
-	findings: z.array(z.string()).optional(),
+	findings: z.string().optional(),
 	referrals: z.array(z.string()).optional(),
 });
 registry.add(Exams, { id: "Exams" });

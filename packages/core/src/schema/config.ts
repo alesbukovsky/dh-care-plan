@@ -42,7 +42,6 @@ const Format = z.object({
 	}),
 	condition: z.object({
 		medication: z.string(),
-		description: z.string(),
 	}),
 });
 
@@ -92,7 +91,6 @@ export const DEFAULT_CONFIG: Config = {
 		},
 		condition: {
 			medication: "{name} ({description})",
-			description: "{name} - {description}",
 		},
 	},
 	delimiter: {

@@ -53,13 +53,6 @@ function FormatSection({ value, onChange }: FormatSectionProps) {
 					onChange({ ...value, condition: { ...value.condition, medication: next ?? "" } })
 				}
 			/>
-			<Field
-				label="Condition description"
-				value={value.condition.description}
-				onChange={(next) =>
-					onChange({ ...value, condition: { ...value.condition, description: next ?? "" } })
-				}
-			/>
 		</div>
 	);
 }

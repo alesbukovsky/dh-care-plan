@@ -60,8 +60,6 @@ interface ObjectiveSectionProps {
 }
 
 export default function ObjectiveSection({ objective, onChange, config }: ObjectiveSectionProps) {
-	const findings = objective.exams?.findings ?? [];
-
 	return (
 		<Section title="Objective data" hint="Clinical findings from assessment">
 			<Subsection title="Vitals">
@@ -89,14 +87,12 @@ export default function ObjectiveSection({ objective, onChange, config }: Object
 			</Subsection>
 
 			<Subsection title="Extraoral / intraoral exams">
-				<StringListField
+				<Field
 					label="Findings"
 					placeholder="e.g. no visible lesions"
-					addLabel="Add finding"
-					values={findings}
-					onChange={(next) =>
-						onChange({ ...objective, exams: { ...objective.exams, findings: next } })
-					}
+					value={objective.exams?.findings}
+					onChange={(findings) => onChange({ ...objective, exams: { ...objective.exams, findings } })}
+					multiline
 				/>
 				<StringListField
 					label="Need for referrals"
@@ -198,6 +194,7 @@ function VisitsEditor({ objective, onChange }: VisitsEditorProps) {
 				placeholder="vitals with no visit on record, e.g. BP 120/80, pulse 72"
 				value={vitals.undated}
 				onChange={(undated) => onChange({ ...objective, vitals: { ...vitals, undated } })}
+				multiline
 			/>
 			<div className="mt-3 space-y-2">
 				{visits.map((visit, index) => (

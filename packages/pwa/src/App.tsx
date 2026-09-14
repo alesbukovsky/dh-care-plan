@@ -42,6 +42,7 @@ export default function App() {
 	const [configImportFailure, setConfigImportFailure] = useState<ConfigImportFailure | null>(null);
 	const [generateFailure, setGenerateFailure] = useState<GenerateFailure | null>(null);
 	const [confirmingNewPlan, setConfirmingNewPlan] = useState(false);
+	const [confirmingImport, setConfirmingImport] = useState(false);
 	const [generating, setGenerating] = useState(false);
 	const [configuring, setConfiguring] = useState(false);
 	const [templateSelection, setTemplateSelection] = useState<TemplateSelection | null>(null);
@@ -79,6 +80,11 @@ export default function App() {
 		}, AUTOSAVE_DEBOUNCE_MS);
 		return () => clearTimeout(timeout);
 	}, [plan, config]);
+
+	function confirmImport() {
+		setConfirmingImport(false);
+		fileInputRef.current?.click();
+	}
 
 	function startNewPlan() {
 		setPlan(structuredClone(DEFAULT_PLAN));
@@ -147,7 +153,7 @@ export default function App() {
 				collapsed={commandBarCollapsed}
 				onToggleCollapsed={() => setCommandBarCollapsed((prev) => !prev)}
 				onNewPlan={() => setConfirmingNewPlan(true)}
-				onImport={() => fileInputRef.current?.click()}
+				onImport={() => setConfirmingImport(true)}
 				onExport={() => void exportPlan(plan)}
 				onGenerate={openGenerateDialog}
 				onConfigure={() => setConfiguring(true)}
@@ -192,6 +198,16 @@ export default function App() {
 					confirmLabel="Start new plan"
 					onConfirm={startNewPlan}
 					onCancel={() => setConfirmingNewPlan(false)}
+				/>
+			)}
+
+			{confirmingImport && (
+				<ConfirmDialog
+					title="Import a plan?"
+					message="The current plan will be replaced with the imported file. Any unsaved changes will be lost."
+					confirmLabel="Choose file"
+					onConfirm={confirmImport}
+					onCancel={() => setConfirmingImport(false)}
 				/>
 			)}
 

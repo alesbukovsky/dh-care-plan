@@ -23,7 +23,7 @@ export function getPlanSample(): Plan {
 				asa: "I",
 				referrals: ["none"],
 			},
-			exams: { findings: ["no visible caries"], referrals: ["none"] },
+			exams: { findings: "no visible caries", referrals: ["none"] },
 			restorative: {
 				caries: "none",
 				restorations: "none",

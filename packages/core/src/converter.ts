@@ -107,11 +107,8 @@ export function convertData(plan: Plan, config: Config = DEFAULT_CONFIG) {
 	const hasVitals = vitals.length > 0;
 
 	const conditions = plan.conditions.map((condition) => ({
-		description: formatNameDescription(
-			condition.name,
-			condition.description,
-			config.format.condition.description,
-		),
+		name: condition.name,
+		description: condition.description,
 		medications: condition.medications
 			.map((medication) =>
 				formatNameDescription(

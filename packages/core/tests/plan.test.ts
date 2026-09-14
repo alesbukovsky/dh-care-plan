@@ -48,7 +48,13 @@ describe("Patient", () => {
 	});
 
 	test("still rejects a field that is present but malformed", () => {
-		expect(() => Plan.parse({ ...DEFAULT_PLAN, patient: { dob: "17/04/2001" } })).toThrow();
+		expect(() => Plan.parse({ ...DEFAULT_PLAN, patient: { chartId: 12345 } })).toThrow();
+	});
+
+	test("accepts dob as free text, not just an ISO date", () => {
+		const plan = Plan.parse({ ...DEFAULT_PLAN, patient: { dob: "01/17/2001 (age: 25)" } });
+
+		expect(plan.patient.dob).toBe("01/17/2001 (age: 25)");
 	});
 });
 

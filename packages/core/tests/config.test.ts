@@ -6,6 +6,14 @@ describe("DEFAULT_CONFIG", () => {
 	test("includes a format.goal.doneBy pattern", () => {
 		expect(DEFAULT_CONFIG.format.goal.doneBy).toBe("{date} / {relative}");
 	});
+
+	test("includes a format.bmi pattern", () => {
+		expect(DEFAULT_CONFIG.format.bmi).toBe("{value} {class}");
+	});
+
+	test("parses via the Config schema", () => {
+		expect(Config.parse(DEFAULT_CONFIG)).toEqual(DEFAULT_CONFIG);
+	});
 });
 
 describe("Config's mapping shape aligns with Plan enums", () => {

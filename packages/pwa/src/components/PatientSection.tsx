@@ -1,56 +1,48 @@
-import type { Plan } from "@dh-care-plan/core";
-import { DerivedField, Field } from "./fields";
+import type { Config, Plan } from "@dh-care-plan/core";
+import DobCalculatorButton from "./DobCalculatorButton";
+import { Field } from "./fields";
 import Section from "./Section";
 
+export { calculateAge } from "../age";
+
 type Patient = Plan["patient"];
-
-export function calculateAge(dob: string | undefined, on: Date = new Date()): number | undefined {
-	const [year, month, day] = (dob ?? "").split("-").map(Number);
-	if (!year || !month || !day) return undefined;
-
-	let age = on.getFullYear() - year;
-	const beforeBirthday =
-		on.getMonth() + 1 < month || (on.getMonth() + 1 === month && on.getDate() < day);
-	if (beforeBirthday) age -= 1;
-
-	return age >= 0 ? age : undefined;
-}
 
 interface PatientSectionProps {
 	patient: Patient;
 	onChangePatient: (next: Patient) => void;
+	config: Config;
 }
 
-export default function PatientSection({ patient, onChangePatient }: PatientSectionProps) {
-	const age = calculateAge(patient.dob);
-
+export default function PatientSection({ patient, onChangePatient, config }: PatientSectionProps) {
 	return (
 		<Section title="Patient" hint="Personal information" badge={patient.initials}>
-			<div className="grid grid-cols-2 gap-3">
+			<div className="grid grid-cols-5 gap-3">
 				<Field
 					label="Initials"
 					placeholder="e.g. J.D."
 					value={patient.initials}
 					onChange={(next) => onChangePatient({ ...patient, initials: next })}
+					className="col-span-1"
 				/>
 				<Field
 					label="Chart ID"
 					placeholder="e.g. 12345"
 					value={patient.chartId}
 					onChange={(next) => onChangePatient({ ...patient, chartId: next })}
+					className="col-span-2"
 				/>
-			</div>
-			<div className="grid grid-cols-2 gap-3">
 				<Field
 					label="Date of birth"
-					type="date"
+					placeholder="e.g. 01/17/1990 (age: 35)"
 					value={patient.dob}
 					onChange={(next) => onChangePatient({ ...patient, dob: next })}
-				/>
-				<DerivedField
-					label="Age"
-					hint="Calculated from the date of birth"
-					value={age === undefined ? "—" : `${age} years`}
+					className="col-span-2"
+					extra={
+						<DobCalculatorButton
+							config={config}
+							onAccept={(next) => onChangePatient({ ...patient, dob: next })}
+						/>
+					}
 				/>
 			</div>
 		</Section>

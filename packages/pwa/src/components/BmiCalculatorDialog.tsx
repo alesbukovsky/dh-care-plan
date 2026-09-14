@@ -1,7 +1,9 @@
+import type { Config } from "@dh-care-plan/core";
 import { useEffect, useId, useRef, useState } from "react";
 import { inputClass, labelClass } from "./fields";
 
 interface BmiCalculatorDialogProps {
+	config: Config;
 	onAccept: (result: string) => void;
 	onCancel: () => void;
 }
@@ -21,7 +23,13 @@ function calculateBmi(weightLbs: number, feet: number, inches: number): number |
 	return (703 * weightLbs) / (totalInches * totalInches);
 }
 
-export default function BmiCalculatorDialog({ onAccept, onCancel }: BmiCalculatorDialogProps) {
+function formatBmi(bmi: number, config: Config): string {
+	return config.format.bmi
+		.replace("{value}", bmi.toFixed(1))
+		.replace("{class}", categorize(bmi));
+}
+
+export default function BmiCalculatorDialog({ config, onAccept, onCancel }: BmiCalculatorDialogProps) {
 	const [weight, setWeight] = useState("");
 	const [feet, setFeet] = useState("");
 	const [inches, setInches] = useState("");
@@ -40,7 +48,7 @@ export default function BmiCalculatorDialog({ onAccept, onCancel }: BmiCalculato
 	}, [onCancel]);
 
 	const bmi = calculateBmi(Number(weight), Number(feet) || 0, Number(inches) || 0);
-	const result = bmi !== undefined ? `${bmi.toFixed(1)} ${categorize(bmi)}` : undefined;
+	const result = bmi !== undefined ? formatBmi(bmi, config) : undefined;
 
 	return (
 		<div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1E2B27]/40 p-4">

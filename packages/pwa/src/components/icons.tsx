@@ -126,6 +126,16 @@ export function CalculatorIcon(props: SVGProps<SVGSVGElement>) {
 	);
 }
 
+export function CalendarIcon(props: SVGProps<SVGSVGElement>) {
+	return (
+		<Icon {...props}>
+			<rect x="3.5" y="4.5" width="17" height="16" rx="1.5" />
+			<path d="M3.5 9h17" />
+			<path d="M8 3v3M16 3v3" />
+		</Icon>
+	);
+}
+
 export function ExclamationIcon(props: SVGProps<SVGSVGElement>) {
 	return (
 		<Icon {...props}>

@@ -1,4 +1,4 @@
-export { convertData } from "./converter";
+export { convertData, dateStr } from "./converter";
 export type { JsonResult, ParseResult, SchemaIssue } from "./parser";
 export { parseConfig, parseJson, parsePlan, parseWith } from "./parser";
 export type { RenderResult, TemplateIssue, TemplateResult } from "./renderer";

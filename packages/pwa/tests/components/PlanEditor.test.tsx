@@ -1,8 +1,8 @@
-import type { Plan } from "@dh-care-plan/core";
+import { type Config, DEFAULT_CONFIG, type Plan } from "@dh-care-plan/core";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { useState } from "react";
-import { afterEach, expect, test, vi } from "vitest";
-import { calculateAge } from "../../src/components/PatientSection";
+import { afterEach, expect, test } from "vitest";
+import { calculateAge } from "../../src/age";
 import PlanEditor from "../../src/components/PlanEditor";
 
 afterEach(cleanup);
@@ -14,7 +14,7 @@ function required<T>(value: T | undefined | null): T {
 
 let latest: Plan;
 
-function Harness() {
+function Harness({ config = DEFAULT_CONFIG }: { config?: Config }) {
 	const [plan, setPlan] = useState<Plan>({
 		patient: { initials: "", dob: "", chartId: "" },
 		subjective: {},
@@ -23,7 +23,7 @@ function Harness() {
 		needs: [],
 	});
 	latest = plan;
-	return <PlanEditor plan={plan} onChange={setPlan} />;
+	return <PlanEditor plan={plan} onChange={setPlan} config={config} />;
 }
 
 function expand(title: string) {
@@ -39,25 +39,6 @@ test("patient identifiers are editable", () => {
 	fireEvent.change(screen.getByLabelText("Date of birth"), { target: { value: "1990-01-01" } });
 
 	expect(latest.patient).toEqual({ initials: "J.D.", dob: "1990-01-01", chartId: "12345" });
-});
-
-test("age is derived from the date of birth and is not editable", () => {
-	vi.useFakeTimers({ toFake: ["Date"] });
-	vi.setSystemTime(new Date("2026-07-27T12:00:00Z"));
-
-	render(<Harness />);
-	expand("Patient");
-
-	const ageField = screen.getByLabelText("Age");
-	expect(ageField).toHaveValue("—");
-	expect(ageField).toHaveAttribute("readonly");
-
-	fireEvent.change(screen.getByLabelText("Date of birth"), { target: { value: "1990-01-01" } });
-
-	expect(screen.getByLabelText("Age")).toHaveValue("36 years");
-	expect(latest.patient).not.toHaveProperty("age");
-
-	vi.useRealTimers();
 });
 
 test("age accounts for a birthday that has not happened yet this year", () => {
@@ -119,6 +100,24 @@ test("objective groups, exam findings, and other findings are editable", () => {
 		exams: { findings: ["no visible caries"] },
 		radiographic: "none needed",
 	});
+});
+
+test("the BMI calculator formats its result using config.format.bmi", () => {
+	const config: Config = {
+		...DEFAULT_CONFIG,
+		format: { ...DEFAULT_CONFIG.format, bmi: "BMI {value} ({class})" },
+	};
+	render(<Harness config={config} />);
+	expand("Objective data");
+	expand("Medical history");
+
+	fireEvent.click(screen.getByTitle("BMI calculator"));
+	fireEvent.change(screen.getByLabelText("Weight (lbs)"), { target: { value: "160" } });
+	fireEvent.change(screen.getByLabelText("Height (ft)"), { target: { value: "5" } });
+	fireEvent.change(screen.getByLabelText("Height (in)"), { target: { value: "10" } });
+	fireEvent.click(screen.getByRole("button", { name: "Accept" }));
+
+	expect(latest.objective.medical?.bmi).toBe("BMI 23.0 (normal)");
 });
 
 test("exam findings are edited and removed by position, and the last one drops the list", () => {

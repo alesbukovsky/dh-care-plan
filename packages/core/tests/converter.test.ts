@@ -231,10 +231,10 @@ describe("convertData", () => {
 		});
 	});
 
-	test("formats patient.dob using config.format.date, otherwise copying patient fields unchanged", () => {
+	test("copies patient fields unchanged, including the free-text dob", () => {
 		const data = convertData(validPlan);
 
-		expect(data.patient).toEqual({ ...PATIENT, dob: "01/01/1990" });
+		expect(data.patient).toEqual(PATIENT);
 	});
 
 	test("orders objective.visits oldest to newest, formatting and joining using config.format.date / config.delimiter.visits", () => {
@@ -470,12 +470,21 @@ describe("convertData", () => {
 	});
 
 	test("formats dates using a custom config.format.date pattern", () => {
-		const data = convertData(validPlan, {
-			...DEFAULT_CONFIG,
-			format: { ...DEFAULT_CONFIG.format, date: "DD.MM.YYYY" },
-		});
+		const data = convertData(
+			{
+				...validPlan,
+				objective: {
+					...validPlan.objective,
+					vitals: { visits: [{ date: "2026-08-01", vitals: "BP 120/80" }] },
+				},
+			},
+			{
+				...DEFAULT_CONFIG,
+				format: { ...DEFAULT_CONFIG.format, date: "DD.MM.YYYY" },
+			},
+		);
 
-		expect(data.patient.dob).toBe("01.01.1990");
+		expect(data.visits).toBe("01.08.2026");
 	});
 
 	function goalWithDoneBy(doneBy: { date?: string; relative?: string } | undefined) {

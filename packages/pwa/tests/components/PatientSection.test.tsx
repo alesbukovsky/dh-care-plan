@@ -1,8 +1,9 @@
-import type { Plan } from "@dh-care-plan/core";
+import { DEFAULT_CONFIG, type Plan } from "@dh-care-plan/core";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { useState } from "react";
 import { expect, test } from "vitest";
-import PatientSection, { calculateAge } from "../../src/components/PatientSection";
+import { calculateAge } from "../../src/age";
+import PatientSection from "../../src/components/PatientSection";
 
 type Patient = Plan["patient"];
 
@@ -11,7 +12,9 @@ let latest: Patient;
 function Harness(props: { initial: Patient }) {
 	const [patient, setPatient] = useState<Patient>(props.initial);
 	latest = patient;
-	return <PatientSection patient={patient} onChangePatient={setPatient} />;
+	return (
+		<PatientSection patient={patient} onChangePatient={setPatient} config={DEFAULT_CONFIG} />
+	);
 }
 
 const patient: Patient = { initials: "J.D.", chartId: "12345", dob: "1990-06-15" };
@@ -34,14 +37,14 @@ test("clearing a patient field drops it, since every one of them is optional", (
 	expect(latest).toEqual({});
 });
 
-test("age shows a dash until the date of birth is a real date", () => {
+test("date of birth is a free text field", () => {
 	render(<Harness initial={{ ...patient, dob: "" }} />);
 	expand();
 
-	expect(screen.getByLabelText("Age")).toHaveValue("—");
-
-	fireEvent.change(screen.getByLabelText("Date of birth"), { target: { value: "1990-06-15" } });
-	expect(screen.getByLabelText("Age")).not.toHaveValue("—");
+	fireEvent.change(screen.getByLabelText("Date of birth"), {
+		target: { value: "06/15/1990 (age: 35)" },
+	});
+	expect(latest).toEqual({ ...patient, dob: "06/15/1990 (age: 35)" });
 });
 
 test("calculateAge counts whole years elapsed on the given day", () => {

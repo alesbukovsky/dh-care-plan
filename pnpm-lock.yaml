@@ -177,7 +177,7 @@ importers:
   packages/cli:
     dependencies:
       '@dh-care-plan/core':
-        specifier: workspace:0.4.1
+        specifier: workspace:0.5.0
         version: link:../core
       commander:
         specifier: 15.0.0
@@ -239,7 +239,7 @@ importers:
   packages/pwa:
     dependencies:
       '@dh-care-plan/core':
-        specifier: workspace:0.4.1
+        specifier: workspace:0.5.0
         version: link:../core
       react:
         specifier: 19.2.8

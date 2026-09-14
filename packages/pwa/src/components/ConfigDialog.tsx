@@ -40,6 +40,13 @@ function FormatSection({ value, onChange }: FormatSectionProps) {
 				onChange={(next) => onChange({ ...value, vitals: next ?? "" })}
 			/>
 			<Field
+				label="Patient date of birth"
+				value={value.patient.dob}
+				onChange={(next) =>
+					onChange({ ...value, patient: { ...value.patient, dob: next ?? "" } })
+				}
+			/>
+			<Field
 				label="Condition medication"
 				value={value.condition.medication}
 				onChange={(next) =>

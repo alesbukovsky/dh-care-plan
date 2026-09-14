@@ -165,7 +165,7 @@ export default function App() {
 				onMouseDown={startResizingCaseStudy}
 				className="w-1 shrink-0 cursor-col-resize border-0 bg-[#D8DED9] p-0 hover:bg-[#7C8B86] active:bg-[#7C8B86]"
 			/>
-			<PlanEditor key={planGeneration} plan={plan} onChange={setPlan} />
+			<PlanEditor key={planGeneration} plan={plan} onChange={setPlan} config={config} />
 
 			<input
 				ref={fileInputRef}

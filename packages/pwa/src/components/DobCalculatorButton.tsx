@@ -1,28 +1,28 @@
 import type { Config } from "@dh-care-plan/core";
 import { useState } from "react";
-import BmiCalculatorDialog from "./BmiCalculatorDialog";
-import { CalculatorIcon } from "./icons";
+import DobCalculatorDialog from "./DobCalculatorDialog";
+import { CalendarIcon } from "./icons";
 
-interface BmiCalculatorButtonProps {
+interface DobCalculatorButtonProps {
 	config: Config;
 	onAccept: (result: string | undefined) => void;
 }
 
-export default function BmiCalculatorButton({ config, onAccept }: BmiCalculatorButtonProps) {
+export default function DobCalculatorButton({ config, onAccept }: DobCalculatorButtonProps) {
 	const [open, setOpen] = useState(false);
 
 	return (
 		<>
 			<button
 				type="button"
-				title="BMI calculator"
+				title="Date of birth calculator"
 				onClick={() => setOpen(true)}
 				className="shrink-0 rounded p-1 text-[#7C8B86] hover:bg-[#F0F0EC] hover:text-[#2F6F62]"
 			>
-				<CalculatorIcon className="h-5 w-5" />
+				<CalendarIcon className="h-5 w-5" />
 			</button>
 			{open && (
-				<BmiCalculatorDialog
+				<DobCalculatorDialog
 					config={config}
 					onAccept={(result) => {
 						onAccept(result);

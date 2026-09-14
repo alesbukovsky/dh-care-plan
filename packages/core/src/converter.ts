@@ -142,7 +142,7 @@ export function convertData(plan: Plan, config: Config = DEFAULT_CONFIG) {
 		patient: {
 			initials: orEmpty(plan.patient.initials),
 			chartId: orEmpty(plan.patient.chartId),
-			dob: plan.patient.dob ? dateStr(plan.patient.dob, config.format.date) : "",
+			dob: orEmpty(plan.patient.dob),
 		},
 		visits: visits || undefined,
 		subjective: plan.subjective,

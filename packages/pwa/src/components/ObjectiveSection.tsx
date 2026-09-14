@@ -1,4 +1,4 @@
-import type { Plan } from "@dh-care-plan/core";
+import type { Config, Plan } from "@dh-care-plan/core";
 import BmiCalculatorButton from "./BmiCalculatorButton";
 import { Field, type FieldDefinition, FieldGroup, inputClass, StringListField } from "./fields";
 import { PlusIcon, TrashIcon } from "./icons";
@@ -12,23 +12,27 @@ type Periodontal = NonNullable<Objective["periodontal"]>;
 type Vitals = NonNullable<Objective["vitals"]>;
 type Visit = NonNullable<Vitals["visits"]>[number];
 
-const MEDICAL_FIELDS: FieldDefinition<Medical>[] = [
-	{
-		key: "bmi",
-		label: "BMI",
-		placeholder: "e.g. 22.4",
-		width: "half",
-		renderExtra: (_value, onChange) => <BmiCalculatorButton onAccept={onChange} />,
-	},
-	{ key: "asa", label: "ASA class", placeholder: "e.g. II", width: "half" },
-	{ key: "allergies", label: "Allergies", placeholder: "allergen and reaction", multiline: true },
-	{
-		key: "referrals",
-		label: "Need for referrals",
-		placeholder: "medical referrals made",
-		multiline: true,
-	},
-];
+function getMedicalFields(config: Config): FieldDefinition<Medical>[] {
+	return [
+		{
+			key: "bmi",
+			label: "BMI",
+			placeholder: "e.g. 22.4",
+			width: "half",
+			renderExtra: (_value, onChange) => (
+				<BmiCalculatorButton config={config} onAccept={onChange} />
+			),
+		},
+		{ key: "asa", label: "ASA class", placeholder: "e.g. II", width: "half" },
+		{ key: "allergies", label: "Allergies", placeholder: "allergen and reaction", multiline: true },
+		{
+			key: "referrals",
+			label: "Need for referrals",
+			placeholder: "medical referrals made",
+			multiline: true,
+		},
+	];
+}
 
 const RESTORATIVE_FIELDS: FieldDefinition<Restorative>[] = [
 	{ key: "caries", label: "Caries", placeholder: "teeth and surfaces affected", multiline: true },
@@ -70,9 +74,10 @@ const PERIODONTAL_FIELDS: FieldDefinition<Periodontal>[] = [
 interface ObjectiveSectionProps {
 	objective: Objective;
 	onChange: (next: Objective) => void;
+	config: Config;
 }
 
-export default function ObjectiveSection({ objective, onChange }: ObjectiveSectionProps) {
+export default function ObjectiveSection({ objective, onChange, config }: ObjectiveSectionProps) {
 	const findings = objective.exams?.findings ?? [];
 
 	return (
@@ -86,7 +91,7 @@ export default function ObjectiveSection({ objective, onChange }: ObjectiveSecti
 					Medications and diseases are entered in the "Medical conditions" section below.
 				</p>
 				<FieldGroup
-					fields={MEDICAL_FIELDS}
+					fields={getMedicalFields(config)}
 					value={objective.medical}
 					onChange={(medical) => onChange({ ...objective, medical })}
 				/>

@@ -5,7 +5,7 @@ const registry = z.registry<{ id?: string }>();
 
 const Patient = z.object({
 	initials: z.string().optional(),
-	dob: z.iso.date().optional(),
+	dob: z.string().optional(),
 	chartId: z.string().optional(),
 });
 registry.add(Patient, { id: "Patient" });

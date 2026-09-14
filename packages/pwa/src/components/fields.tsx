@@ -75,31 +75,6 @@ export function Field({
 	);
 }
 
-interface DerivedFieldProps {
-	label: string;
-	value: string;
-	hint?: string;
-}
-
-export function DerivedField({ label, value, hint }: DerivedFieldProps) {
-	const id = useId();
-
-	return (
-		<div>
-			<label htmlFor={id} className={labelClass}>
-				{label}
-			</label>
-			<input
-				id={id}
-				readOnly
-				title={hint}
-				className="w-full cursor-default rounded-md border border-dashed border-[#B9C3BD] bg-[#F6F5F0] px-2 py-1 text-sm text-[#4B5B55] outline-none"
-				value={value}
-			/>
-		</div>
-	);
-}
-
 interface StringListFieldProps {
 	label: string;
 	placeholder: string;

@@ -128,17 +128,12 @@ test("bad dates spell out the expected format", async () => {
 	const result = await readPlanFile(
 		planFile({
 			...VALID_PLAN,
-			patient: { ...VALID_PLAN.patient, dob: "17/04/2001" },
 			objective: { ...VALID_PLAN.objective, vitals: { visits: [{ date: "2026-13-01" }] } },
 		}),
 	);
 
 	if (result.ok) throw new Error("expected the import to fail");
 	expect(result.issues).toEqual([
-		{
-			field: "Patient → Date of birth",
-			message: 'Must be a date written as YYYY-MM-DD, but the file has text ("17/04/2001").',
-		},
 		{
 			field: "Objective data → Vitals → Visits #1 → Date",
 			message: 'Must be a date written as YYYY-MM-DD, but the file has text ("2026-13-01").',
@@ -242,14 +237,8 @@ test("a brand new plan exported before any editing is importable again", async (
 	expect(result).toEqual({ ok: true, plan: DEFAULT_PLAN });
 });
 
-test("a patient field left empty by the editor is still rejected as a date", async () => {
+test("a patient's date of birth is free text, so an empty value is accepted", async () => {
 	const result = await readPlanFile(planFile({ ...DEFAULT_PLAN, patient: { dob: "" } }));
 
-	if (result.ok) throw new Error("expected the import to fail");
-	expect(result.issues).toEqual([
-		{
-			field: "Patient → Date of birth",
-			message: "Must be a date written as YYYY-MM-DD, but the file has empty text.",
-		},
-	]);
+	expect(result).toEqual({ ok: true, plan: { ...DEFAULT_PLAN, patient: { dob: "" } } });
 });

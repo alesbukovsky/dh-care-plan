@@ -36,6 +36,10 @@ const Format = z.object({
 	date: z.string(),
 	goal: Goal,
 	vitals: z.string(),
+	bmi: z.string(),
+	patient: z.object({
+		dob: z.string(),
+	}),
 	condition: z.object({
 		medication: z.string(),
 		description: z.string(),
@@ -82,6 +86,10 @@ export const DEFAULT_CONFIG: Config = {
 			doneBy: "{date} / {relative}",
 		},
 		vitals: "Appointment {date}: {vitals}",
+		bmi: "{value} - {class}",
+		patient: {
+			dob: "{date} (age {age})",
+		},
 		condition: {
 			medication: "{name} ({description})",
 			description: "{name} - {description}",

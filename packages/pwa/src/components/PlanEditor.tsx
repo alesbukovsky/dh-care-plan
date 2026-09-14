@@ -1,4 +1,4 @@
-import type { Need, Plan } from "@dh-care-plan/core";
+import type { Config, Need, Plan } from "@dh-care-plan/core";
 import { useMemo } from "react";
 import { NEEDS } from "../needs";
 import { computePriorityErrors } from "../priorityValidation";
@@ -13,9 +13,10 @@ import SubjectiveSection from "./SubjectiveSection";
 interface PlanEditorProps {
 	plan: Plan;
 	onChange: (next: Plan) => void;
+	config: Config;
 }
 
-export default function PlanEditor({ plan, onChange }: PlanEditorProps) {
+export default function PlanEditor({ plan, onChange, config }: PlanEditorProps) {
 	function updateNeed(type: Need["type"], next: Need) {
 		const index = plan.needs.findIndex((need) => need.type === type);
 		const needs =
@@ -40,6 +41,7 @@ export default function PlanEditor({ plan, onChange }: PlanEditorProps) {
 				<PatientSection
 					patient={plan.patient}
 					onChangePatient={(patient) => onChange({ ...plan, patient })}
+					config={config}
 				/>
 				<SubjectiveSection
 					subjective={plan.subjective}
@@ -48,6 +50,7 @@ export default function PlanEditor({ plan, onChange }: PlanEditorProps) {
 				<ObjectiveSection
 					objective={plan.objective}
 					onChange={(objective) => onChange({ ...plan, objective })}
+					config={config}
 				/>
 				<ConditionsSection
 					conditions={plan.conditions}

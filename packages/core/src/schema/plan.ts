@@ -24,13 +24,13 @@ const Medical = z.object({
 	bmi: z.string().optional(),
 	allergies: z.string().optional(),
 	asa: z.string().optional(),
-	referrals: z.string().optional(),
+	referrals: z.array(z.string()).optional(),
 });
 registry.add(Medical, { id: "Medical" });
 
 const Exams = z.object({
 	findings: z.array(z.string()).optional(),
-	referrals: z.string().optional(),
+	referrals: z.array(z.string()).optional(),
 });
 registry.add(Exams, { id: "Exams" });
 
@@ -39,7 +39,7 @@ const Restorative = z.object({
 	restorations: z.string().optional(),
 	risk: z.string().optional(),
 	occlusion: z.string().optional(),
-	referrals: z.string().optional(),
+	referrals: z.array(z.string()).optional(),
 });
 registry.add(Restorative, { id: "Restorative" });
 
@@ -49,7 +49,7 @@ const Periodontal = z.object({
 	debridement: z.string().optional(),
 	gi: z.string().optional(),
 	pi: z.string().optional(),
-	referrals: z.string().optional(),
+	referrals: z.array(z.string()).optional(),
 });
 registry.add(Periodontal, { id: "Periodontal" });
 

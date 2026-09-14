@@ -37,6 +37,15 @@ test("the filename lists the initials before the chart id, without dots", () => 
 	expect(planFileName(makePlan(), TODAY)).toBe("plan-2026-07-28.json");
 });
 
+test("the filename strips dots and slashes and turns spaces into hyphens", () => {
+	expect(planFileName(makePlan({ initials: "J/D", chartId: "A\\1234" }), TODAY)).toBe(
+		"plan-JD-A1234-2026-07-28.json",
+	);
+	expect(planFileName(makePlan({ initials: "J D", chartId: "A  1234" }), TODAY)).toBe(
+		"plan-J-D-A-1234-2026-07-28.json",
+	);
+});
+
 test("the plan is written to the file the user picks", async () => {
 	const write = vi.fn();
 	const close = vi.fn();

@@ -151,7 +151,8 @@ test("exam referrals and diagnostic needs are stored under their own keys", () =
 	expand("Extraoral / intraoral exams");
 	expand("Other findings");
 
-	fireEvent.change(screen.getByLabelText("Need for referrals"), {
+	fireEvent.click(screen.getByRole("button", { name: "Add referral" }));
+	fireEvent.change(screen.getByPlaceholderText("referrals from the exams"), {
 		target: { value: "oral surgery" },
 	});
 	fireEvent.change(screen.getByLabelText("Diagnostic needs"), {
@@ -159,7 +160,7 @@ test("exam referrals and diagnostic needs are stored under their own keys", () =
 	});
 
 	expect(latest.objective).toEqual({
-		exams: { referrals: "oral surgery" },
+		exams: { referrals: ["oral surgery"] },
 		diagnostic: "pulp vitality test",
 	});
 });

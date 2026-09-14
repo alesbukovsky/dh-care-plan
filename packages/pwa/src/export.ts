@@ -5,7 +5,8 @@ import { saveFile } from "./files";
 export function planFileName(plan: Plan, today: Date, extension = "json"): string {
 	const slug = (value: string | undefined) =>
 		(value ?? "")
-			.replace(/\./g, "")
+			.replace(/[./\\]/g, "")
+			.replace(/\s+/g, "-")
 			.replace(/[^A-Za-z0-9]+/g, "-")
 			.replace(/^-|-$/g, "");
 	const date = today.toISOString().slice(0, 10);

@@ -25,12 +25,6 @@ function getMedicalFields(config: Config): FieldDefinition<Medical>[] {
 		},
 		{ key: "asa", label: "ASA class", placeholder: "e.g. II", width: "half" },
 		{ key: "allergies", label: "Allergies", placeholder: "allergen and reaction", multiline: true },
-		{
-			key: "referrals",
-			label: "Need for referrals",
-			placeholder: "medical referrals made",
-			multiline: true,
-		},
 	];
 }
 
@@ -44,12 +38,6 @@ const RESTORATIVE_FIELDS: FieldDefinition<Restorative>[] = [
 	},
 	{ key: "risk", label: "Caries risk", placeholder: "e.g. low", width: "half" },
 	{ key: "occlusion", label: "Occlusion", placeholder: "e.g. class I", width: "half" },
-	{
-		key: "referrals",
-		label: "Need for referrals",
-		placeholder: "restorative referrals made",
-		multiline: true,
-	},
 ];
 
 const PERIODONTAL_FIELDS: FieldDefinition<Periodontal>[] = [
@@ -63,12 +51,6 @@ const PERIODONTAL_FIELDS: FieldDefinition<Periodontal>[] = [
 	{ key: "debridement", label: "Debridement Skill", placeholder: "e.g. 2", width: "third" },
 	{ key: "gi", label: "Gingival index (GI)", placeholder: "e.g. 1.2", width: "third" },
 	{ key: "pi", label: "Plaque index (PI)", placeholder: "e.g. 1.8", width: "third" },
-	{
-		key: "referrals",
-		label: "Need for referrals",
-		placeholder: "periodontal referrals made",
-		multiline: true,
-	},
 ];
 
 interface ObjectiveSectionProps {
@@ -95,6 +77,15 @@ export default function ObjectiveSection({ objective, onChange, config }: Object
 					value={objective.medical}
 					onChange={(medical) => onChange({ ...objective, medical })}
 				/>
+				<StringListField
+					label="Need for referrals"
+					placeholder="medical referrals made"
+					addLabel="Add referral"
+					values={objective.medical?.referrals ?? []}
+					onChange={(referrals) =>
+						onChange({ ...objective, medical: { ...objective.medical, referrals } })
+					}
+				/>
 			</Subsection>
 
 			<Subsection title="Extraoral / intraoral exams">
@@ -107,11 +98,11 @@ export default function ObjectiveSection({ objective, onChange, config }: Object
 						onChange({ ...objective, exams: { ...objective.exams, findings: next } })
 					}
 				/>
-				<Field
+				<StringListField
 					label="Need for referrals"
 					placeholder="referrals from the exams"
-					multiline
-					value={objective.exams?.referrals}
+					addLabel="Add referral"
+					values={objective.exams?.referrals ?? []}
 					onChange={(referrals) =>
 						onChange({ ...objective, exams: { ...objective.exams, referrals } })
 					}
@@ -124,6 +115,15 @@ export default function ObjectiveSection({ objective, onChange, config }: Object
 					value={objective.restorative}
 					onChange={(restorative) => onChange({ ...objective, restorative })}
 				/>
+				<StringListField
+					label="Need for referrals"
+					placeholder="restorative referrals made"
+					addLabel="Add referral"
+					values={objective.restorative?.referrals ?? []}
+					onChange={(referrals) =>
+						onChange({ ...objective, restorative: { ...objective.restorative, referrals } })
+					}
+				/>
 			</Subsection>
 
 			<Subsection title="Periodontal assessment">
@@ -131,6 +131,15 @@ export default function ObjectiveSection({ objective, onChange, config }: Object
 					fields={PERIODONTAL_FIELDS}
 					value={objective.periodontal}
 					onChange={(periodontal) => onChange({ ...objective, periodontal })}
+				/>
+				<StringListField
+					label="Need for referrals"
+					placeholder="periodontal referrals made"
+					addLabel="Add referral"
+					values={objective.periodontal?.referrals ?? []}
+					onChange={(referrals) =>
+						onChange({ ...objective, periodontal: { ...objective.periodontal, referrals } })
+					}
 				/>
 			</Subsection>
 

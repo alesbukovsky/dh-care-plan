@@ -8,7 +8,7 @@ describe("DEFAULT_CONFIG", () => {
 	});
 
 	test("includes a format.bmi pattern", () => {
-		expect(DEFAULT_CONFIG.format.bmi).toBe("{value} {class}");
+		expect(DEFAULT_CONFIG.format.bmi).toBe("{value} - {class}");
 	});
 
 	test("parses via the Config schema", () => {

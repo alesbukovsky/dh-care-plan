@@ -19,7 +19,7 @@ beforeAll(async () => {
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
 				medical: { bmi: "22.4", allergies: "none", asa: "I" },
-				exams: { findings: ["no visible caries"], referrals: ["none"] },
+				exams: { findings: "no visible caries", referrals: ["none"] },
 			},
 			needs: [{ type: "maintenance", exists: false }],
 		}),

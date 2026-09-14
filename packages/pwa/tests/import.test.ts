@@ -113,10 +113,6 @@ test("wrong types name both what was expected and what the file has", async () =
 				message: "Expected text, but the file has a number (22.4).",
 			},
 			{
-				field: "Objective data → Exams → Findings",
-				message: 'Expected a list, but the file has text ("None").',
-			},
-			{
 				field: "Human needs #1 → Has the need",
 				message: 'Expected a true/false value, but the file has text ("yes").',
 			},
@@ -201,7 +197,7 @@ test("every kind of wrong value is named in plain language", async () => {
 			...VALID_PLAN,
 			patient: { initials: 12, dob: null, chartId: { id: "A1234" } },
 			subjective: { complaint: true },
-			objective: { medical: { bmi: [22.4] }, exams: { findings: long } },
+			objective: { medical: { bmi: [22.4] }, exams: { referrals: long } },
 		}),
 	);
 
@@ -225,7 +221,7 @@ test("every kind of wrong value is named in plain language", async () => {
 			message: "Expected text, but the file has a list.",
 		},
 		{
-			field: "Objective data → Exams → Findings",
+			field: "Objective data → Exams → Referrals",
 			message: `Expected a list, but the file has text ("${long.slice(0, 30)}…").`,
 		},
 	]);

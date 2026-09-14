@@ -88,8 +88,7 @@ test("objective groups, exam findings, and other findings are editable", () => {
 		target: { value: "none needed" },
 	});
 
-	fireEvent.click(screen.getByRole("button", { name: "Add finding" }));
-	fireEvent.change(required(screen.getAllByPlaceholderText("e.g. no visible lesions")[0]), {
+	fireEvent.change(screen.getByLabelText("Findings"), {
 		target: { value: "no visible caries" },
 	});
 
@@ -97,7 +96,7 @@ test("objective groups, exam findings, and other findings are editable", () => {
 		medical: { asa: "II" },
 		restorative: { risk: "low" },
 		periodontal: { gi: "1.2" },
-		exams: { findings: ["no visible caries"] },
+		exams: { findings: "no visible caries" },
 		radiographic: "none needed",
 	});
 });
@@ -120,27 +119,18 @@ test("the BMI calculator formats its result using config.format.bmi", () => {
 	expect(latest.objective.medical?.bmi).toBe("BMI 23.0 (normal)");
 });
 
-test("exam findings are edited and removed by position, and the last one drops the list", () => {
+test("exam findings are edited as free text and clearing it drops the field", () => {
 	render(<Harness />);
 	expand("Objective data");
 	expand("Extraoral / intraoral exams");
 
-	fireEvent.click(screen.getByRole("button", { name: "Add finding" }));
-	fireEvent.click(screen.getByRole("button", { name: "Add finding" }));
-	const findings = screen.getAllByPlaceholderText("e.g. no visible lesions");
-	fireEvent.change(required(findings[0]), { target: { value: "no visible lesions" } });
-	fireEvent.change(required(findings[1]), { target: { value: "tonsils within normal limits" } });
+	fireEvent.change(screen.getByLabelText("Findings"), {
+		target: { value: "no visible lesions" },
+	});
 
-	expect(latest.objective.exams?.findings).toEqual([
-		"no visible lesions",
-		"tonsils within normal limits",
-	]);
+	expect(latest.objective.exams?.findings).toBe("no visible lesions");
 
-	fireEvent.click(required(screen.getAllByRole("button", { name: "Remove findings entry" })[0]));
-
-	expect(latest.objective.exams?.findings).toEqual(["tonsils within normal limits"]);
-
-	fireEvent.click(screen.getByRole("button", { name: "Remove findings entry" }));
+	fireEvent.change(screen.getByLabelText("Findings"), { target: { value: "" } });
 
 	expect(latest.objective.exams?.findings).toBeUndefined();
 });

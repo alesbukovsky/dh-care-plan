@@ -84,6 +84,7 @@ test("the import button opens the file picker", () => {
 	const click = vi.spyOn(HTMLInputElement.prototype, "click").mockImplementation(() => {});
 
 	fireEvent.click(screen.getByRole("button", { name: "Import data" }));
+	fireEvent.click(screen.getByRole("button", { name: "Choose file" }));
 
 	expect(click).toHaveBeenCalled();
 	click.mockRestore();

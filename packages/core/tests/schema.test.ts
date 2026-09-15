@@ -8,6 +8,7 @@ import {
 	getTemplateSample,
 	getTemplateSchema,
 	Plan,
+	TEMPLATE_VERSION,
 	Template,
 } from "../src";
 import { SCHEMA_BASE_URI } from "../src/schema/common";
@@ -42,6 +43,7 @@ describe("getTemplateSchema", () => {
 describe("Template", () => {
 	test("assembles a basic structure from an empty object", () => {
 		expect(Template.parse({})).toEqual({
+			version: TEMPLATE_VERSION,
 			patient: {},
 			subjective: {},
 			objective: {},

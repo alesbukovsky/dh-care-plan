@@ -13,8 +13,7 @@ import {
 } from "./icons";
 
 const APP_VERSION = __APP_VERSION__;
-const GUIDE_URL =
-	"https://github.com/alesbukovsky/dh-care-plan/blob/main/docs/GUIDE.md";
+const GUIDE_URL = "https://github.com/alesbukovsky/dh-care-plan/blob/main/docs/GUIDE.md";
 
 interface CommandAction {
 	key: string;

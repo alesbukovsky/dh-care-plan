@@ -35,24 +35,56 @@ test("corrupt JSON is treated as no draft, and the bad entry is cleared", () => 
 	expect(localStorage.getItem(DRAFT_STORAGE_KEY)).toBeNull();
 });
 
-test("a draft that no longer matches the schema is treated as no draft, and cleared", () => {
+test("a draft that no longer matches the schema, even after migrating, is treated as no draft, and cleared", () => {
 	localStorage.setItem(
 		DRAFT_STORAGE_KEY,
-		JSON.stringify({ version: 1, plan: { needs: "not an array" }, config: DEFAULT_CONFIG }),
+		JSON.stringify({ plan: { needs: "not an array" }, config: DEFAULT_CONFIG }),
 	);
 
 	expect(loadDraft()).toBeNull();
 	expect(localStorage.getItem(DRAFT_STORAGE_KEY)).toBeNull();
 });
 
-test("a draft saved under an old version is treated as no draft, and cleared", () => {
+test("a plan saved under a version with no migration path is treated as no draft, and cleared", () => {
 	localStorage.setItem(
 		DRAFT_STORAGE_KEY,
-		JSON.stringify({ version: 0, plan: DEFAULT_PLAN, config: DEFAULT_CONFIG }),
+		JSON.stringify({
+			plan: { ...DEFAULT_PLAN, version: -1 },
+			config: DEFAULT_CONFIG,
+		}),
 	);
 
 	expect(loadDraft()).toBeNull();
 	expect(localStorage.getItem(DRAFT_STORAGE_KEY)).toBeNull();
+});
+
+test("a plan saved under a version newer than this build understands is treated as no draft, and cleared", () => {
+	localStorage.setItem(
+		DRAFT_STORAGE_KEY,
+		JSON.stringify({
+			plan: { ...DEFAULT_PLAN, version: 99 },
+			config: DEFAULT_CONFIG,
+		}),
+	);
+
+	expect(loadDraft()).toBeNull();
+	expect(localStorage.getItem(DRAFT_STORAGE_KEY)).toBeNull();
+});
+
+test("a plan with no version field at all is assumed to predate that field, and stamped with the current one", () => {
+	const { version, ...v1Plan } = {
+		...DEFAULT_PLAN,
+		objective: { exams: { findings: "no visible lesions" } },
+	};
+	localStorage.setItem(
+		DRAFT_STORAGE_KEY,
+		JSON.stringify({ plan: v1Plan, config: DEFAULT_CONFIG }),
+	);
+
+	expect(loadDraft()).toEqual({
+		plan: { ...DEFAULT_PLAN, objective: { exams: { findings: "no visible lesions" } } },
+		config: DEFAULT_CONFIG,
+	});
 });
 
 test("clearDraft removes any saved draft", () => {

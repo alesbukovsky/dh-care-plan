@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { SCHEMA_BASE_URI } from "./common";
 
+export const TEMPLATE_VERSION = 1;
+
 const registry = z.registry<{ id?: string }>();
 
 const Patient = z.object({
@@ -133,6 +135,7 @@ export const Appointment = z.object({
 registry.add(Appointment, { id: "Appointment" });
 
 export const Template = z.object({
+	version: z.number().int().default(TEMPLATE_VERSION),
 	patient: Patient.default(() => ({})),
 	visits: z.string().optional(),
 	subjective: Subjective.default(() => ({})),

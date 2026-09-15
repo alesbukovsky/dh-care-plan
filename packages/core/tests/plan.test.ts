@@ -1,5 +1,12 @@
 import { describe, expect, test } from "vitest";
-import { DEFAULT_PLAN, NEED_TYPES, Need, Plan } from "../src/schema/plan";
+import {
+	DEFAULT_PLAN,
+	migratePlan,
+	NEED_TYPES,
+	Need,
+	PLAN_VERSION,
+	Plan,
+} from "../src/schema/plan";
 
 const baseGoal = { task: "floss daily", outcome: { status: "unmet" as const } };
 
@@ -96,5 +103,27 @@ describe("Plan with the new Goal.doneBy shape", () => {
 		};
 
 		expect(() => Need.array().parse(plan.needs)).not.toThrow();
+	});
+});
+
+describe("migratePlan", () => {
+	test("data with no version field is assumed to be version 1, and stamped with the current version", () => {
+		const migrated = migratePlan({ objective: { exams: { findings: "no visible caries" } } });
+
+		expect(migrated).toEqual({
+			version: PLAN_VERSION,
+			data: {
+				version: PLAN_VERSION,
+				objective: { exams: { findings: "no visible caries" } },
+			},
+		});
+	});
+
+	test("data already at the current version passes through unchanged", () => {
+		expect(migratePlan(DEFAULT_PLAN)).toEqual({ version: PLAN_VERSION, data: DEFAULT_PLAN });
+	});
+
+	test("a version newer than this build understands returns null", () => {
+		expect(migratePlan({ ...DEFAULT_PLAN, version: PLAN_VERSION + 1 })).toBeNull();
 	});
 });

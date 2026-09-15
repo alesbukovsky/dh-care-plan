@@ -1,5 +1,8 @@
 import { z } from "zod";
+import { type Migrated, type Migration, migrate } from "../migration";
 import { SCHEMA_BASE_URI } from "./common";
+
+export const PLAN_VERSION = 1;
 
 const registry = z.registry<{ id?: string }>();
 
@@ -148,6 +151,7 @@ export const Appointment = z.object({
 registry.add(Appointment, { id: "Appointment" });
 
 export const Plan = z.object({
+	version: z.number().int().default(PLAN_VERSION),
 	study: z.string().optional(),
 	patient: Patient.default(() => ({})),
 	subjective: Subjective.default(() => ({})),
@@ -173,3 +177,9 @@ export function getPlanSchema(): object {
 }
 
 export const DEFAULT_PLAN: Plan = Plan.parse({});
+
+const migrations: Record<number, Migration> = {};
+
+export function migratePlan(data: unknown): Migrated | null {
+	return migrate(data, PLAN_VERSION, migrations);
+}

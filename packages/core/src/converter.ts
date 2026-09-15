@@ -1,5 +1,6 @@
 import { type Config, DEFAULT_CONFIG } from "./schema/config";
 import type { Plan } from "./schema/plan";
+import { TEMPLATE_VERSION } from "./schema/template";
 
 function orEmpty(value: string | undefined): string {
 	return value ?? "";
@@ -47,8 +48,6 @@ function goalDoneBy(
 }
 
 export function convertData(plan: Plan, config: Config = DEFAULT_CONFIG) {
-	// An unassessed need still lists in the justification/assessment tables, undecided, and
-	// carries no diagnosis statement (that requires exists to be explicitly true).
 	const justifications = plan.needs.map((need) => ({
 		need: config.mapping.need[need.type],
 		exists: existsLabel(need.exists, config),
@@ -136,6 +135,7 @@ export function convertData(plan: Plan, config: Config = DEFAULT_CONFIG) {
 		.join(config.delimiter.medical.diseases);
 
 	return {
+		version: TEMPLATE_VERSION,
 		patient: {
 			initials: orEmpty(plan.patient.initials),
 			chartId: orEmpty(plan.patient.chartId),

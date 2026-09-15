@@ -18,7 +18,11 @@ function formatDob(iso: string, config: Config): string | undefined {
 		.replace("{age}", String(age));
 }
 
-export default function DobCalculatorDialog({ config, onAccept, onCancel }: DobCalculatorDialogProps) {
+export default function DobCalculatorDialog({
+	config,
+	onAccept,
+	onCancel,
+}: DobCalculatorDialogProps) {
 	const [date, setDate] = useState("");
 	const cancelRef = useRef<HTMLButtonElement>(null);
 	const dateId = useId();

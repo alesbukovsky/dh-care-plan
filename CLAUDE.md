@@ -11,6 +11,8 @@
 - Always pin dependencies to an exact specific version to avoid supply chain attacks
 - Relative imports are extension-less, e.g. `./converter` not `./converter.js`
 - Core is runtime agnostic: no Node builtins, no DOM, no `fetch`
+- If changing core models ask for confirmation to bump the schema version. If confirmed, add respective migration 
+  function as needed.
  
 ## Tools
 

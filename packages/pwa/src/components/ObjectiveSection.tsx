@@ -24,7 +24,12 @@ function getMedicalFields(config: Config): FieldDefinition<Medical>[] {
 			),
 		},
 		{ key: "asa", label: "ASA class", placeholder: "e.g. II", width: "half" },
-		{ key: "allergies", label: "Allergies", placeholder: "allergen and reaction", multiline: true },
+		{
+			key: "allergies",
+			label: "Allergies",
+			placeholder: "allergen and reaction",
+			multiline: true,
+		},
 	];
 }
 
@@ -91,7 +96,9 @@ export default function ObjectiveSection({ objective, onChange, config }: Object
 					label="Findings"
 					placeholder="e.g. no visible lesions"
 					value={objective.exams?.findings}
-					onChange={(findings) => onChange({ ...objective, exams: { ...objective.exams, findings } })}
+					onChange={(findings) =>
+						onChange({ ...objective, exams: { ...objective.exams, findings } })
+					}
 					multiline
 				/>
 				<StringListField

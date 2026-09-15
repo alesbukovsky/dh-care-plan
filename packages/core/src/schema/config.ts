@@ -1,5 +1,8 @@
 import { z } from "zod";
+import { type Migrated, type Migration, migrate } from "../migration";
 import { SCHEMA_BASE_URI } from "./common";
+
+export const CONFIG_VERSION = 1;
 
 const registry = z.registry<{ id?: string }>();
 
@@ -63,6 +66,7 @@ const Mapping = z.object({
 });
 
 export const Config = z.object({
+	version: z.number().int().default(CONFIG_VERSION),
 	format: Format,
 	delimiter: Delimiter,
 	mapping: Mapping,
@@ -78,7 +82,7 @@ export function getConfigSchema(): object {
 	};
 }
 
-export const DEFAULT_CONFIG: Config = {
+export const DEFAULT_CONFIG: Config = Config.parse({
 	format: {
 		date: "MM/DD/YYYY",
 		goal: {
@@ -127,4 +131,10 @@ export const DEFAULT_CONFIG: Config = {
 			undefined: "",
 		},
 	},
-};
+});
+
+const migrations: Record<number, Migration> = {};
+
+export function migrateConfig(data: unknown): Migrated | null {
+	return migrate(data, CONFIG_VERSION, migrations);
+}

@@ -1,8 +1,9 @@
-import { DEFAULT_PLAN, NEED_TYPES, type Plan } from "@dh-care-plan/core";
+import { DEFAULT_PLAN, NEED_TYPES, PLAN_VERSION, type Plan } from "@dh-care-plan/core";
 import { expect, test } from "vitest";
 import { readPlanFile } from "../src/import";
 
 const VALID_PLAN: Plan = {
+	version: PLAN_VERSION,
 	patient: { initials: "J.D.", dob: "2001-04-17", chartId: "A1234" },
 	subjective: { complaint: "Sensitivity on the lower left" },
 	objective: { medical: { bmi: "22.4" } },
@@ -59,6 +60,7 @@ test("an empty plan is accepted so an unfilled DOCX can still be rendered", asyn
 	expect(result).toEqual({
 		ok: true,
 		plan: {
+			version: PLAN_VERSION,
 			patient: {},
 			subjective: {},
 			objective: {},
@@ -74,6 +76,7 @@ test("missing top-level sections are filled in rather than rejected", async () =
 	expect(result).toEqual({
 		ok: true,
 		plan: {
+			version: PLAN_VERSION,
 			patient: { initials: "JD" },
 			subjective: {},
 			objective: {},

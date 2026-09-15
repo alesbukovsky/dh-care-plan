@@ -42,9 +42,7 @@ function FormatSection({ value, onChange }: FormatSectionProps) {
 			<Field
 				label="Patient date of birth"
 				value={value.patient.dob}
-				onChange={(next) =>
-					onChange({ ...value, patient: { ...value.patient, dob: next ?? "" } })
-				}
+				onChange={(next) => onChange({ ...value, patient: { ...value.patient, dob: next ?? "" } })}
 			/>
 			<Field
 				label="Condition medication"

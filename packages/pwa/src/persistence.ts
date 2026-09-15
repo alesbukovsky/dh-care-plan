@@ -1,7 +1,6 @@
-import { Config, Plan } from "@dh-care-plan/core";
+import { Config, migrateConfig, migratePlan, Plan } from "@dh-care-plan/core";
 
 const DRAFT_STORAGE_KEY = "dh-care-plan:draft";
-const DRAFT_VERSION = 1;
 const PROBE_KEY = "dh-care-plan:storage-probe";
 
 export interface Draft {
@@ -10,14 +9,18 @@ export interface Draft {
 }
 
 interface StoredDraft {
-	version: number;
 	plan: unknown;
 	config: unknown;
 }
 
-/** Persists the current draft. Returns whether the write succeeded. */
+/**
+ * Persists the current draft. `plan`/`config` already carry their own
+ * `version` (defaulted in by `Plan.parse`/`Config.parse`), so the stored
+ * payload is self-describing with no extra envelope. Returns whether the
+ * write succeeded.
+ */
 export function saveDraft(plan: Plan, config: Config): boolean {
-	const payload: StoredDraft = { version: DRAFT_VERSION, plan, config };
+	const payload: StoredDraft = { plan, config };
 	try {
 		localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(payload));
 		return true;
@@ -28,8 +31,10 @@ export function saveDraft(plan: Plan, config: Config): boolean {
 
 /**
  * Restores the last saved draft, or `null` if there isn't one, it's
- * unreadable, or it no longer matches the current schema. A draft that
- * fails to restore is cleared so it doesn't keep failing on every load.
+ * unreadable, or it no longer matches the current schema (even after
+ * migrating — see `migratePlan`/`migrateConfig` in `@dh-care-plan/core`). A
+ * draft that fails to restore is cleared so it doesn't keep failing on
+ * every load.
  */
 export function loadDraft(): Draft | null {
 	let raw: string | null;
@@ -48,13 +53,22 @@ export function loadDraft(): Draft | null {
 		return null;
 	}
 
-	if (stored.version !== DRAFT_VERSION) {
+	let migratedPlan: ReturnType<typeof migratePlan>;
+	let migratedConfig: ReturnType<typeof migrateConfig>;
+	try {
+		migratedPlan = migratePlan(stored.plan);
+		migratedConfig = migrateConfig(stored.config);
+	} catch {
+		migratedPlan = null;
+		migratedConfig = null;
+	}
+	if (!migratedPlan || !migratedConfig) {
 		clearDraft();
 		return null;
 	}
 
-	const plan = Plan.safeParse(stored.plan);
-	const config = Config.safeParse(stored.config);
+	const plan = Plan.safeParse(migratedPlan.data);
+	const config = Config.safeParse(migratedConfig.data);
 	if (!plan.success || !config.success) {
 		clearDraft();
 		return null;

@@ -1,5 +1,11 @@
 import { DEFAULT_CONFIG, DEFAULT_PLAN } from "@dh-care-plan/core";
-import { type ChangeEvent, type MouseEvent as ReactMouseEvent, useEffect, useRef, useState } from "react";
+import {
+	type ChangeEvent,
+	type MouseEvent as ReactMouseEvent,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
 import CaseStudyPane from "./components/CaseStudyPane";
 import CommandBar from "./components/CommandBar";
 import ConfigDialog, { type ConfigImportFailure } from "./components/ConfigDialog";
@@ -59,9 +65,7 @@ export default function App() {
 
 		function handleMouseMove(moveEvent: globalThis.MouseEvent) {
 			const nextWidth = startWidth + (moveEvent.clientX - startX);
-			setCaseStudyWidth(
-				Math.min(CASE_STUDY_MAX_WIDTH, Math.max(CASE_STUDY_MIN_WIDTH, nextWidth)),
-			);
+			setCaseStudyWidth(Math.min(CASE_STUDY_MAX_WIDTH, Math.max(CASE_STUDY_MIN_WIDTH, nextWidth)));
 		}
 
 		function handleMouseUp() {

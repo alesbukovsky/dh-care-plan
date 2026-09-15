@@ -1,11 +1,12 @@
 import { convertData } from "./converter";
 import type { Config } from "./schema/config";
 import { DEFAULT_CONFIG } from "./schema/config";
-import type { Plan } from "./schema/plan";
+import { PLAN_VERSION, type Plan } from "./schema/plan";
 import type { Template } from "./schema/template";
 
 export function getPlanSample(): Plan {
 	return {
+		version: PLAN_VERSION,
 		study: "case study text",
 		patient: { initials: "J.D.", dob: "1990-01-01", chartId: "12345" },
 		subjective: {

@@ -1,11 +1,12 @@
 import { describe, expect, test } from "vitest";
 import { convertData, dateStr } from "../src/converter";
 import { DEFAULT_CONFIG } from "../src/schema/config";
-import { DEFAULT_PLAN, Need } from "../src/schema/plan";
+import { DEFAULT_PLAN, Need, PLAN_VERSION } from "../src/schema/plan";
 
 const PATIENT = { initials: "J.D.", dob: "1990-01-01", chartId: "12345" };
 
 const validPlan = {
+	version: PLAN_VERSION,
 	patient: PATIENT,
 	subjective: { complaint: "sensitive teeth" },
 	objective: {
@@ -83,6 +84,7 @@ describe("convertData", () => {
 
 	test("derives both justification.need and statement.need from config.mapping.need for the same need", () => {
 		const data = convertData({
+			version: PLAN_VERSION,
 			patient: PATIENT,
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
@@ -106,6 +108,7 @@ describe("convertData", () => {
 
 	test("gives an unmet need without goals an empty goals array", () => {
 		const data = convertData({
+			version: PLAN_VERSION,
 			patient: PATIENT,
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
@@ -128,6 +131,7 @@ describe("convertData", () => {
 
 	test("labels goals with <statement number><goal letter>, based on position among statements", () => {
 		const data = convertData({
+			version: PLAN_VERSION,
 			patient: PATIENT,
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
@@ -192,6 +196,7 @@ describe("convertData", () => {
 
 	test("defaults a missing relatedTo or evidencedBy to an empty string", () => {
 		const data = convertData({
+			version: PLAN_VERSION,
 			patient: PATIENT,
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
@@ -210,6 +215,7 @@ describe("convertData", () => {
 		expect(data.statements[0]).toMatchObject({ relatedTo: "", evidencedBy: "x-ray" });
 
 		const data2 = convertData({
+			version: PLAN_VERSION,
 			patient: PATIENT,
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
@@ -492,6 +498,7 @@ describe("convertData", () => {
 
 	function goalWithDoneBy(doneBy: { date?: string; relative?: string } | undefined) {
 		return convertData({
+			version: PLAN_VERSION,
 			patient: PATIENT,
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
@@ -538,6 +545,7 @@ describe("convertData", () => {
 	test("uses a custom config.format.goal.doneBy pattern when both are given", () => {
 		const data = convertData(
 			{
+				version: PLAN_VERSION,
 				patient: PATIENT,
 				subjective: { complaint: "sensitive teeth" },
 				objective: {
@@ -576,6 +584,7 @@ describe("convertData", () => {
 		expect(data.statements[0]?.goals[0]?.interventions).toEqual(["oral hygiene education"]);
 
 		const dataWithoutInterventions = convertData({
+			version: PLAN_VERSION,
 			patient: PATIENT,
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
@@ -598,6 +607,7 @@ describe("convertData", () => {
 
 	test("maps outcome status to a display label, one case per status", () => {
 		const met = convertData({
+			version: PLAN_VERSION,
 			patient: PATIENT,
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
@@ -618,6 +628,7 @@ describe("convertData", () => {
 		expect(met.statements[0]?.goals[0]?.outcome).toEqual({ label: "Met", note: "resolved" });
 
 		const partial = convertData({
+			version: PLAN_VERSION,
 			patient: PATIENT,
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
@@ -641,6 +652,7 @@ describe("convertData", () => {
 		});
 
 		const unmet = convertData({
+			version: PLAN_VERSION,
 			patient: PATIENT,
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
@@ -663,6 +675,7 @@ describe("convertData", () => {
 
 	test("labels a goal's outcome as undefined when no outcome is given", () => {
 		const data = convertData({
+			version: PLAN_VERSION,
 			patient: PATIENT,
 			subjective: { complaint: "sensitive teeth" },
 			objective: {
@@ -694,6 +707,7 @@ describe("convertData", () => {
 
 		const data = convertData(
 			{
+				version: PLAN_VERSION,
 				patient: PATIENT,
 				subjective: { complaint: "sensitive teeth" },
 				objective: {
@@ -722,6 +736,7 @@ describe("convertData", () => {
 
 	test("two goals on the same statement carry independent interventions and outcomes", () => {
 		const data = convertData({
+			version: PLAN_VERSION,
 			patient: PATIENT,
 			subjective: { complaint: "sensitive teeth" },
 			objective: {

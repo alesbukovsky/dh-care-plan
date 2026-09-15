@@ -83,6 +83,36 @@ Prerequisites: Node 24+, `pnpm` 12+
 
 Vitest is used for all unit tests, Vite for the PWA and `tsdown` for the core and CLI publishable packages.
 
+### Schema versioning
+
+Core models (`Plan`, `Config` and `Template`) are each stamped with their schema `version`. The tool supports automatic
+schema migration for plan and config data, templates are excluded (see [Gotchas](#gotchas) for details).
+
+Whenever a change to a model could make `safeParse` reject previously-saved data, bump the corresponding `*_VERSION` 
+and add a migration step into respective `migrations` dictionary. Without this, users may lose their data when a 
+schema breaking change is deployed. Note that the migration treat the data as `unknown` type, because at the time it
+is to clear it could be actually parsed into the current schema shape.
+
+The following example handles changing `findings` from an array in v1 to a single string in v2:
+
+```ts
+const migrations: Record<number, Migration> = {
+    // v1 -> v2
+    1: (data) => {
+        const plan = data as { objective?: { exams?: { findings?: unknown } } };
+        const findings = plan?.objective?.exams?.findings;
+        if (!Array.isArray(findings)) return plan;
+            return {
+                ...plan,
+                objective: {
+                    ...plan.objective,
+                    exams: { ...plan.objective?.exams, findings: findings.join("\n") },
+                },
+        };
+    },
+};
+```
+
 ### Gotchas
 
 - `pnpm-workspace.yaml` has to list `esbuild` and `workerd` under `allowBuilds`, because the tool blocks dependency 
@@ -100,7 +130,7 @@ Vitest is used for all unit tests, Vite for the PWA and `tsdown` for the core an
   error. Note that `pnpm run deploy` invokes the custom script. It could be a regression on the `pnpm` side as this 
   used to work. The Cloudflare deployment scripts are named `flare` to avoid this issue.
 
-## Notes
-
-- Age is not an editable field because it isn't actually used as a variable anywhere in the template. It's shown as 
-  a reference to help when writing the plan.
+- The template model carries a version but doesn't support migrations. The tool's primary use case, plan creation via 
+  the PWA interface, generates templates on the fly, so they always use the current schema version. This leaves the CLI 
+  as the only path that can receive an outdated template. In that case, parsing fails, and the user is expected to 
+  regenerate the template from the corresponding plan data.

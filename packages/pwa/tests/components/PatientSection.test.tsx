@@ -12,9 +12,7 @@ let latest: Patient;
 function Harness(props: { initial: Patient }) {
 	const [patient, setPatient] = useState<Patient>(props.initial);
 	latest = patient;
-	return (
-		<PatientSection patient={patient} onChangePatient={setPatient} config={DEFAULT_CONFIG} />
-	);
+	return <PatientSection patient={patient} onChangePatient={setPatient} config={DEFAULT_CONFIG} />;
 }
 
 const patient: Patient = { initials: "J.D.", chartId: "12345", dob: "1990-06-15" };

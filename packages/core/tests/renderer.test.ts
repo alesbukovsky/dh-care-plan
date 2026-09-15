@@ -4,6 +4,7 @@ import { parsePlan } from "../src/parser";
 import { createTemplater, describeTemplaterError, render } from "../src/renderer";
 import { DEFAULT_CONFIG } from "../src/schema/config";
 import type { Plan } from "../src/schema/plan";
+import { PLAN_VERSION } from "../src/schema/plan";
 import { buildDocx } from "./helpers/docx-fixture";
 
 function renderedText(doc: ReturnType<typeof createTemplater>): string {
@@ -13,6 +14,7 @@ function renderedText(doc: ReturnType<typeof createTemplater>): string {
 }
 
 const validPlan: Plan = {
+	version: PLAN_VERSION,
 	patient: { initials: "J.D.", dob: "1990-01-01", chartId: "12345" },
 	subjective: { complaint: "sensitive teeth" },
 	objective: {

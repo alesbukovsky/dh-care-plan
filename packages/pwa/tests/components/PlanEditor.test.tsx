@@ -1,4 +1,4 @@
-import { type Config, DEFAULT_CONFIG, type Plan } from "@dh-care-plan/core";
+import { type Config, DEFAULT_CONFIG, PLAN_VERSION, type Plan } from "@dh-care-plan/core";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { useState } from "react";
 import { afterEach, expect, test } from "vitest";
@@ -16,6 +16,7 @@ let latest: Plan;
 
 function Harness({ config = DEFAULT_CONFIG }: { config?: Config }) {
 	const [plan, setPlan] = useState<Plan>({
+		version: PLAN_VERSION,
 		patient: { initials: "", dob: "", chartId: "" },
 		subjective: {},
 		objective: {},

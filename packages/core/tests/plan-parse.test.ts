@@ -1,9 +1,10 @@
 import { describe, expect, test } from "vitest";
 import { parseConfig, parseJson, parsePlan } from "../src/parser";
 import { DEFAULT_CONFIG } from "../src/schema/config";
-import { NEED_TYPES, type Plan } from "../src/schema/plan";
+import { NEED_TYPES, PLAN_VERSION, type Plan } from "../src/schema/plan";
 
 const PLAN: Plan = {
+	version: PLAN_VERSION,
 	patient: { initials: "J.D.", dob: "2001-04-17", chartId: "A1234" },
 	subjective: { complaint: "Sensitivity" },
 	objective: {},
@@ -53,6 +54,7 @@ describe("parsePlan", () => {
 		expect(result).toEqual({
 			ok: true,
 			data: {
+				version: PLAN_VERSION,
 				patient: {},
 				subjective: {},
 				objective: {},

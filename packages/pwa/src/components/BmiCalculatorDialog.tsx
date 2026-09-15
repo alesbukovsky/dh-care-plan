@@ -24,12 +24,14 @@ function calculateBmi(weightLbs: number, feet: number, inches: number): number |
 }
 
 function formatBmi(bmi: number, config: Config): string {
-	return config.format.bmi
-		.replace("{value}", bmi.toFixed(1))
-		.replace("{class}", categorize(bmi));
+	return config.format.bmi.replace("{value}", bmi.toFixed(1)).replace("{class}", categorize(bmi));
 }
 
-export default function BmiCalculatorDialog({ config, onAccept, onCancel }: BmiCalculatorDialogProps) {
+export default function BmiCalculatorDialog({
+	config,
+	onAccept,
+	onCancel,
+}: BmiCalculatorDialogProps) {
 	const [weight, setWeight] = useState("");
 	const [feet, setFeet] = useState("");
 	const [inches, setInches] = useState("");

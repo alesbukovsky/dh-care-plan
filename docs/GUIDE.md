@@ -80,3 +80,9 @@ text used in the document for each need. Use it, if you want different wording o
 You can always revert back to the original original built-in configuration using **Reset to defaults**.
 
 As with the data, the configuration could be exported and imported using the button at the bottom of its dialog.
+
+## Application updates
+
+When a new version of the app is released, a banner appears on the top of the screen letting you know. You can click 
+**Refresh** right away or **Dismiss** and update later by reloading the page yourself. No data is ever lost, though if 
+the update includes changes to the plan structure, it's migrated automatically and may need a bit of manual touch-up.

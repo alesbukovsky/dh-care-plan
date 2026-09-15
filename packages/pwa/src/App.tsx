@@ -13,6 +13,7 @@ import ConfirmDialog from "./components/ConfirmDialog";
 import GenerateDialog from "./components/GenerateDialog";
 import ImportErrorDialog from "./components/ImportErrorDialog";
 import PlanEditor from "./components/PlanEditor";
+import UpdateToast from "./components/UpdateToast";
 import { exportPlan } from "./export";
 import {
 	downloadGeneratedPlan,
@@ -261,6 +262,8 @@ export default function App() {
 					onCancel={() => setConfiguring(false)}
 				/>
 			)}
+
+			<UpdateToast />
 		</main>
 	);
 }

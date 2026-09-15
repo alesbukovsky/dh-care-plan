@@ -76,6 +76,13 @@ version installed as a PWA dependency is executed, using the associated `wrangle
 - `wrangler.sh versions deploy`: promotes staged version to receive live traffic.
 - `wrangler.sh rollback`: rollbacks to previous live version.
 
+#### New version detection
+
+The PWA registers a service worker with `registerType: "prompt"`, so a new deploy is never applied silently. The tool
+polls `registration.update()` on an _hourly_ interval and also handles the browser's native update check on navigation
+and reload. When a new service worker is found waiting, a refresh banner is shown to the user. This means that a browser
+tab left open _won't show_ the banner immediately after a new version deployment.
+
 ### Toolchain
 
 Prerequisites: Node 24+, `pnpm` 12+

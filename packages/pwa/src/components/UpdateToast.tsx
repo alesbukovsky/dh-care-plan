@@ -1,11 +1,17 @@
 import { useRegisterSW } from "virtual:pwa-register/react";
 
-/** Prompts to reload once a new service worker is installed, instead of swapping it in silently. */
+const UPDATE_CHECK_INTERVAL_MS = 60 * 60 * 1000;
+
 export default function UpdateToast() {
 	const {
 		needRefresh: [needRefresh, setNeedRefresh],
 		updateServiceWorker,
-	} = useRegisterSW();
+	} = useRegisterSW({
+		onRegisteredSW(_url, registration) {
+			if (!registration) return;
+			setInterval(() => registration.update(), UPDATE_CHECK_INTERVAL_MS);
+		},
+	});
 
 	if (!needRefresh) return null;
 

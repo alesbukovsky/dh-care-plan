@@ -5,8 +5,8 @@
 		"build:core": "pnpm --filter @dh-care-plan/core run build",
 		"build:cli": "pnpm --filter \"@dh-care-plan/cli...\" run build",
 		"build:pwa": "pnpm --filter \"@dh-care-plan/pwa...\" run build",
-		"lint": "biome check --error-on-warnings .",
-		"lint:fix": "biome check --write --error-on-warnings .",
+		"lint": "biome check --error-on-warnings . && prettier --check \"**/*.md\" && markdownlint-cli2",
+		"lint:fix": "biome check --write --error-on-warnings . && prettier --write \"**/*.md\" && markdownlint-cli2 --fix",
 		"typecheck": "pnpm -r --stream --workspace-concurrency=1 run typecheck",
 		"test": "pnpm -r --stream --workspace-concurrency=1 run test",
 		"dev": "pnpm --filter @dh-care-plan/pwa run dev",
@@ -16,7 +16,9 @@
 		"flare:stage": "pnpm run test && pnpm run build:pwa && pnpm --filter @dh-care-plan/pwa run flare:stage"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.5.5"
+		"@biomejs/biome": "2.5.5",
+		"markdownlint-cli2": "0.23.2",
+		"prettier": "3.9.6"
 	},
 	"peerDependencies": {
 		"typescript": "^5"

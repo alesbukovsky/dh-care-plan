@@ -1,12 +1,12 @@
 # Dental Hygiene Care Plan Builder
 
-A set of tools that simplify the creation of a dental hygiene care plan. Users enter data through an intuitive 
+A set of tools that simplify the creation of a dental hygiene care plan. Users enter data through an intuitive
 interface, and the tool uses a Word (`.docx`) template to generate the final document.
 
-Progressive web app ([PWA](https://en.wikipedia.org/wiki/Progressive_web_app)) is available here: 
-https://dhplan.alesb.workers.dev/
+Progressive web app ([PWA](https://en.wikipedia.org/wiki/Progressive_web_app)) is available here:
+<https://dhplan.alesb.workers.dev/>
 
-This app runs entirely locally in the browser, no data is ever sent anywhere. That said, it is not technically HIPAA 
+This app runs entirely locally in the browser, no data is ever sent anywhere. That said, it is not technically HIPAA
 compliant, so it is intended primarily for student practice rather than real patient data.
 
 ## Usage
@@ -20,10 +20,10 @@ compliant, so it is intended primarily for student practice rather than real pat
 
 The app strives to be browser-agnostic, but a few quirks depend on your browser and its settings:
 
-- **File exports**: you may be prompted to choose a save location, or the file may go straight to a configured downloads 
+- **File exports**: you may be prompted to choose a save location, or the file may go straight to a configured downloads
   folder.
 - **PWA installation**: support varies by browser. For example, Brave may not show an install icon in the address bar (
-  there is a toggle for this in the toolbar's appearance configuration), but the app can still be installed via the 
+  there is a toggle for this in the toolbar's appearance configuration), but the app can still be installed via the
   browser's "_Save and Share_" menu.
 
 ## Development
@@ -31,7 +31,7 @@ The app strives to be browser-agnostic, but a few quirks depend on your browser 
 The project consists of the following parts:
 
 - `packages/core`: shared library with common logic
-- `packages/cli`: command-line interface (CLI) 
+- `packages/cli`: command-line interface (CLI)
 - `packages/pwa`: progressive web application (PWA)
 
 ### Getting started
@@ -46,7 +46,7 @@ pnpm dev
 
 If you editor complains about unresolved imports from `@dh-care-plan/core`, build it explicitly via `pnpm build:core`.
 
-If you want the `dhplan` CLI command sim-linked on your PATH: 
+If you want the `dhplan` CLI command sim-linked on your PATH:
 
 ```sh
 pnpm setup
@@ -55,23 +55,22 @@ pnpm link:cli
 
 ### Icons
 
-Source images are kept in `packages/pwa/src/assets` folder in SVG format. These are used to generate the following PWA 
+Source images are kept in `packages/pwa/src/assets` folder in SVG format. These are used to generate the following PWA
 icons in the `packages/pwa/src/public` folder:
 
 - `favicon.ico` (contains 16x16, 32x32 and 48x48)
 - `icon-192.png` and `icon-maskable-192.png`
 - `icon-512.png` and `icon-maskable-512.png`
 
-
 ### PWA Deployment
 
-Uses Cloudflare Worker with static assets. Create `.cf` file in the project root and export your `CLOUDFLARE_API_TOKEN` 
+Uses Cloudflare Worker with static assets. Create `.cf` file in the project root and export your `CLOUDFLARE_API_TOKEN`
 within.
 
 - `pnpm flare`: uploads to live URL, and immediately routes traffic.
 - `pnpm flare:stage`: stages a version for preview, no traffic yet.
 
-The `wrangler.sh` script is a wrapper around the Cloudflare CLI tool. It sources the `.cf` file and ensures that the 
+The `wrangler.sh` script is a wrapper around the Cloudflare CLI tool. It sources the `.cf` file and ensures that the
 version installed as a PWA dependency is executed, using the associated `wrangler.jsonc` configuration. For example:
 
 - `wrangler.sh versions deploy`: promotes staged version to receive live traffic.
@@ -88,49 +87,48 @@ Vitest is used for all unit tests, Vite for the PWA and `tsdown` for the core an
 Core models (`Plan`, `Config` and `Template`) are each stamped with their schema `version`. The tool supports automatic
 schema migration for plan and config data, templates are excluded (see [Gotchas](#gotchas) for details).
 
-Whenever a change to a model could make `safeParse` reject previously-saved data, bump the corresponding `*_VERSION` 
-and add a migration step into respective `migrations` dictionary. Without this, users may lose their data when a 
-schema breaking change is deployed. Note that the migration treat the data as `unknown` type, because at the time it
-is to clear it could be actually parsed into the current schema shape.
+Whenever a change to a model could make `safeParse` reject previously-saved data, bump the corresponding `*_VERSION` and
+add a migration step into respective `migrations` dictionary. Without this, users may lose their data when a schema
+breaking change is deployed. Note that the migration treat the data as `unknown` type, because at the time it is to
+clear it could be actually parsed into the current schema shape.
 
 The following example handles changing `findings` from an array in v1 to a single string in v2:
 
 ```ts
 const migrations: Record<number, Migration> = {
-    // v1 -> v2
-    1: (data) => {
-        const plan = data as { objective?: { exams?: { findings?: unknown } } };
-        const findings = plan?.objective?.exams?.findings;
-        if (!Array.isArray(findings)) return plan;
-            return {
-                ...plan,
-                objective: {
-                    ...plan.objective,
-                    exams: { ...plan.objective?.exams, findings: findings.join("\n") },
-                },
-        };
-    },
+  // v1 -> v2
+  1: (data) => {
+    const plan = data as { objective?: { exams?: { findings?: unknown } } };
+    const findings = plan?.objective?.exams?.findings;
+    if (!Array.isArray(findings)) return plan;
+    return {
+      ...plan,
+      objective: {
+        ...plan.objective,
+        exams: { ...plan.objective?.exams, findings: findings.join("\n") },
+      },
+    };
+  },
 };
 ```
 
 ### Gotchas
 
-- `pnpm-workspace.yaml` has to list `esbuild` and `workerd` under `allowBuilds`, because the tool blocks dependency 
-  lifecycle scripts by default (needed here to install platform-specific binary). Without it Vite and `wrangler` 
-  fail at run time, not at install time. Rolldown ships its binary as an optional platform dependency and needs no 
-  entry here.
+- `pnpm-workspace.yaml` has to list `esbuild` and `workerd` under `allowBuilds`, because the tool blocks dependency
+  lifecycle scripts by default (needed here to install platform-specific binary). Without it Vite and `wrangler` fail at
+  run time, not at install time. Rolldown ships its binary as an optional platform dependency and needs no entry here.
 
-- Extensionless relative imports work because a bundler-style resolver always sits in front of the source, `tsdown` 
-  for core and CLI, Vite for the PWA and for Vitest, so no hand-written specifier ever reaches Node's ESM resolver. 
-  This is a style preference, not a constraint. For example, `./converter.js` resolves in both a bundler and Node, 
-  so the explicit form is a strict superset. It is kept because `.js` inside a `.ts` file reads wrong.
+- Extensionless relative imports work because a bundler-style resolver always sits in front of the source, `tsdown` for
+  core and CLI, Vite for the PWA and for Vitest, so no hand-written specifier ever reaches Node's ESM resolver. This is
+  a style preference, not a constraint. For example, `./converter.js` resolves in both a bundler and Node, so the
+  explicit form is a strict superset. It is kept because `.js` inside a `.ts` file reads wrong.
 
 - Despite the documentation stating the [opposite](https://pnpm.io/scripts#built-in-command-and-script-name-conflicts),
   `pnpm 12.3.4` ignores custom `deploy` script, runs built-in instead and fails with `ERR_PNPM_CANNOT_DEPLOY_MANY`
-  error. Note that `pnpm run deploy` invokes the custom script. It could be a regression on the `pnpm` side as this 
-  used to work. The Cloudflare deployment scripts are named `flare` to avoid this issue.
+  error. Note that `pnpm run deploy` invokes the custom script. It could be a regression on the `pnpm` side as this used
+  to work. The Cloudflare deployment scripts are named `flare` to avoid this issue.
 
-- The template model carries a version but doesn't support migrations. The tool's primary use case, plan creation via 
-  the PWA interface, generates templates on the fly, so they always use the current schema version. This leaves the CLI 
-  as the only path that can receive an outdated template. In that case, parsing fails, and the user is expected to 
+- The template model carries a version but doesn't support migrations. The tool's primary use case, plan creation via
+  the PWA interface, generates templates on the fly, so they always use the current schema version. This leaves the CLI
+  as the only path that can receive an outdated template. In that case, parsing fails, and the user is expected to
   regenerate the template from the corresponding plan data.

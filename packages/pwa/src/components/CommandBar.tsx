@@ -19,15 +19,16 @@ interface CommandAction {
 	key: string;
 	label: string;
 	Icon: ComponentType<SVGProps<SVGSVGElement>>;
+	iconClassName: string;
 	disabled?: boolean;
 }
 
 const ACTIONS: CommandAction[] = [
-	{ key: "new", label: "New plan", Icon: NewDocumentIcon },
-	{ key: "import", label: "Import data", Icon: UploadIcon },
-	{ key: "export", label: "Export data", Icon: DownloadIcon },
-	{ key: "generate", label: "Generate plan", Icon: DocumentIcon },
-	{ key: "configure", label: "Configure", Icon: SettingsIcon },
+	{ key: "new", label: "New plan", Icon: NewDocumentIcon, iconClassName: "h-5 w-5" },
+	{ key: "import", label: "Import data", Icon: UploadIcon, iconClassName: "h-5 w-5" },
+	{ key: "export", label: "Export data", Icon: DownloadIcon, iconClassName: "h-5 w-5" },
+	{ key: "generate", label: "Generate plan", Icon: DocumentIcon, iconClassName: "h-5 w-5" },
+	{ key: "configure", label: "Configure", Icon: SettingsIcon, iconClassName: "h-4 w-4" },
 ];
 
 interface CommandBarProps {
@@ -82,7 +83,7 @@ export default function CommandBar({
 			</div>
 
 			<div className="flex flex-1 flex-col gap-1 p-2">
-				{ACTIONS.map(({ key, label, Icon, disabled }) => (
+				{ACTIONS.map(({ key, label, Icon, iconClassName, disabled }) => (
 					<button
 						key={key}
 						type="button"
@@ -95,7 +96,9 @@ export default function CommandBar({
 								: "text-[#CFE3DC] hover:bg-white/10 hover:text-[#EFEFE9]"
 						} ${collapsed ? "justify-center" : ""}`}
 					>
-						<Icon />
+						<span className="flex h-5 w-5 shrink-0 items-center justify-center">
+							<Icon className={iconClassName} />
+						</span>
 						{!collapsed && <span>{label}</span>}
 					</button>
 				))}
@@ -111,7 +114,9 @@ export default function CommandBar({
 						collapsed ? "justify-center" : ""
 					}`}
 				>
-					<HelpIcon />
+					<span className="flex h-5 w-5 shrink-0 items-center justify-center">
+						<HelpIcon className="h-5 w-5" />
+					</span>
 					{!collapsed && <span>Help</span>}
 				</a>
 			</div>

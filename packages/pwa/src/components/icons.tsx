@@ -110,8 +110,9 @@ export function CloudOffIcon(props: SVGProps<SVGSVGElement>) {
 export function EraserIcon(props: SVGProps<SVGSVGElement>) {
 	return (
 		<Icon {...props}>
-			<path d="m16 5 3 3-9.5 9.5H6V14Z" />
-			<path d="M9 20h9" />
+			<path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21" />
+			<path d="M22 21H7" />
+			<path d="m5 11 9 9" />
 		</Icon>
 	);
 }

@@ -1,6 +1,7 @@
 # User Guide
 
-A web app for building a dental hygiene care plan in an intuitive way and generating it into a Word document.
+A web app for building a dental hygiene care plan (as described by Darby and Walsh in _Dental Hygiene: Theory and
+Practice_) in an intuitive way and generating it into a Word document.
 
 ## Layout
 

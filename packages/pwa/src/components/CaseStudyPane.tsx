@@ -90,7 +90,7 @@ export default function CaseStudyPane({ value, onChange, width }: CaseStudyPaneP
 				))}
 				<button
 					type="button"
-					title="Clear selected highlight"
+					title="Clear highlight"
 					onMouseDown={handleHighlight(null)}
 					className="ml-1 rounded p-1 text-[#7C8B86] hover:bg-[#EAE5D8] hover:text-[#B85C2E]"
 				>

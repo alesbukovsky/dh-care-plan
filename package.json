@@ -16,7 +16,7 @@
 		"flare:stage": "pnpm run test && pnpm run build:pwa && pnpm --filter @dh-care-plan/pwa run flare:stage"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.5.5",
+		"@biomejs/biome": "2.5.13",
 		"markdownlint-cli2": "0.23.2",
 		"prettier": "3.9.6"
 	},

@@ -12,9 +12,9 @@ The app is a single screen with three panes:
 
 ## Case study
 
-Paste the patient case text into the case study pane. Highlight parts of it as you work, if needed. It stays pinned on
-screen as you scroll and expand sections on the plan side, so you can keep referring back to it while filling out needs,
-goals, assessments etc.
+Paste the patient case text into the case study pane. Highlight parts of it as you work, if needed (highlight eraser is
+also available). It stays pinned on screen as you scroll and expand sections on the plan side, so you can keep referring
+back to it while filling out needs, goals, assessments etc.
 
 ## Filling out the plan
 

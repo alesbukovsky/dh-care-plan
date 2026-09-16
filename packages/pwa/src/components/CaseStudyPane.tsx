@@ -85,7 +85,7 @@ export default function CaseStudyPane({ value, onChange, width }: CaseStudyPaneP
 						type="button"
 						title={`Highlight ${color.label.toLowerCase()}`}
 						onMouseDown={handleHighlight(color.className)}
-						className={`h-5 w-5 rounded-full border border-black/10 ${color.className}`}
+						className={`h-5 w-5 rounded-md border border-black/10 ${color.className}`}
 					/>
 				))}
 				<button

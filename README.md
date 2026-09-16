@@ -1,7 +1,8 @@
 # Dental Hygiene Care Plan Builder
 
-A set of tools that simplify the creation of a dental hygiene care plan. Users enter data through an intuitive
-interface, and the tool uses a Word (`.docx`) template to generate the final document.
+A set of tools that simplify the creation of a dental hygiene care plan (as described by Darby and Walsh in _Dental
+Hygiene: Theory and Practice_). Users enter data through an intuitive interface, and the tool uses a Word (`.docx`)
+template to generate the final document.
 
 Progressive web app ([PWA](https://en.wikipedia.org/wiki/Progressive_web_app)) is available here:
 <https://dhplan.alesb.workers.dev/>
@@ -138,4 +139,4 @@ const migrations: Record<number, Migration> = {
 - The template model carries a version but doesn't support migrations. The tool's primary use case, plan creation via
   the PWA interface, generates templates on the fly, so they always use the current schema version. This leaves the CLI
   as the only path that can receive an outdated template. In that case, parsing fails, and the user is expected to
-  regenerate the template from the corresponding plan data.
+  regenerate the template from the corresponding plan data. Also, schema migrations are not supported via the CLI.

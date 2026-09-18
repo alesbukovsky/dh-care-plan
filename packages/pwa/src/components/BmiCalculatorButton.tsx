@@ -1,7 +1,7 @@
 import type { Config } from "@dh-care-plan/core";
+import { CalculatorIcon } from "@phosphor-icons/react";
 import { useState } from "react";
 import BmiCalculatorDialog from "./BmiCalculatorDialog";
-import { CalculatorIcon } from "./icons";
 
 interface BmiCalculatorButtonProps {
 	config: Config;

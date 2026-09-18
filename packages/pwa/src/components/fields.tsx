@@ -1,6 +1,6 @@
+import { PlusIcon, TrashIcon } from "@phosphor-icons/react";
 import type { ReactNode } from "react";
 import { useId } from "react";
-import { PlusIcon, TrashIcon } from "./icons";
 
 export const inputClass =
 	"rounded-md border border-[#B9C3BD] bg-white px-2 py-1 text-sm text-[#1E2B27] outline-none focus:border-[#7C8B86]";

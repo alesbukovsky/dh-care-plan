@@ -1,8 +1,8 @@
 import type { Need } from "@dh-care-plan/core";
+import { PlusIcon, TrashIcon, WarningCircleIcon } from "@phosphor-icons/react";
 import { useState } from "react";
 import type { NeedDefinition } from "../needs";
 import { inputClass } from "./fields";
-import { ExclamationIcon, PlusIcon, TrashIcon } from "./icons";
 
 interface NeedCardProps {
 	definition: NeedDefinition;
@@ -170,7 +170,7 @@ export default function NeedCard({
 											className="absolute inset-y-0 right-2 flex items-center text-[#C19C98]"
 											title={priorityError}
 										>
-											<ExclamationIcon className="h-[18px] w-[18px]" strokeWidth={2} />
+											<WarningCircleIcon className="h-[18px] w-[18px]" weight="bold" />
 										</span>
 									)}
 								</div>

@@ -1,6 +1,6 @@
 import type { Plan } from "@dh-care-plan/core";
+import { PlusIcon, TrashIcon } from "@phosphor-icons/react";
 import { type FieldDefinition, FieldGroup, inputClass } from "./fields";
-import { PlusIcon, TrashIcon } from "./icons";
 import Section from "./Section";
 
 type Condition = Plan["conditions"][number];

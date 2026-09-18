@@ -1,7 +1,7 @@
 import type { Config } from "@dh-care-plan/core";
+import { CalendarBlankIcon } from "@phosphor-icons/react";
 import { useState } from "react";
 import DobCalculatorDialog from "./DobCalculatorDialog";
-import { CalendarIcon } from "./icons";
 
 interface DobCalculatorButtonProps {
 	config: Config;
@@ -19,7 +19,7 @@ export default function DobCalculatorButton({ config, onAccept }: DobCalculatorB
 				onClick={() => setOpen(true)}
 				className="shrink-0 rounded p-1 text-[#7C8B86] hover:bg-[#F0F0EC] hover:text-[#2F6F62]"
 			>
-				<CalendarIcon className="h-5 w-5" />
+				<CalendarBlankIcon className="h-5 w-5" />
 			</button>
 			{open && (
 				<DobCalculatorDialog

@@ -1,7 +1,7 @@
 import type { Config, Plan } from "@dh-care-plan/core";
+import { PlusIcon, TrashIcon } from "@phosphor-icons/react";
 import BmiCalculatorButton from "./BmiCalculatorButton";
 import { Field, type FieldDefinition, FieldGroup, inputClass, StringListField } from "./fields";
-import { PlusIcon, TrashIcon } from "./icons";
 import Section from "./Section";
 import Subsection from "./Subsection";
 

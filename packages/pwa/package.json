@@ -1,6 +1,6 @@
 {
 	"name": "@dh-care-plan/pwa",
-	"version": "0.5.3",
+	"version": "0.5.4",
 	"module": "src/main.tsx",
 	"type": "module",
 	"private": true,
@@ -33,7 +33,8 @@
 		"typescript": "^5"
 	},
 	"dependencies": {
-		"@dh-care-plan/core": "workspace:0.5.3",
+		"@dh-care-plan/core": "workspace:0.5.4",
+		"@phosphor-icons/react": "2.1.10",
 		"react": "19.3.0",
 		"react-dom": "19.3.0",
 		"workbox-window": "7.4.1"

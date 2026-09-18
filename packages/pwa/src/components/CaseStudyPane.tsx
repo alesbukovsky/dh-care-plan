@@ -1,6 +1,7 @@
+import { EraserIcon } from "@phosphor-icons/react";
 import {
 	type ClipboardEvent,
-	type FormEvent,
+	type InputEvent,
 	type KeyboardEvent,
 	type MouseEvent,
 	useEffect,
@@ -13,7 +14,6 @@ import {
 	insertPlainText,
 	sanitizeHtml,
 } from "../highlight";
-import { EraserIcon } from "./icons";
 
 interface CaseStudyPaneProps {
 	value: string;
@@ -40,7 +40,7 @@ export default function CaseStudyPane({ value, onChange, width }: CaseStudyPaneP
 		onChange(clean);
 	}
 
-	function handleInput(event: FormEvent<HTMLDivElement>) {
+	function handleInput(event: InputEvent<HTMLDivElement>) {
 		commit(event.currentTarget);
 	}
 

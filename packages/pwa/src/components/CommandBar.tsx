@@ -1,16 +1,16 @@
-import type { ComponentType, SVGProps } from "react";
+import type { Icon as PhosphorIcon } from "@phosphor-icons/react";
 import {
-	ChevronLeftIcon,
-	ChevronRightIcon,
-	CloudIcon,
-	CloudOffIcon,
-	DocumentIcon,
+	CaretLeftIcon,
+	CaretRightIcon,
+	CloudArrowUpIcon,
+	CloudSlashIcon,
 	DownloadIcon,
-	HelpIcon,
-	NewDocumentIcon,
-	SettingsIcon,
+	FileIcon,
+	FilePlusIcon,
+	GearIcon,
+	QuestionIcon,
 	UploadIcon,
-} from "./icons";
+} from "@phosphor-icons/react";
 
 const APP_VERSION = __APP_VERSION__;
 const GUIDE_URL = "https://github.com/alesbukovsky/dh-care-plan/blob/main/docs/GUIDE.md";
@@ -18,17 +18,17 @@ const GUIDE_URL = "https://github.com/alesbukovsky/dh-care-plan/blob/main/docs/G
 interface CommandAction {
 	key: string;
 	label: string;
-	Icon: ComponentType<SVGProps<SVGSVGElement>>;
+	Icon: PhosphorIcon;
 	iconClassName: string;
 	disabled?: boolean;
 }
 
 const ACTIONS: CommandAction[] = [
-	{ key: "new", label: "New plan", Icon: NewDocumentIcon, iconClassName: "h-5 w-5" },
-	{ key: "import", label: "Import data", Icon: UploadIcon, iconClassName: "h-5 w-5" },
-	{ key: "export", label: "Export data", Icon: DownloadIcon, iconClassName: "h-5 w-5" },
-	{ key: "generate", label: "Generate plan", Icon: DocumentIcon, iconClassName: "h-5 w-5" },
-	{ key: "configure", label: "Configure", Icon: SettingsIcon, iconClassName: "h-4 w-4" },
+	{ key: "new", label: "New plan", Icon: FilePlusIcon, iconClassName: "h-4 w-4" },
+	{ key: "import", label: "Import data", Icon: UploadIcon, iconClassName: "h-4 w-4" },
+	{ key: "export", label: "Export data", Icon: DownloadIcon, iconClassName: "h-4 w-4" },
+	{ key: "generate", label: "Generate plan", Icon: FileIcon, iconClassName: "h-4 w-4" },
+	{ key: "configure", label: "Configure", Icon: GearIcon, iconClassName: "h-4 w-4" },
 ];
 
 interface CommandBarProps {
@@ -78,7 +78,7 @@ export default function CommandBar({
 					onClick={onToggleCollapsed}
 					className="rounded p-1 text-[#9FC3B7] hover:bg-white/10 hover:text-[#EFEFE9]"
 				>
-					{collapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+					{collapsed ? <CaretRightIcon /> : <CaretLeftIcon />}
 				</button>
 			</div>
 
@@ -115,7 +115,7 @@ export default function CommandBar({
 					}`}
 				>
 					<span className="flex h-5 w-5 shrink-0 items-center justify-center">
-						<HelpIcon className="h-5 w-5" />
+						<QuestionIcon className="h-4 w-4" />
 					</span>
 					{!collapsed && <span>Help</span>}
 				</a>
@@ -132,9 +132,9 @@ export default function CommandBar({
 						}
 					>
 						{autosaveAvailable ? (
-							<CloudIcon className="h-4 w-4" />
+							<CloudArrowUpIcon className="h-4 w-4" />
 						) : (
-							<CloudOffIcon className="h-4 w-4 text-amber-400" />
+							<CloudSlashIcon className="h-4 w-4 text-amber-400" />
 						)}
 					</span>
 				</div>

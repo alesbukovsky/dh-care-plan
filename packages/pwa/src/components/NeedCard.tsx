@@ -293,11 +293,11 @@ function GoalsEditor({ need, onChange }: GoalsEditorProps) {
 										<div
 											// biome-ignore lint/suspicious/noArrayIndexKey: interventions have no stable id in the schema
 											key={`intervention-${interventionIndex}`}
-											className="flex items-center gap-2"
+											className="flex items-start gap-2"
 										>
-											<input
-												type="text"
-												className={`flex-1 ${inputClass}`}
+											<textarea
+												className={`flex-1 resize-y ${inputClass}`}
+												rows={2}
 												placeholder="e.g. provide oral hygiene instruction"
 												value={intervention}
 												onChange={(e) =>
@@ -316,7 +316,7 @@ function GoalsEditor({ need, onChange }: GoalsEditorProps) {
 														interventions: interventions.filter((_, i) => i !== interventionIndex),
 													})
 												}
-												className="rounded p-1 text-[#7C8B86] hover:bg-[#F0F0EC] hover:text-[#B85C2E]"
+												className="mt-1 rounded p-1 text-[#7C8B86] hover:bg-[#F0F0EC] hover:text-[#B85C2E]"
 											>
 												<TrashIcon />
 											</button>

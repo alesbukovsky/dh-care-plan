@@ -87,3 +87,5 @@ As with the data, the configuration could be exported and imported using the but
 When a new version of the app is released, a banner appears on the top of the screen letting you know. You can click
 **Refresh** right away or **Dismiss** and update later by reloading the page yourself. No data is ever lost, though if
 the update includes changes to the plan structure, it's migrated automatically and may need a bit of manual touch-up.
+
+See the [changelog](./CHANGELOG.md) for user-facing changes in each application version.

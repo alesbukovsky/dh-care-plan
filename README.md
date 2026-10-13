@@ -16,6 +16,7 @@ compliant, so it is intended primarily for student practice rather than real pat
 - [Template reference](docs/TEMPLATE.md)
 - [Sample Word template](docs/sample-template.docx)
 - [CLI reference](docs/CLI.md)
+- [Changelog](docs/CHANGELOG.md) (user related changes only)
 
 ## Browser Support
 

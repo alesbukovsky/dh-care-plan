@@ -183,7 +183,7 @@ importers:
   packages/cli:
     dependencies:
       '@dh-care-plan/core':
-        specifier: workspace:0.5.5
+        specifier: workspace:0.6.0
         version: link:../core
       commander:
         specifier: 15.0.0
@@ -245,7 +245,7 @@ importers:
   packages/pwa:
     dependencies:
       '@dh-care-plan/core':
-        specifier: workspace:0.5.5
+        specifier: workspace:0.6.0
         version: link:../core
       '@phosphor-icons/react':
         specifier: 2.1.10

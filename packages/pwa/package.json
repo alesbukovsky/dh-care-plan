@@ -33,7 +33,7 @@
 		"typescript": "^5"
 	},
 	"dependencies": {
-		"@dh-care-plan/core": "workspace:0.5.5",
+		"@dh-care-plan/core": "workspace:0.6.0",
 		"@phosphor-icons/react": "2.1.10",
 		"react": "19.3.0",
 		"react-dom": "19.3.0",

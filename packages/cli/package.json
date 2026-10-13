@@ -20,7 +20,7 @@
 		"test": "pnpm run build && pnpm run typecheck && vitest run --coverage"
 	},
 	"dependencies": {
-		"@dh-care-plan/core": "workspace:0.5.5",
+		"@dh-care-plan/core": "workspace:0.6.0",
 		"commander": "15.0.0"
 	},
 	"devDependencies": {

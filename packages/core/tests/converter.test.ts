@@ -54,6 +54,69 @@ describe("dateStr", () => {
 });
 
 describe("convertData", () => {
+	describe("statement ordering by priority", () => {
+		const plan = (needs: Need[]) => ({ ...validPlan, needs });
+		const labels = (data: ReturnType<typeof convertData>) => data.statements.map((s) => s.need);
+		const N = DEFAULT_CONFIG.mapping.need;
+		const needs: Need[] = [
+			{ type: "image", exists: true },
+			{ type: "peace", exists: true, priority: "3" },
+			{ type: "integrity", exists: true, priority: "1" },
+			{ type: "health", exists: true, priority: "text" },
+			{ type: "comfort", exists: true, priority: "2" },
+			{ type: "dentition", exists: false, priority: "1" },
+		] as Need[];
+
+		test("sorts statements by ascending priority, unprioritized last in original order", () => {
+			const data = convertData(plan(needs));
+
+			expect(labels(data)).toEqual([N.integrity, N.comfort, N.peace, N.image, N.health]);
+			expect(data.statements.map((s) => s.label)).toEqual(["1", "2", "3", "4", "5"]);
+		});
+
+		test("goal labels follow the sorted statement numbers", () => {
+			const data = convertData(
+				plan([
+					{ type: "image", exists: true, priority: "2", goals: [{ task: "a" }] },
+					{ type: "peace", exists: true, priority: "1", goals: [{ task: "b" }] },
+				] as Need[]),
+			);
+
+			expect(data.statements.map((s) => [s.need, s.goals[0]?.label])).toEqual([
+				[N.peace, "1a"],
+				[N.image, "2a"],
+			]);
+		});
+
+		test("equal priorities keep their original order", () => {
+			const data = convertData(
+				plan([
+					{ type: "image", exists: true, priority: "1" },
+					{ type: "peace", exists: true, priority: "1" },
+				] as Need[]),
+			);
+
+			expect(labels(data)).toEqual([N.image, N.peace]);
+		});
+
+		test("justifications and assessments stay in the original order", () => {
+			const data = convertData(plan(needs));
+			const original = needs.map((need) => N[need.type]);
+
+			expect(data.justifications.map((j) => j.need)).toEqual(original);
+			expect(data.assessments.map((a) => a.need)).toEqual(original);
+		});
+
+		test("keeps the original order when config.sort.statements is off", () => {
+			const data = convertData(plan(needs), {
+				...DEFAULT_CONFIG,
+				sort: { statements: false },
+			});
+
+			expect(labels(data)).toEqual([N.image, N.peace, N.integrity, N.health, N.comfort]);
+		});
+	});
+
 	test("maps every need to a justification, preserving order", () => {
 		const data = convertData(validPlan);
 

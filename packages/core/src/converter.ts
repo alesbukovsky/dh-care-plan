@@ -1,5 +1,5 @@
 import { type Config, DEFAULT_CONFIG } from "./schema/config";
-import type { Plan } from "./schema/plan";
+import type { Need, Plan } from "./schema/plan";
 import { TEMPLATE_VERSION } from "./schema/template";
 
 function orEmpty(value: string | undefined): string {
@@ -47,6 +47,22 @@ function goalDoneBy(
 	return undefined;
 }
 
+function priorityRank(need: Need): number {
+	const text = need.priority?.trim();
+	if (!text) return Number.POSITIVE_INFINITY;
+	const value = Number(text);
+	return Number.isFinite(value) ? value : Number.POSITIVE_INFINITY;
+}
+
+function byPriority(needs: Need[]): Need[] {
+	return needs.toSorted((a, b) => {
+		const rankA = priorityRank(a);
+		const rankB = priorityRank(b);
+		if (rankA === rankB) return 0;
+		return rankA < rankB ? -1 : 1;
+	});
+}
+
 export function convertData(plan: Plan, config: Config = DEFAULT_CONFIG) {
 	const justifications = plan.needs.map((need) => ({
 		need: config.mapping.need[need.type],
@@ -63,8 +79,9 @@ export function convertData(plan: Plan, config: Config = DEFAULT_CONFIG) {
 	}));
 
 	const existingNeeds = plan.needs.filter((need) => need.exists === true);
+	const statementNeeds = config.sort.statements ? byPriority(existingNeeds) : existingNeeds;
 
-	const statements = existingNeeds.map((need, needInx) => {
+	const statements = statementNeeds.map((need, needInx) => {
 		const statementNo = needInx + 1;
 		return {
 			label: String(statementNo),

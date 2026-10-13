@@ -159,3 +159,23 @@ test("importing an invalid config file reports the failure and leaves the draft 
 	);
 	expect(screen.getByLabelText("Date")).toHaveValue(DEFAULT_CONFIG.format.date);
 });
+
+test("the statement sorting option is on by default and saved when toggled", () => {
+	const onSave = vi.fn();
+	render(
+		<ConfigDialog
+			config={DEFAULT_CONFIG}
+			onImportFailure={vi.fn()}
+			onSave={onSave}
+			onCancel={vi.fn()}
+		/>,
+	);
+
+	const checkbox = screen.getByRole("checkbox", { name: "Sort statements by need priority" });
+	expect(checkbox).toBeChecked();
+
+	fireEvent.click(checkbox);
+	fireEvent.click(screen.getByRole("button", { name: "Save" }));
+
+	expect(onSave).toHaveBeenCalledWith({ ...DEFAULT_CONFIG, sort: { statements: false } });
+});

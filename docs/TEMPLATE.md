@@ -137,7 +137,7 @@ actual value you can print. The rest really only exists for data organization pu
 | `assessments.exists`                  | text       | Whether the need exists                                     |
 | `assessments.relatedTo`               | text       | Related to                                                  |
 | `assessments.evidencedBy`             | text       | Evidenced by                                                |
-| `statements`                          | list       | Care plan statements                                        |
+| `statements`                          | list       | Care plan statements, sorted by priority.                   |
 | `statements.label`                    | text       | Statement label                                             |
 | `statements.need`                     | text       | Identified need                                             |
 | `statements.exists`                   | text       | Whether the need exists                                     |

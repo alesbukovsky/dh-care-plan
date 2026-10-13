@@ -19,6 +19,8 @@ const FIELD_LABELS: Record<string, string> = {
 	format: "Format",
 	goal: "Goal",
 	mapping: "Mapping",
+	sort: "Sorting",
+	statements: "Statements",
 	need: "Need labels",
 	outcome: "Outcome labels",
 	visits: "Visits",

@@ -3,6 +3,10 @@
 This document captures only changes affecting user experience and tool usage. It does not list versions that carry only
 internal changes.
 
+## 0.6.0 (2026-10-13)
+
+- Human need statements in the template are sorted by priority (lowest number first, controlled via configuration).
+
 ## 0.5.5 (2026-10-09)
 
 - Goal intervention field changed to a resizable multi-line text area.

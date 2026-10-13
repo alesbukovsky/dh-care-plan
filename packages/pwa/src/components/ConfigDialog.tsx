@@ -93,6 +93,24 @@ function DelimiterSection({ value, onChange }: DelimiterSectionProps) {
 	);
 }
 
+interface SortSectionProps {
+	value: Config["sort"];
+	onChange: (next: Config["sort"]) => void;
+}
+
+function SortSection({ value, onChange }: SortSectionProps) {
+	return (
+		<label className="flex items-center gap-2 text-sm text-[#1E2B27]">
+			<input
+				type="checkbox"
+				checked={value.statements}
+				onChange={(event) => onChange({ ...value, statements: event.target.checked })}
+			/>
+			Sort statements by need priority
+		</label>
+	);
+}
+
 interface NeedSectionProps {
 	value: Config["mapping"]["need"];
 	onChange: (next: Config["mapping"]["need"]) => void;
@@ -259,6 +277,13 @@ export default function ConfigDialog({
 							value={draft.delimiter}
 							onChange={(delimiter) => setDraft({ ...draft, delimiter })}
 						/>
+					</section>
+
+					<section className="rounded-md border border-[#D8DED9] bg-white p-3">
+						<h3 className="mb-2 font-mono text-xs font-bold uppercase tracking-wide text-[#4B5B55]">
+							Sorting
+						</h3>
+						<SortSection value={draft.sort} onChange={(sort) => setDraft({ ...draft, sort })} />
 					</section>
 
 					<section className="rounded-md border border-[#D8DED9] bg-white p-3">

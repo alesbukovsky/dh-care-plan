@@ -78,6 +78,10 @@ export it before closing the tab.
 **Configure** in the command bar opens the formatting and labels used for plan generation, e.g date/time formats or the
 text used in the document for each need. Use it, if you want different wording or formats in your plan document.
 
+By default, human need statements are listed by need priority, lowest number first. Needs without a numeric priority
+follow, in their original order. Untick **Sort statements by need priority** to keep the original order. Justifications
+and assessments are never reordered.
+
 You can always revert back to the original original built-in configuration using **Reset to defaults**.
 
 As with the data, the configuration could be exported and imported using the button at the bottom of its dialog.

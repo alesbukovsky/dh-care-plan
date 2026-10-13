@@ -2,7 +2,7 @@ import { z } from "zod";
 import { type Migrated, type Migration, migrate } from "../migration";
 import { SCHEMA_BASE_URI } from "./common";
 
-export const CONFIG_VERSION = 1;
+export const CONFIG_VERSION = 2;
 
 const registry = z.registry<{ id?: string }>();
 
@@ -59,6 +59,10 @@ const Delimiter = z.object({
 	}),
 });
 
+const Sort = z.object({
+	statements: z.boolean(),
+});
+
 const Mapping = z.object({
 	need: Need,
 	outcome: Outcome,
@@ -69,6 +73,7 @@ export const Config = z.object({
 	version: z.number().int().default(CONFIG_VERSION),
 	format: Format,
 	delimiter: Delimiter,
+	sort: Sort,
 	mapping: Mapping,
 });
 
@@ -107,6 +112,9 @@ export const DEFAULT_CONFIG: Config = Config.parse({
 			medications: ", ",
 		},
 	},
+	sort: {
+		statements: true,
+	},
 	mapping: {
 		need: {
 			image: "Wholesome facial image",
@@ -133,7 +141,12 @@ export const DEFAULT_CONFIG: Config = Config.parse({
 	},
 });
 
-const migrations: Record<number, Migration> = {};
+const migrations: Record<number, Migration> = {
+	1: (data) => {
+		if (typeof data !== "object" || data === null) return data;
+		return { sort: { statements: true }, ...data };
+	},
+};
 
 export function migrateConfig(data: unknown): Migrated | null {
 	return migrate(data, CONFIG_VERSION, migrations);

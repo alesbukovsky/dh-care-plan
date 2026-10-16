@@ -288,6 +288,9 @@ function GoalsEditor({ need, onChange }: GoalsEditorProps) {
 								<p className="mb-1.5 font-mono text-xs uppercase tracking-wide text-[#7C8B86]">
 									Interventions
 								</p>
+								{interventions.length > 0 && (
+									<p className="mb-1.5 font-serif italic text-[#4B5B55]">The hygienist will</p>
+								)}
 								<div className="space-y-2">
 									{interventions.map((intervention, interventionIndex) => (
 										<div
